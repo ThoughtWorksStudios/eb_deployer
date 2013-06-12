@@ -2,11 +2,14 @@
 require File.expand_path('../lib/eb_deployer/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["tworker"]
-  gem.email         = ["tworker@thoughtworks.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.authors       = ["wpc", "betarelease"]
+  gem.email         = ["alex.hal9000@gmail.com", "sudhindra.r.rao@gmail.com"]
+  gem.description   = %q{Elastic Beanstalk Deployer with different deployment strategies.}
+  gem.summary       = %q{Pick strategies like InplaceUpdate, Blue/Green.}
   gem.homepage      = ""
+
+  gem.add_runtime_dependency 'aws-sdk'
+  gem.add_development_dependency 'minitest'
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
