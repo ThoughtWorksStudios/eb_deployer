@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["alex.hal9000@gmail.com", "sudhindra.r.rao@gmail.com"]
   gem.description   = %q{Elastic Beanstalk Deployer with different deployment strategies.}
   gem.summary       = %q{Pick strategies like InplaceUpdate, Blue/Green.}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/ThoughtWorksStudios/eb_deployer"
 
   gem.add_runtime_dependency 'aws-sdk'
   gem.add_development_dependency 'minitest'
