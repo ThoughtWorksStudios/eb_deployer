@@ -26,8 +26,14 @@ module EbDeployer
 
     def upload_if_not_exists(file, bucket_name)
       if @s3.object_length(@bucket_name, s3_path) != File.size(file)
+        log("start uploading to s3 bucket #{@bucket_name}...")
         @s3.upload_file(@bucket_name, s3_path, file)
+        log("uploading finished")
       end
+    end
+
+    def log(message)
+      puts "[#{Time.now.utc}][package:#{File.basename(@file)}] #{message}"
     end
   end
 end
