@@ -11,6 +11,7 @@ require 'set'
 require 'time'
 require 'json'
 require 'timeout'
+require 'aws-sdk'
 
 module EbDeployer
   def self.deploy(opts)
