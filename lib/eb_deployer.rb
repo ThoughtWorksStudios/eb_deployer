@@ -6,6 +6,7 @@ require "eb_deployer/environment"
 require "eb_deployer/event_poller"
 require "eb_deployer/package"
 require 'eb_deployer/s3_driver'
+require 'eb_deployer/cloud_formation_driver'
 require 'digest'
 require 'set'
 require 'time'
@@ -21,8 +22,9 @@ module EbDeployer
     end
     app = opts[:application]
     env_name = opts[:environment]
-    cf = CloudFormationProvisioner.new("#{app}-#{env_name}")
-    cf.output(key)
+    cf = opts[:cf_driver] || CloudFormationDriver.new
+    provisioner = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
+    provisioner.output(key)
   end
 
   def self.deploy(opts)
@@ -33,6 +35,7 @@ module EbDeployer
 
     bs = opts[:bs_driver] || Beanstalk.new
     s3 = opts[:s3_driver] || S3Driver.new
+    cf = opts[:cf_driver] || CloudFormationDriver.new
     stack_name = opts[:solution_stack_name] || "64bit Amazon Linux running Tomcat 7"
     app = opts[:application]
     env_name = opts[:environment]
@@ -44,7 +47,7 @@ module EbDeployer
     smoke_test = opts[:smoke_test] || Proc.new {}
 
     package = Package.new(opts[:package], app + "-packages", s3)
-    cf = CloudFormationProvisioner.new("#{app}-#{env_name}")
+    cf = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
     strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs,
                                          :solution_stack => stack_name,
                                          :cname_prefix => cname_prefix,

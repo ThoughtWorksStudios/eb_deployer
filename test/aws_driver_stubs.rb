@@ -64,6 +64,10 @@ class EBStub
     @envs[env_key(app_name, env_name)][:version]
   end
 
+  def environment_settings(app_name, env_name)
+    @envs[env_key(app_name, env_name)][:settings]
+  end
+
   private
   def env_key(app, name)
     [app, name].join("-")
@@ -90,5 +94,32 @@ class S3Stub
 
   def upload_file(bucket_name, obj_name, file)
     @buckets[bucket_name][obj_name] = file
+  end
+end
+
+class CFStub
+  def initialize
+    @stacks = {}
+  end
+
+  def create_stack(name, template, opts)
+    @stacks[name] = {:template => template, :opts => opts }
+  end
+
+  def update_stack(name, template, opts)
+    @stacks[name] = @stacks[name].merge(:template => template, opts => opts)
+  end
+
+  def stack_status(name)
+    @stacks[name] && :update_complete
+  end
+
+  def stack_exists?(name)
+    @stacks.has_key?(name)
+  end
+
+  def query_output(name, key)
+    raise AWS::CloudFormation::Errors::ValidationError.new unless stack_exists?(name)
+    "value of #{key}"
   end
 end
