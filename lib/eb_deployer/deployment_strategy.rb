@@ -26,7 +26,7 @@ module EbDeployer
 
       def deploy(version_label, env_settings)
         if !envs.any?(&method(:active_env?))
-          env('blue', @major_cname_prefix).
+          env('a', @major_cname_prefix).
             deploy(version_label, env_settings)
           return
         end
@@ -44,11 +44,11 @@ module EbDeployer
       end
 
       def envs
-        [env('blue'), env('green')]
+        [env('a'), env('b')]
       end
 
-      def env(color, cname_prefix=nil)
-        Environment.new(@app, @env_name + '-' + color, @eb_driver,
+      def env(suffix, cname_prefix=nil)
+        Environment.new(@app, @env_name + '-' + suffix, @eb_driver,
                         :solution_stack => @solution_stack,
                         :cname_prefix => cname_prefix || inactive_cname_prefix,
                         :smoke_test => @smoke_test)

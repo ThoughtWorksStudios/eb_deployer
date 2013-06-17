@@ -6,6 +6,7 @@ class EBStub
 
   def create_environment(app, env, solution_stack, cname_prefix, version, settings)
     raise 'cname prefix is not avaible' if @envs.values.detect { |env| env[:cname_prefix] == cname_prefix }
+    raise "env name #{env} is longer than 23 chars" if env.size > 23
     @envs[env_key(app, env)] = {
       :solution_stack => solution_stack,
       :version => version,

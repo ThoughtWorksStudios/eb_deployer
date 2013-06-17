@@ -1,9 +1,16 @@
 module EbDeployer
   class Environment
     attr_reader :app, :name
+
+    def self.unique_ebenv_name(app_name, env_name)
+      raise "Environment name #{env_name} is too long, it must be under 15 chars" if env_name.size > 15
+      digest = Digest::SHA1.hexdigest(app_name + '-' + env_name)[0..6]
+      "#{env_name}-#{digest}"
+    end
+
     def initialize(app, env_name, eb_driver, creation_opts={})
       @app = app
-      @name = @app + '-' + env_name
+      @name = self.class.unique_ebenv_name(app, env_name)
       @bs = eb_driver
       @creation_opts = creation_opts
       @poller = EventPoller.new(@app, @name, @bs)
@@ -29,6 +36,14 @@ module EbDeployer
     end
 
     private
+
+
+    def shorten(str, max_length, digest_length=5)
+      raise "max length (#{max_length}) should be larger than digest_length (#{digest_length})" if max_length < digest_length
+      return self if str.size <= max_length
+      sha1 = Digest::SHA1.hexdigest(str)
+      sha1[0..(digest_length - 1)] + str[(max_length - digest_length - 1)..-1]
+    end
 
     def create_or_update_env(version_label, settings)
       if @bs.environment_exists?(@app, @name)
