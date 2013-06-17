@@ -17,6 +17,11 @@ module EbDeployer
       transform_output_to_settings(transforms)
     end
 
+    def output(key)
+      stack.outputs.find { |o| o.key == key }.try(:value)
+    end
+
+
     private
 
     def update_stack(template, params)
@@ -55,9 +60,6 @@ module EbDeployer
       end while !SUCCESS_STATS.include?(stats)
     end
 
-    def output(key)
-      stack.outputs.find { |o| o.key == key }.try(:value)
-    end
 
     def extract_params
       Hash[ENV.map {|k, v| k =~ /^AWSRESOURCES_(.*)/ ? [$1, v] : nil }.compact]
