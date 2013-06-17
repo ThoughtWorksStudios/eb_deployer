@@ -6,12 +6,12 @@ module EbDeployer
     end
 
     def create_stack(name, template, opts)
-      cloud_formation.stacks.create(name, tempalte, opts)
+      cloud_formation.stacks.create(name, template, opts)
     end
 
-    def update_stack(name, tempalte, opts)
+    def update_stack(name, template, opts)
       begin
-        stack(name).update(opts.merge(:tempalte => template))
+        stack(name).update(opts.merge(:template => template))
       rescue AWS::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
           log(e.message)
