@@ -19,9 +19,9 @@ class DeployTest < Minitest::Test
 
 
   def test_first_deployment_create_environment
-    assert !@eb_driver.environment_exists?('simple', 'production')
+    assert !@eb_driver.environment_exists?('simple', 'simple-production')
     deploy(:application => 'simple', :environment => "production")
-    assert @eb_driver.environment_exists?('simple', 'production')
+    assert @eb_driver.environment_exists?('simple', 'simple-production')
   end
 
 
@@ -29,20 +29,20 @@ class DeployTest < Minitest::Test
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 1)
-    assert_equal '1', @eb_driver.environment_verion_label('simple', 'production')
+    assert_equal '1', @eb_driver.environment_verion_label('simple', 'simple-production')
 
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 2)
 
-    assert_equal '2', @eb_driver.environment_verion_label('simple', 'production')
+    assert_equal '2', @eb_driver.environment_verion_label('simple', 'simple-production')
   end
 
   def test_default_cname_that_deployed_should_app_env_name
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 42)
-    assert_equal "simple-production", @eb_driver.environment_cname_prefix('simple', 'production')
+    assert_equal "simple-production", @eb_driver.environment_cname_prefix('simple', 'simple-production')
   end
 
   def test_cname_prefix_can_be_override
@@ -50,7 +50,7 @@ class DeployTest < Minitest::Test
            :environment => "production",
            :cname_prefix => 'sports123',
            :version_label => 42)
-    assert_equal "sports123", @eb_driver.environment_cname_prefix('simple', 'production')
+    assert_equal "sports123", @eb_driver.environment_cname_prefix('simple', 'simple-production')
   end
 
 
@@ -81,8 +81,8 @@ class DeployTest < Minitest::Test
            :strategy => 'blue_green',
            :version_label => 42)
 
-    assert @eb_driver.environment_exists?('simple', 'production-blue')
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-blue')
+    assert @eb_driver.environment_exists?('simple', 'simple-production-blue')
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'simple-production-blue')
   end
 
 
@@ -97,8 +97,8 @@ class DeployTest < Minitest::Test
            :strategy => 'blue_green',
            :version_label => 43)
 
-    assert @eb_driver.environment_exists?('simple', 'production-blue')
-    assert @eb_driver.environment_exists?('simple', 'production-green')
+    assert @eb_driver.environment_exists?('simple', 'simple-production-blue')
+    assert @eb_driver.environment_exists?('simple', 'simple-production-green')
   end
 
 
@@ -113,9 +113,9 @@ class DeployTest < Minitest::Test
            :strategy => 'blue_green',
            :version_label => 43)
 
-    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'production-blue'))
+    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'simple-production-blue'))
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-green')
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'simple-production-green')
 
 
     deploy(:application => 'simple',
@@ -123,9 +123,9 @@ class DeployTest < Minitest::Test
            :strategy => 'blue_green',
            :version_label => 44)
 
-    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'production-green'))
+    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'simple-production-green'))
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-blue')
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'simple-production-blue')
   end
 
 

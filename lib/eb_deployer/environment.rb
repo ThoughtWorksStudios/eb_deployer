@@ -3,7 +3,7 @@ module EbDeployer
     attr_reader :app, :name
     def initialize(app, env_name, eb_driver, creation_opts={})
       @app = app
-      @name = env_name
+      @name = @app + '-' + env_name
       @bs = eb_driver
       @creation_opts = creation_opts
       @poller = EventPoller.new(@app, @name, @bs)
