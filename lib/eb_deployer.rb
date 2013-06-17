@@ -14,6 +14,17 @@ require 'timeout'
 require 'aws-sdk'
 
 module EbDeployer
+  def self.query_resource_output(key, opts)
+    # AWS.config(:logger => Logger.new($stdout))
+    if region = opts[:region]
+      AWS.config(:region => region)
+    end
+    app = opts[:application]
+    env_name = opts[:environment]
+    cf = CloudFormationProvisioner.new("#{app}-#{env_name}")
+    cf.output(key)
+  end
+
   def self.deploy(opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
