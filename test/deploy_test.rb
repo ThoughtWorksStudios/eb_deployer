@@ -12,6 +12,12 @@ class DeployTest < Minitest::Test
     File.open(@sample_package, 'w') { |f| f << 's' * 100 }
   end
 
+  def test_first_deplyment_create_eb_application
+    assert !@eb_driver.application_exists?('simple')
+    deploy(:application => 'simple', :environment => "production")
+    assert @eb_driver.application_exists?('simple')
+  end
+
   def test_first_deployment_create_environment
     assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
     deploy(:application => 'simple', :environment => "production")

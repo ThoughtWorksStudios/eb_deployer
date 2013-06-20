@@ -2,6 +2,7 @@ require "eb_deployer/version"
 require "eb_deployer/deployment_strategy"
 require "eb_deployer/beanstalk"
 require "eb_deployer/cloud_formation_provisioner"
+require 'eb_deployer/application'
 require "eb_deployer/environment"
 require "eb_deployer/event_poller"
 require "eb_deployer/package"
@@ -46,8 +47,10 @@ module EbDeployer
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
 
-    package = Package.new(opts[:package], app + "-packages", s3)
+    application = Application.new(app, bs, s3)
+
     cf = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
+
     strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs,
                                          :solution_stack => stack_name,
                                          :cname_prefix => cname_prefix,
@@ -57,12 +60,7 @@ module EbDeployer
       env_settings += cf.provision(resources)
     end
 
-    package.upload
-
-    unless bs.application_version_labels.include?(version_label)
-      bs.create_application_version(app, version_label, package.source_bundle)
-    end
-
+    application.create_version(version_label, opts[:package])
     strategy.deploy(version_label, env_settings)
   end
 

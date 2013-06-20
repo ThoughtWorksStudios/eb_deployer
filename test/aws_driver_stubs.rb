@@ -1,7 +1,17 @@
 class EBStub
   def initialize
+    @apps = []
     @envs = {}
     @versions = {}
+  end
+
+  def create_application(app)
+    raise 'already exists' if application_exists?(app)
+    @apps << app
+  end
+
+  def application_exists?(app)
+    @apps.include?(app)
   end
 
   def create_environment(app, env, solution_stack, cname_prefix, version, settings)
