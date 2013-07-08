@@ -117,7 +117,7 @@ class CFStub
   end
 
   def update_stack(name, template, opts)
-    @stacks[name] = @stacks[name].merge(:template => template, opts => opts)
+    @stacks[name] = @stacks[name].merge(:template => template, :opts => opts)
   end
 
   def stack_status(name)
@@ -131,5 +131,9 @@ class CFStub
   def query_output(name, key)
     raise AWS::CloudFormation::Errors::ValidationError.new unless stack_exists?(name)
     "value of #{key}"
+  end
+
+  def stack_config(name)
+    @stacks[name][:opts]
   end
 end

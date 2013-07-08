@@ -15,8 +15,9 @@ module EbDeployer
       params = extract_params
       template = File.read(resources[:template])
       transforms = resources[:transforms]
+      capabilities = resources[:capabilities] || []
 
-      stack_exists? ? update_stack(template, params) : create_stack(template, params)
+      stack_exists? ? update_stack(template, params, capabilities) : create_stack(template, params, capabilities)
       wait_for_stack_op_terminate
       transform_output_to_settings(transforms)
     end
@@ -29,8 +30,9 @@ module EbDeployer
 
     private
 
-    def update_stack(template, params)
+    def update_stack(template, params, capabilities)
       @cf_driver.update_stack(@stack_name, template,
+                              :capabilities => capabilities,
                               :parameters => params)
     end
 
@@ -38,9 +40,10 @@ module EbDeployer
       @cf_driver.stack_exists?(@stack_name)
     end
 
-    def create_stack(template, params)
+    def create_stack(template, params, capabilities)
       @cf_driver.create_stack(@stack_name, template,
                               :disable_rollback => true,
+                              :capabilities => capabilities,
                               :parameters => params)
     end
 

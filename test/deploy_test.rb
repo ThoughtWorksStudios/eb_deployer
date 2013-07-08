@@ -1,3 +1,4 @@
+$:.unshift(File.expand_path("../../lib", __FILE__))
 require 'tempfile'
 require 'eb_deployer'
 require 'aws_driver_stubs'
@@ -161,13 +162,14 @@ class DeployTest < Minitest::Test
     assert @cf_driver.stack_exists?('simple-production')
   end
 
-  def test_transforms_resource_provsion_output_to_elastic_beanstalk_settings
+  def test_provision_resources_with_capacities
     cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}}}))
     deploy(:application => 'simple', :environment => "production",
            :resources => {
-             :template => cf_template
+             :template => cf_template,
+             :capabilities => ['CAPABILITY_IAM']
            })
-    assert @cf_driver.stack_exists?('simple-production')
+    assert_equal ['CAPABILITY_IAM'],  @cf_driver.stack_config('simple-production')[:capabilities]
   end
 
   def test_transforms_resource_provsion_output_to_elastic_beanstalk_settings
