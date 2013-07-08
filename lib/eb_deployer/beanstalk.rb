@@ -10,7 +10,7 @@ module EbDeployer
     end
 
     def application_exists?(app)
-      @client.describe_applications(:application_name => app)[:applications].any?
+      @client.describe_applications(:application_names => [app])[:applications].any?
     end
 
     def update_environment(app_name, env_name, version, settings)
