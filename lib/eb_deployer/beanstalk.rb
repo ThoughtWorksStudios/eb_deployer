@@ -5,6 +5,14 @@ module EbDeployer
       @client = client
     end
 
+    def create_application(app)
+      @client.create_application(:application_name => app)
+    end
+
+    def application_exists?(app)
+      @client.describe_applications(:application_name => app)[:applications].any?
+    end
+
     def update_environment(app_name, env_name, version, settings)
       env_id = convert_env_name_to_id(app_name, [env_name]).first
       @client.update_environment(:environment_id => env_id,
