@@ -172,6 +172,17 @@ class DeployTest < Minitest::Test
     assert_equal ['CAPABILITY_IAM'],  @cf_driver.stack_config('simple-production')[:capabilities]
   end
 
+  def test_provision_resources_with_parameters
+    cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}}}))
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+             :template => cf_template,
+             :parameters => {'a' => 1}
+           })
+    assert_equal({'a' => 1 },  @cf_driver.stack_config('simple-production')[:parameters])
+  end
+
+
   def test_transforms_resource_provsion_output_to_elastic_beanstalk_settings
     cf_template = temp_file(JSON.dump({
                                         'Resources' => {'R1' => {}},

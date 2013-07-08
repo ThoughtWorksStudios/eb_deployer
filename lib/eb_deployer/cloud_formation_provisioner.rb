@@ -12,10 +12,10 @@ module EbDeployer
     end
 
     def provision(resources)
-      params = extract_params
       template = File.read(resources[:template])
       transforms = resources[:transforms]
-      capabilities = resources[:capabilities] || []
+      capabilities = resources[:capabilities]
+      params = resources[:parameters]
 
       stack_exists? ? update_stack(template, params, capabilities) : create_stack(template, params, capabilities)
       wait_for_stack_op_terminate
@@ -67,11 +67,6 @@ module EbDeployer
         raise "Resource stack update failed!" if FAILED_STATS.include?(stats)
         log "current status: #{stack_status}"
       end
-    end
-
-
-    def extract_params
-      Hash[ENV.map {|k, v| k =~ /^AWSRESOURCES_(.*)/ ? [$1, v] : nil }.compact]
     end
 
     def log(msg)
