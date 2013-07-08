@@ -160,6 +160,8 @@ class DeployTest < Minitest::Test
              :template => cf_template
            })
     assert @cf_driver.stack_exists?('simple-production')
+    assert_equal({},  @cf_driver.stack_config('simple-production')[:parameters])
+    assert_equal([],  @cf_driver.stack_config('simple-production')[:capabilities])
   end
 
   def test_provision_resources_with_capacities

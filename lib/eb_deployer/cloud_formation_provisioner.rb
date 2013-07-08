@@ -14,8 +14,8 @@ module EbDeployer
     def provision(resources)
       template = File.read(resources[:template])
       transforms = resources[:transforms]
-      capabilities = resources[:capabilities]
-      params = resources[:parameters]
+      capabilities = resources[:capabilities] || []
+      params = resources[:parameters] || {}
 
       stack_exists? ? update_stack(template, params, capabilities) : create_stack(template, params, capabilities)
       wait_for_stack_op_terminate
