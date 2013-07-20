@@ -1,0 +1,20 @@
+require 'rake'
+$:.unshift(File.expand_path("../../../lib", __FILE__))
+require 'eb_deployer'
+require 'digest'
+
+desc "deploy our simple java app with one page"
+task :deploy, [:package, :env] do |t, args|
+  EbDeployer.deploy(:application => "ebtest-simple",
+                    :environment => args[:env],
+                    :strategy => 'blue_green',
+                    :package => args[:package],
+                    :version_label => "dev-" + Digest::MD5.file(args[:package]).hexdigest,
+                    :smoke_test => lambda { |host|
+                      Timeout.timeout(600) do
+                        until `curl http://#{host}`.include?('Hello, World')
+                          sleep 5
+                        end
+                      end
+                    })
+end
