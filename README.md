@@ -43,11 +43,12 @@ Add a deploy task for deployment in your Rakefile
     end
 
 ### Step Four: Fast your seat belt
-execute
-     rake deploy AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
+run deploy task:
+
+    rake deploy AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
 Then open aws console for Elastic Beanstalk to see what happened.
 
-Later tutorials coming soon will show
+Later tutorials coming soon will cover
 * how to add smoke test which will run between blue green switch
 * how to setup multiple environment suites: production, staging, and how to manage configurations for them
 * how to setup RDS or other AWS resource and share them between blue green environments
