@@ -45,7 +45,7 @@ Add a deploy task for deployment in your Rakefile
 ### Step Four: Fast your seat belt
 run deploy task:
 
-    rake deploy AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
+    rake deploy[<package built>] AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
 Then open aws console for Elastic Beanstalk to see what happened.
 
 Later tutorials coming soon will cover
