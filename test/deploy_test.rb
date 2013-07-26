@@ -19,6 +19,13 @@ class DeployTest < Minitest::Test
     assert @eb_driver.application_exists?('simple')
   end
 
+  def test_destroy_should_clean_up_eb_application_and_env
+    deploy(:application => 'simple', :environment => "production")
+    destroy(:application => 'simple')
+    assert !@eb_driver.application_exists?('simple')
+    assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+  end
+
   def test_first_deployment_create_environment
     assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
     deploy(:application => 'simple', :environment => "production")
@@ -246,10 +253,19 @@ class DeployTest < Minitest::Test
 
   def deploy(opts)
     EbDeployer.deploy({:package => @sample_package,
-                        :bs_driver => @eb_driver,
-                        :s3_driver => @s3_driver,
-                        :cf_driver => @cf_driver,
-                        :version_label => 1}.merge(opts))
+                        :version_label => 1}.merge(opts).merge(stubs))
+  end
+
+  def destroy(opts)
+    EbDeployer.destroy(opts.merge(stubs))
+  end
+
+
+  def stubs
+    { :bs_driver => @eb_driver,
+      :s3_driver => @s3_driver,
+      :cf_driver => @cf_driver
+    }
   end
 
 
