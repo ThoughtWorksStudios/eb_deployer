@@ -43,7 +43,7 @@ module EbDeployer
     version_label = opts[:version_label].to_s.strip
     cname = opts[:cname]
     env_settings = opts[:settings] || []
-    strategy_name = opts[:strategy] || :inplace_update
+    strategy_name = opts[:strategy] || :blue_green
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
 

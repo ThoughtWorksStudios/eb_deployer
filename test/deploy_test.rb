@@ -253,6 +253,7 @@ class DeployTest < Minitest::Test
 
   def deploy(opts)
     EbDeployer.deploy({:package => @sample_package,
+                        :strategy => :inplace_update,
                         :version_label => 1}.merge(opts).merge(stubs))
   end
 
