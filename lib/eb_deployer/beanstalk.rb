@@ -9,6 +9,10 @@ module EbDeployer
       @client.create_application(:application_name => app)
     end
 
+    def delete_application(app)
+      @client.delete_application(:application_name => app)
+    end
+
     def application_exists?(app)
       @client.describe_applications(:application_names => [app])[:applications].any?
     end
@@ -24,6 +28,10 @@ module EbDeployer
       alive_envs(app_name, [env_name]).any?
     end
 
+    def environment_names_for_application(app_name)
+      alive_envs(app_name).collect { |env| env[:environment_name] }
+    end
+
     def create_environment(app_name, env_name, stack_name, cname_prefix, version, settings)
       request = {:application_name => app_name,
         :environment_name => env_name,
@@ -32,6 +40,10 @@ module EbDeployer
         :option_settings => settings }
       request[:cname_prefix] = cname_prefix if cname_prefix
       @client.create_environment(request)
+    end
+
+    def delete_environment(app_name, env_name)
+      @client.terminate_environment(:environment_name => env_name)
     end
 
     def create_application_version(app_name, version_label, source_bundle)

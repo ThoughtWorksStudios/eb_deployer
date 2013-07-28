@@ -1,6 +1,7 @@
 # EbDeployer
 
-TODO: Write a gem description
+Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.
+
 
 ## Installation
 
@@ -18,25 +19,43 @@ Or install it yourself as:
 
 ## Usage
 
-Elastic Beanstalk currently allows you do deploy applications to its predefined set of solution stacks. You will be able to use eb_deployer to deploy to any of those predefined stacks.
+### Step One: AWS Account Setup
 
-Pick the application that fits those stacks. We have a jruby application that we are going to use for this example.
+Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later.
 
-Once you have selected that application in the home folder install the eb_deployer gem. You could add it to your Gemfile under :development group as well and re-run 'bundle install'. 
+### Step Two: Packaging
 
-You can then copy the rake task we have in the samples/simple/Rakefile with the prerequisites.
+You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack.
 
-Once you have copied the rake task and renamed it appropriately so that it is available when you run rake, ensure that you have set the correct options.
-The options you would want to change are :application, :environment, :solution_stack (if it is different from the default). 
-Before you run the rake task you will need to create a deployable package of your application. Both tar.gz and war versions work. We will use the war version.
 
-To create a war package of your application, run 'gem install warbler' and then run 'warble'. You should have a your_app.war.
-(Ensure keys are set correctly in the environment before you call this rake task.)
-Now you are ready to deploy using eb_deployer. 
+### Step Three: Define the task
+Add a deploy task for deployment in your Rakefile
 
-Run 'rake eb:deploy' and in a few minutes your application should show up in your ElasticBeanstalk console. You will notice that it shows up as (a). 
+    require 'digest'
 
-Now deploy this again. You will notice that it shows up as (b). These are the two EB instances used to do blue-green deployment.
+    desc "deploy our beloved app to elastic beanstalk"
+    task :deploy, [:package] do |t, args|
+      EbDeployer.deploy(:application => "MYAPP",
+                        :environment => "production",
+                        :solution_stack_name => <SOLUTION_STACK_NAME>
+                        :package => args[:package],
+                        :version_label => "dev-" + Digest::MD5.file(args[:package]).hexdigest)
+    end
+
+### Step Four: Fasten your seat belt
+run deploy task:
+
+    rake deploy[<package built>] AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
+Then open aws console for Elastic Beanstalk to see what happened.
+
+Later tutorials coming soon will cover
+* blue green switch and how it works
+* how to add smoke test which will run between blue green switch
+* how to setup multiple environment suites: production, staging, and how to manage configurations for them
+* how to setup RDS or other AWS resource and share them between blue green environments
+
+Take a look at code if you can not wait for the documentation.
+
 
 ## Contributing
 

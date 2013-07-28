@@ -10,6 +10,11 @@ class EBStub
     @apps << app
   end
 
+  def delete_application(app)
+    raise "there are environments running for this app" unless environment_names_for_application(app).empty?
+    @apps.delete(app)
+  end
+
   def application_exists?(app)
     @apps.include?(app)
   end
@@ -17,11 +22,17 @@ class EBStub
   def create_environment(app, env, solution_stack, cname_prefix, version, settings)
     raise 'cname prefix is not avaible' if @envs.values.detect { |env| env[:cname_prefix] == cname_prefix }
     raise "env name #{env} is longer than 23 chars" if env.size > 23
+    raise "app not exists" unless application_exists?(app)
     @envs[env_key(app, env)] = {
+      :application => app,
       :solution_stack => solution_stack,
       :version => version,
       :cname_prefix => cname_prefix,
       :settings => settings}
+  end
+
+  def delete_environment(app, env)
+    @envs.delete(env)
   end
 
   def update_environment(app, env, version, settings)
@@ -78,7 +89,16 @@ class EBStub
     @envs[env_key(app_name, env_name)][:settings]
   end
 
+  def environment_names_for_application(app)
+    @envs.inject([]) do |memo, pair|
+      env_name, env = pair
+      memo << env_name if env[:application] == app
+      memo
+    end
+  end
+
   private
+
   def env_key(app, name)
     [app, name].join("-")
   end

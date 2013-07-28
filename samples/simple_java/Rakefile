@@ -18,3 +18,10 @@ task :deploy, [:package, :env] do |t, args|
                       end
                     })
 end
+
+
+
+desc "clean up everything"
+task :teardown do |t, args|
+  EbDeployer.destroy(:application => "ebtest-simple")
+end

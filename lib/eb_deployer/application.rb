@@ -17,6 +17,16 @@ module EbDeployer
       end
     end
 
+    def delete
+      if @eb_driver.application_exists?(@name)
+        @eb_driver.environment_names_for_application(@name).each do |env|
+          @eb_driver.delete_environment(@name, env)
+        end
+
+        @eb_driver.delete_application(@name)
+      end
+    end
+
     private
 
     def create_application_if_not_exists

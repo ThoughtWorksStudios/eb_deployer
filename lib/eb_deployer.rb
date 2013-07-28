@@ -43,7 +43,7 @@ module EbDeployer
     version_label = opts[:version_label].to_s.strip
     cname = opts[:cname]
     env_settings = opts[:settings] || []
-    strategy_name = opts[:strategy] || :inplace_update
+    strategy_name = opts[:strategy] || :blue_green
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
 
@@ -62,6 +62,18 @@ module EbDeployer
 
     application.create_version(version_label, opts[:package])
     strategy.deploy(version_label, env_settings)
+  end
+
+  def self.destroy(opts)
+    if region = opts[:region]
+      AWS.config(:region => region)
+    end
+
+    app = opts[:application]
+    bs = opts[:bs_driver] || Beanstalk.new
+    s3 = opts[:s3_driver] || S3Driver.new
+    cf = opts[:cf_driver] || CloudFormationDriver.new
+    Application.new(app, bs, s3).delete
   end
 
 end
