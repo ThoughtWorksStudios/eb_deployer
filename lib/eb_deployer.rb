@@ -28,6 +28,26 @@ module EbDeployer
     provisioner.output(key)
   end
 
+
+  #
+  # Options:
+  # :application (required)    application name, this used for isolate packages
+  #                 and contribute to your cname on elastic beanstalk
+  #
+  # :environment (required)    the deployment units for same application, for
+  # example testing, staging, production
+  #
+  # :package (required)        package for the application which should be
+  # suitable for elastic beanstalk deploying. For example, a war file
+  # should be provided for java solution stacks and a tar gz file
+  # should be provided for rails stack.
+  #
+  # :version_label (required)  version label give the package uploaded a unique
+  # identifier
+  #
+  #
+  # deploy a package to specfied environments on elastic beanstalk
+  #
   def self.deploy(opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
