@@ -20,6 +20,7 @@
         <h1>Eb deployer</h1>
         <p>AWS Elastic Beanstalk blue-green deployment automation</p>
         <p class="view"><a href="https://github.com/ThoughtWorksStudios/eb_deployer">View the Project on GitHub <small>ThoughtWorksStudios/eb_deployer</small></a></p>
+        
         <ul>
           <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -28,6 +29,16 @@
       </header>
       <section>
         <h1>
+<navigation>
+  <ul>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#smoketest">Smoke Testing and Continuous Delivery</a></li>
+    <li><a href="#bluegreen">Blue Green Deployments</a></li>
+    <li><a href="#destroystack">Cleaning up</a></li>
+    <li><a href="#contributing">Contribute</a></li>
+  </ul>
+</navigation>
+          
 <a name="ebdeployer" class="anchor" href="#ebdeployer"><span class="octicon octicon-link"></span></a>EbDeployer</h1>
 
 <p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.</p>
@@ -53,7 +64,7 @@
 </code></pre>
 
 <h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+<a name="usage" class="anchor" href="#usage" id="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <h3>
 <a name="step-one-aws-account-setup" class="anchor" href="#step-one-aws-account-setup"><span class="octicon octicon-link"></span></a>Step One: AWS Account Setup</h3>
@@ -93,7 +104,7 @@ end
 <p>Then open aws console for Elastic Beanstalk to see what happened.</p>
 
 <h3>
-<a name="step-five-smoke-testing-your-stack" class="anchor" href="#step-five-smoke-testing-your-stack"><span class="octicon octicon-link"></span></a>Step Five: Smoke Testing your stack</h3>
+<a name="smoketest" class="anchor" href="#smoketest"><span class="octicon octicon-link"></span></a>Smoke Testing and Continuous Delivery</h3>
 
 <p>EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly. 
 Adding a smoke test suite is also simple. All that you need to do is edit your rake task as follows:</p>
@@ -119,7 +130,7 @@ end
 Smoke testing gets you one step closer to continuous delivery.</p>
 
 <h3>
-<a name="step-six-blue-green-deployment" class="anchor" href="#step-six-blue-green-deployment"><span class="octicon octicon-link"></span></a>Step Six: Blue-Green deployment</h3>
+<a name="bluegreen" class="anchor" href="#bluegreen"><span class="octicon octicon-link"></span></a>Blue-Green deployment</h3>
 
 <p>Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments. </p>
 
@@ -128,7 +139,7 @@ Smoke testing gets you one step closer to continuous delivery.</p>
 <p>Once this new stack is stable or has run for a while you can choose to delete the old stack. Or if you are doing continuous delivery you may be ready to another 'blue' deployment. You could just trigger another deployment and repeat this every hour/day/week... you get the idea.</p>
 
 <h3>
-<a name="destroying-a-stack" class="anchor" href="#destroying-a-stack"><span class="octicon octicon-link"></span></a>Destroying a stack</h3>
+<a name="destroystack" class="anchor" href="#destroystack" ><span class="octicon octicon-link"></span></a>Destroying a stack</h3>
 
 <p>So you are done with this application or environment, you can destroy it easily as well.</p>
 
