@@ -50,7 +50,8 @@ run deploy task:
 Then open aws console for Elastic Beanstalk to see what happened.
 
 
-### Step Five: Smoke Testing your stack
+### Smoke Testing your stack
+
 EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly. 
 Adding a smoke test suite is also simple. All that you need to do is edit your rake task as follows:
 
@@ -72,7 +73,7 @@ Adding a smoke test suite is also simple. All that you need to do is edit your r
 You can add more smoke tests by calling arbitrary tasks from this rake task.
 Smoke testing gets you one step closer to continuous delivery.
                       
-### Step Six: Blue-Green deployment
+### Blue-Green deployment
 Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments. 
 
 To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime. 
