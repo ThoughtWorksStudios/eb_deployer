@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Eb deployer by ThoughtWorksStudios</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Eb deployer</h1>
+        <p>AWS Elastic Beanstalk blue-green deployment automation</p>
+        <p class="view"><a href="https://github.com/ThoughtWorksStudios/eb_deployer">View the Project on GitHub <small>ThoughtWorksStudios/eb_deployer</small></a></p>
+        <ul>
+          <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="ebdeployer" class="anchor" href="#ebdeployer"><span class="octicon octicon-link"></span></a>EbDeployer</h1>
+
+<p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.</p>
+
+<p>ElasticBeanstalk Deployer thus allows you to do continuous delivery on AWS.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 'eb_deployer'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install eb_deployer
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a name="step-one-aws-account-setup" class="anchor" href="#step-one-aws-account-setup"><span class="octicon octicon-link"></span></a>Step One: AWS Account Setup</h3>
+
+<p>Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later.</p>
+
+<h3>
+<a name="step-two-packaging" class="anchor" href="#step-two-packaging"><span class="octicon octicon-link"></span></a>Step Two: Packaging</h3>
+
+<p>You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack.</p>
+
+<h3>
+<a name="step-three-define-the-task" class="anchor" href="#step-three-define-the-task"><span class="octicon octicon-link"></span></a>Step Three: Define the task</h3>
+
+<p>Add a deploy task for deployment in your Rakefile</p>
+
+<pre><code>require 'digest'
+
+desc "deploy our beloved app to elastic beanstalk"
+task :deploy, [:package] do |t, args|
+  EbDeployer.deploy(:application =&gt; "MYAPP",
+                    :environment =&gt; "production",
+                    :solution_stack_name =&gt; &lt;SOLUTION_STACK_NAME&gt;
+                    :package =&gt; args[:package],
+                    :version_label =&gt; "dev-" + Digest::MD5.file(args[:package]).hexdigest)
+end
+</code></pre>
+
+<h3>
+<a name="step-four-fasten-your-seat-belt" class="anchor" href="#step-four-fasten-your-seat-belt"><span class="octicon octicon-link"></span></a>Step Four: Fasten your seat belt</h3>
+
+<p>run deploy task:</p>
+
+<pre><code>rake deploy[&lt;package built&gt;] AWS_ACCESS_KEY_ID=&lt;deployers_aws_key&gt; AWS_SECRET_ACCESS_KEY=&lt;secret&gt;
+</code></pre>
+
+<p>Then open aws console for Elastic Beanstalk to see what happened.</p>
+
+<h3>
+<a name="step-five-smoke-testing-your-stack" class="anchor" href="#step-five-smoke-testing-your-stack"><span class="octicon octicon-link"></span></a>Step Five: Smoke Testing your stack</h3>
+
+<p>EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly. 
+Adding a smoke test suite is also simple. All that you need to do is edit your rake task as follows:</p>
+
+<pre><code>desc "deploy our simple java app with one page"
+task :deploy, [:package] do |t, args|
+  EbDeployer.deploy(:application =&gt; "MYAPP",
+                    :environment =&gt; "production",
+                    :solution_stack_name =&gt; &lt;SOLUTION_STACK_NAME&gt;
+                    :package =&gt; args[:package],
+                    :version_label =&gt; "dev-" + Digest::MD5.file(args[:package]).hexdigest)
+                    :smoke_test =&gt; lambda { |host|
+                      Timeout.timeout(600) do
+                        until `curl http://#{host}`.include?('Hello, World')
+                          sleep 5
+                        end
+                      end
+                    })
+end                
+</code></pre>
+
+<p>You can add more smoke tests by calling arbitrary tasks from this rake task.
+Smoke testing gets you one step closer to continuous delivery.</p>
+
+<h3>
+<a name="step-six-blue-green-deployment" class="anchor" href="#step-six-blue-green-deployment"><span class="octicon octicon-link"></span></a>Step Six: Blue-Green deployment</h3>
+
+<p>Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments. </p>
+
+<p>To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime. </p>
+
+<p>Once this new stack is stable or has run for a while you can choose to delete the old stack. Or if you are doing continuous delivery you may be ready to another 'blue' deployment. You could just trigger another deployment and repeat this every hour/day/week... you get the idea.</p>
+
+<h3>
+<a name="destroying-a-stack" class="anchor" href="#destroying-a-stack"><span class="octicon octicon-link"></span></a>Destroying a stack</h3>
+
+<p>So you are done with this application or environment, you can destroy it easily as well.</p>
+
+<pre><code>desc "clean up everything"
+task :teardown do |t, args|
+  EbDeployer.destroy(:application =&gt; "ebtest-simple")
+end
+</code></pre>
+
+<p>and you are done!</p>
+
+<p>Later tutorials coming soon will cover</p>
+
+<ul>
+<li>how to setup multiple environment suites: production, staging, and how to manage configurations for them</li>
+<li>how to setup RDS or other AWS resource and share them between blue green environments</li>
+</ul><p>Take a look at code if you can not wait for the documentation.</p>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Added some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/ThoughtWorksStudios">ThoughtWorksStudios</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
