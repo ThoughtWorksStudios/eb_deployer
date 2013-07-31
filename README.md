@@ -82,6 +82,8 @@ Once this new stack is stable or has run for a while you can choose to delete th
 
 
 ### Destroying a stack
+So you are done with this application or environment, you can destroy it easily as well.
+
     desc "clean up everything"
     task :teardown do |t, args|
       EbDeployer.destroy(:application => "ebtest-simple")
@@ -90,8 +92,6 @@ Once this new stack is stable or has run for a while you can choose to delete th
 and you are done!
 
 Later tutorials coming soon will cover
-* blue green switch and how it works
-* how to add smoke test which will run between blue green switch
 * how to setup multiple environment suites: production, staging, and how to manage configurations for them
 * how to setup RDS or other AWS resource and share them between blue green environments
 
