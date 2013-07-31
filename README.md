@@ -2,6 +2,7 @@
 
 Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.
 
+ElasticBeanstalk Deployer thus allows you to do continuous delivery on AWS.
 
 ## Installation
 
@@ -47,6 +48,46 @@ run deploy task:
 
     rake deploy[<package built>] AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
 Then open aws console for Elastic Beanstalk to see what happened.
+
+
+### Step Five: Smoke Testing your stack
+EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly. 
+Adding a smoke test suite is also simple. All that you need to do is edit your rake task as follows:
+
+    desc "deploy our simple java app with one page"
+    task :deploy, [:package] do |t, args|
+      EbDeployer.deploy(:application => "MYAPP",
+                        :environment => "production",
+                        :solution_stack_name => <SOLUTION_STACK_NAME>
+                        :package => args[:package],
+                        :version_label => "dev-" + Digest::MD5.file(args[:package]).hexdigest)
+                        :smoke_test => lambda { |host|
+                          Timeout.timeout(600) do
+                            until `curl http://#{host}`.include?('Hello, World')
+                              sleep 5
+                            end
+                          end
+                        })
+    end                
+You can add more smoke tests by calling arbitrary tasks from this rake task.
+Smoke testing gets you one step closer to continuous delivery.
+                      
+### Step Six: Blue-Green deployment
+Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments. 
+
+To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime. 
+
+Once this new stack is stable or has run for a while you can choose to delete the old stack. Or if you are doing continuous delivery you may be ready to another 'blue' deployment. You could just trigger another deployment and repeat this every hour/day/week... you get the idea.
+
+
+
+### Destroying a stack
+    desc "clean up everything"
+    task :teardown do |t, args|
+      EbDeployer.destroy(:application => "ebtest-simple")
+    end
+    
+and you are done!
 
 Later tutorials coming soon will cover
 * blue green switch and how it works
