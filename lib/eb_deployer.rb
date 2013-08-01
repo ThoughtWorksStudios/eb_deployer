@@ -30,24 +30,86 @@ module EbDeployer
 
 
   #
-  # Options:
-  # :application (required)    application name, this used for isolate packages
-  #                 and contribute to your cname on elastic beanstalk
+  # Options available:
   #
-  # :environment (required)    the deployment units for same application, for
-  # example testing, staging, production
+  # :application (required)
+  # Application name, this used for isolate packages and contribute
+  # to your elastic beanstalk cname for environments
+  #
+  # :environment (required)
+  # Environment for same application, e.g. testing, staging,
+  # production. This will map to 2 elastic beanstalk environments
+  # (env-a-xxx, env-b-xxx) if blue-green deployment strategy specified
   #
   # :package (required)        package for the application which should be
   # suitable for elastic beanstalk deploying. For example, a war file
   # should be provided for java solution stacks and a tar gz file
   # should be provided for rails stack.
   #
-  # :version_label (required)  version label give the package uploaded a unique
-  # identifier
+  # :version_label (required)
+  # Version label give the package uploaded a unique identifier.
+  # Should use something related to pipeline counter if you have build
+  # pipeline setup to build the installer. For the convient of dev we
+  # recommend use md5 digest of the installer so that everytime you
+  # upload new installer it forms a new version. e.g.
+  #
+  #     :version_label => ENV['MY_PIPELINE_COUNTER']
+  #                      || "dev-" + Digest::MD5.file(my_package).hexdigest
+  #
+  # :solution_stack_name (optional default "64bit Amazon Linux running Tomcat 7")
+  # The elastic beanstalk solution stack you want to deploy on top of.
+  # Current possible values include:
+  #
+  # :settings  (optional)
+  # Elastic Beanstalk settings that will apply to the environments you
+  # deploying. Value should be array of hash with format such as:
+  #     [{
+  #        :namespace => 'aws:autoscaling:launchconfiguration',
+  #        :option_name => 'InstanceType',
+  #        :value => 'm1.small' }]
+  # When there are many, Using an external yaml file to hold those
+  # configuration is recommended. Such as:
+  #     YAML.load(File.read("my_settings_file.yml"))
+  # For all available options take a look at
+  # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
+  #
+  # :resources (optional)
+  # If :resources specified, EBDeployer will use the CloudFormation
+  # template you provide to create a default CloudFormation stack with
+  # name <application_name>-<env-name> for the environment current
+  # deploying.  Value of resources need to be hash with following
+  # keys:
+  #    :template => CloudFormation template file with JSON format
+  #    :parameters => A Hash, input values for the CloudFormation
+  # template
+  #    :transforms => A Hash with key map to your CloudFormation
+  # template outputs and value as lambda that return a single or array of
+  # elastic beanstalk settings.
+  #    :capabilities => An array. You need set it to ['CAPABILITY_IAM']
+  # if you want to provision IAM Instance Profile.
+  #
+  # :smoke_test (optional)
+  # Value should be a proc or a lambda which accept single argument that will
+  # passed in as environment DNS name. Smoke test proc or lambda will be
+  # called at the end of the deployment for inplace-update deployment
+  # strategy. For blue-green deployment it will run after inactive
+  # environment update finish and before switching.
+  # Defining a smoke test is high recommended for serious usage. The
+  # simplest one could just be checking the server is up using curl, e.g.
+  #
+  #  :smoke_test => lambda { |host|
+  #    curl_http_code = "curl -k -s -o /dev/null -w \"%{http_code}\" https://#{host}"
+  #    Timeout.timeout(600) do
+  #      while `#{curl_http_code}`.strip != '200'
+  #        sleep 5
+  #      end
+  #    end
+  #  }
   #
   #
   # deploy a package to specfied environments on elastic beanstalk
   #
+
   def self.deploy(opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
