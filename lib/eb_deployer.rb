@@ -98,6 +98,13 @@ module EbDeployer
   #    :capabilities => An array. You need set it to ['CAPABILITY_IAM']
   # if you want to provision IAM Instance Profile.
   #
+  # :deployment_strategy (optional default blue-green)
+  # There are two options: blue-green or inplace-update. Blue green
+  # keep two elastic beanstalk environments and always deploy to
+  # inactive one, to achive zero downtime. inplace-update strategy
+  # will only keep one environment, and update the version inplace on
+  # deploy. this will save resources but will have downtime.
+  #
   # :smoke_test (optional)
   # Value should be a proc or a lambda which accept single argument that will
   # passed in as environment DNS name. Smoke test proc or lambda will be
