@@ -16,6 +16,16 @@ require 'timeout'
 require 'aws-sdk'
 
 module EbDeployer
+
+  ##
+  # Query ouput value of the cloud formation stack
+  # arguments:
+  #  key:    CloudFormation ouput key
+  #  options: a hash
+  #     :application     application name
+  #     :environment     environment name (e.g. staging, production)
+  #
+
   def self.query_resource_output(key, opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
