@@ -13,12 +13,11 @@ module EbDeployer
       @name = self.class.unique_ebenv_name(app, env_name)
       @bs = eb_driver
       @creation_opts = creation_opts
-      @poller = EventPoller.new(@app, @name, @bs)
     end
 
     def deploy(version_label, settings)
+      terminate if @creation_opts[:phoenix_mode]
       create_or_update_env(version_label, settings)
-      poll_events
       smoke_test
       wait_for_env_become_healthy
     end
@@ -37,7 +36,6 @@ module EbDeployer
 
     private
 
-
     def shorten(str, max_length, digest_length=5)
       raise "max length (#{max_length}) should be larger than digest_length (#{digest_length})" if max_length < digest_length
       return self if str.size <= max_length
@@ -45,11 +43,23 @@ module EbDeployer
       sha1[0..(digest_length - 1)] + str[(max_length - digest_length - 1)..-1]
     end
 
+    def terminate
+      if @bs.environment_exists?(@app, @name)
+        with_polling_events(/terminateEnvironment completed successfully/i) do
+          @bs.delete_environment(@app, @name)
+        end
+      end
+    end
+
     def create_or_update_env(version_label, settings)
       if @bs.environment_exists?(@app, @name)
-        @bs.update_environment(@app, @name, version_label, settings)
+        with_polling_events(/Environment update completed successfully/i) do
+          @bs.update_environment(@app, @name, version_label, settings)
+        end
       else
-        @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, settings)
+        with_polling_events(/Successfully launched environment/i) do
+          @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, settings)
+        end
       end
     end
 
@@ -62,13 +72,14 @@ module EbDeployer
       end
     end
 
-    def poll_events
-      @poller.poll do |event|
+    def with_polling_events(terminate_pattern, &block)
+      event_start_time = Time.now
+      yield
+      EventPoller.new(@app, @name, @bs).poll(event_start_time) do |event|
         raise event[:message] if event[:message] =~ /Failed to deploy application/
 
         log_event(event)
-        break if event[:message] =~ /Environment update completed successfully/ ||
-          event[:message] =~ /Successfully launched environment/
+        break if event[:message] =~ terminate_pattern
       end
     end
 

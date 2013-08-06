@@ -88,8 +88,6 @@ class DeployTest < Minitest::Test
     assert_equal 'foobar.elasticbeanstalk.com', host_for_smoke_test
   end
 
-
-
   def test_blue_green_deployment_strategy_should_create_blue_env_on_first_deployment
     deploy(:application => 'simple',
            :environment => "production",
@@ -231,6 +229,44 @@ class DeployTest < Minitest::Test
                             :application => 'simple',
                             :environment => "production")
     end
+  end
+
+  def test_should_terminate_old_environment_if_phoenix_mode_is_enabled
+    deploy(:application => 'simple', :environment => "production", :phoenix_mode => true)
+    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+    deploy(:application => 'simple', :environment => "production", :phoenix_mode => true)
+    assert @eb_driver.environments_been_deleted('simple').include?(eb_envname('simple', 'production'))
+    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+  end
+
+  def test_blue_green_deployment_should_delete_and_recreate_inactive_env_if_phoenix_mode_is_enabled
+    deploy(:application => 'simple',
+           :environment => "production",
+           :strategy => 'blue_green',
+           :version_label => 42,
+           :phoenix_mode => true)
+
+    deploy(:application => 'simple',
+           :environment => "production",
+           :strategy => 'blue_green',
+           :version_label => 43,
+           :phoenix_mode => true)
+
+    assert_equal [],  @eb_driver.environments_been_deleted('simple')
+
+    inactive_env = eb_envname('simple', 'production-a')
+    assert_match(/inactive/,  @eb_driver.environment_cname_prefix('simple', inactive_env))
+
+
+    deploy(:application => 'simple',
+           :environment => "production",
+           :strategy => 'blue_green',
+           :version_label => 44,
+           :phoenix_mode => true)
+
+    assert_equal [inactive_env], @eb_driver.environments_been_deleted('simple')
+
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', inactive_env)
   end
 
   private

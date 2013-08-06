@@ -3,6 +3,7 @@ class EBStub
     @apps = []
     @envs = {}
     @versions = {}
+    @envs_been_deleted = {}
   end
 
   def create_application(app)
@@ -33,6 +34,8 @@ class EBStub
 
   def delete_environment(app, env)
     @envs.delete(env)
+    @envs_been_deleted[app] ||= []
+    @envs_been_deleted[app] << env
   end
 
   def update_environment(app, env, version, settings)
@@ -54,7 +57,12 @@ class EBStub
 
   def fetch_events(app_name, env_name, options={})
     [[{:event_date => Time.now.utc,
-        :message => 'Environment update completed successfully'}],
+        :message => 'Environment update completed successfully'},
+      {:event_date => Time.now.utc,
+        :message => 'terminateEnvironment completed successfully'},
+      {:event_date => Time.now.utc,
+        :message => 'Successfully launched environment'}
+     ],
      nil]
   end
 
@@ -80,6 +88,7 @@ class EBStub
     'Green'
   end
 
+
   #test only
   def environment_verion_label(app_name, env_name)
     @envs[env_key(app_name, env_name)][:version]
@@ -95,6 +104,10 @@ class EBStub
       memo << env_name if env[:application] == app
       memo
     end
+  end
+
+  def environments_been_deleted(app)
+    @envs_been_deleted[app] || []
   end
 
   private

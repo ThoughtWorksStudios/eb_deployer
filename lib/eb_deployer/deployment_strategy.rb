@@ -19,9 +19,8 @@ module EbDeployer
         @app = app
         @env_name = env_name
         @eb_driver = eb_driver
+        @env_creation_opts = env_creation_opts
         @major_cname_prefix = env_creation_opts[:cname_prefix]
-        @solution_stack = env_creation_opts[:solution_stack]
-        @smoke_test = env_creation_opts[:smoke_test]
       end
 
       def deploy(version_label, env_settings)
@@ -48,10 +47,9 @@ module EbDeployer
       end
 
       def env(suffix, cname_prefix=nil)
-        Environment.new(@app, @env_name + '-' + suffix, @eb_driver,
-                        :solution_stack => @solution_stack,
-                        :cname_prefix => cname_prefix || inactive_cname_prefix,
-                        :smoke_test => @smoke_test)
+        Environment.new(@app, @env_name + '-' + suffix,
+                        @eb_driver,
+                        @env_creation_opts.merge({:cname_prefix => cname_prefix || inactive_cname_prefix}))
       end
 
       def inactive_cname_prefix

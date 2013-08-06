@@ -7,7 +7,6 @@ desc "deploy our simple java app with one page"
 task :deploy, [:package, :env] do |t, args|
   EbDeployer.deploy(:application => "ebtest-simple",
                     :environment => args[:env],
-                    :strategy => 'blue_green',
                     :package => args[:package],
                     :version_label => "dev-" + Digest::MD5.file(args[:package]).hexdigest,
                     :smoke_test => lambda { |host|

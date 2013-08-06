@@ -1,13 +1,13 @@
 module EbDeployer
   class EventPoller
     def initialize(app, env, beanstalk)
-      @app, @env, @beanstalk, @start_time = app, env, beanstalk, Time.now
+      @app, @env, @beanstalk = app, env, beanstalk
     end
 
-    def poll(&block)
+    def poll(start_time = Time.now, &block)
       handled = Set.new
       loop do
-        fetch_events do |events|
+        fetch_events(start_time) do |events|
           new_events = events.reject { |e| handled.include?(digest(e)) }
           handle(new_events, &block)
           handled += new_events.map { |e| digest(e) }
@@ -15,6 +15,7 @@ module EbDeployer
         sleep 15
       end
     end
+
 
     private
 
@@ -26,8 +27,8 @@ module EbDeployer
       events.reverse.each(&block)
     end
 
-    def fetch_events(&block)
-      events, next_token = @beanstalk.fetch_events(@app, @env, :start_time => @start_time.iso8601)
+    def fetch_events(start_time, &block)
+      events, next_token = @beanstalk.fetch_events(@app, @env, :start_time => start_time.iso8601)
       yield(events)
       fetch_next(next_token, &block) if next_token
     end

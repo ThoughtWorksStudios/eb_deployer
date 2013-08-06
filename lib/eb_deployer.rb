@@ -98,12 +98,21 @@ module EbDeployer
   #    :capabilities => An array. You need set it to ['CAPABILITY_IAM']
   # if you want to provision IAM Instance Profile.
   #
-  # :deployment_strategy (optional default blue-green)
+  # :strategy (optional default :blue-green)
   # There are two options: blue-green or inplace-update. Blue green
   # keep two elastic beanstalk environments and always deploy to
   # inactive one, to achive zero downtime. inplace-update strategy
   # will only keep one environment, and update the version inplace on
   # deploy. this will save resources but will have downtime.
+  #
+  # :phoenix_mode (optional default false)
+  # If phoenix mode is turn on, it will terminate the old elastic
+  # beanstalk environment and recreate on deploy. For blue-green
+  # deployment it terminate the inactive environment first then
+  # recreate it. This is useful to avoiding configuration drift and
+  # accumulating state on the ec2 instances. Also it has the benifit of
+  # keeping your ec2 instance system package upto date, because everytime ec2
+  # instance boot up from AMI it does a system update.
   #
   # :smoke_test (optional)
   # Value should be a proc or a lambda which accept single argument that will
@@ -145,6 +154,7 @@ module EbDeployer
     strategy_name = opts[:strategy] || :blue_green
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
+    phoenix_mode = opts[:phoenix_mode]
 
     application = Application.new(app, bs, s3)
 
@@ -153,7 +163,8 @@ module EbDeployer
     strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs,
                                          :solution_stack => stack_name,
                                          :cname_prefix => cname_prefix,
-                                         :smoke_test => smoke_test)
+                                         :smoke_test => smoke_test,
+                                         :phoenix_mode => phoenix_mode)
 
     if resources = opts[:resources]
       env_settings += cf.provision(resources)
