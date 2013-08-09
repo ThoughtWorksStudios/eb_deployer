@@ -174,6 +174,16 @@ module EbDeployer
     strategy.deploy(version_label, env_settings)
   end
 
+  ##
+  # WARNING: USE extreme caution, this will destroy *all* Elastic Beanstalk
+  #  environments and the Elastic Beanstalk application itself.
+  #  i.e. do not issue a destroy when you have other environments
+  #   under the same :application that you wish to keep running.
+  #
+  #  options: a hash
+  #     :application     application name
+  #
+
   def self.destroy(opts)
     if region = opts[:region]
       AWS.config(:region => region)
@@ -183,7 +193,7 @@ module EbDeployer
     bs = opts[:bs_driver] || Beanstalk.new
     s3 = opts[:s3_driver] || S3Driver.new
     cf = opts[:cf_driver] || CloudFormationDriver.new
-    Application.new(app, bs, s3).delete
+    Application.new(app, bs, s3).destroy
   end
 
 end

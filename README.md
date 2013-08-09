@@ -85,7 +85,7 @@ Once this new stack is stable or has run for a while you can choose to delete th
 ### Destroying a stack
 So you are done with this application or environment, you can destroy it easily as well.
 
-    desc "clean up everything"
+    desc "destroy application and all configured environments"
     task :teardown do |t, args|
       EbDeployer.destroy(:application => "ebtest-simple")
     end
