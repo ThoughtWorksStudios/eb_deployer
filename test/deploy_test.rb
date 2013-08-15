@@ -19,6 +19,17 @@ class DeployTest < Minitest::Test
     assert @eb_driver.application_exists?('simple')
   end
 
+  def test_set_option_settings_on_deployment
+    redudant = [{:namespace => 'aws:autoscaling:launchconfiguration',
+                                  :option_name => 'MinSize',
+                                  :value => '2' }]
+    deploy(:application => 'simple', :environment => "production",
+           :option_settings => [redudant])
+
+    assert_equal [redudant], @eb_driver.environment_settings('simple', eb_envname('simple', 'production'))
+
+  end
+
   def test_destroy_should_clean_up_eb_application_and_env
     deploy(:application => 'simple', :environment => "production")
     destroy(:application => 'simple')
@@ -304,7 +315,4 @@ class DeployTest < Minitest::Test
       :cf_driver => @cf_driver
     }
   end
-
-
-
 end

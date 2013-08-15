@@ -70,7 +70,7 @@ module EbDeployer
   # The elastic beanstalk solution stack you want to deploy on top of.
   # Current possible values include:
   #
-  # :settings  (optional)
+  # :option_settings (or :settings)  (optional)
   # Elastic Beanstalk settings that will apply to the environments you
   # deploying. Value should be array of hash with format such as:
   #     [{
@@ -150,7 +150,7 @@ module EbDeployer
     env_name = opts[:environment]
     version_label = opts[:version_label].to_s.strip
     cname = opts[:cname]
-    env_settings = opts[:settings] || []
+    env_settings = opts[:option_settings] || opts[:settings] || []
     strategy_name = opts[:strategy] || :blue_green
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
