@@ -39,6 +39,8 @@ module EbDeployer
   end
 
 
+  # # 
+  # Deploy a package to specfied environments on elastic beanstalk
   #
   # Options available:
   #
@@ -133,7 +135,6 @@ module EbDeployer
   #  }
   #
   #
-  # deploy a package to specfied environments on elastic beanstalk
   #
 
   def self.deploy(opts)
