@@ -33,6 +33,7 @@ You need package your application for Elastic Beanstalk stack first. For Java ap
 Add a deploy task for deployment in your Rakefile
 
     require 'digest'
+    require 'eb_deployer'
 
     desc "deploy our beloved app to elastic beanstalk"
     task :deploy, [:package] do |t, args|
