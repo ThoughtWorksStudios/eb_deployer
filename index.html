@@ -20,7 +20,6 @@
         <h1>Eb deployer</h1>
         <p>AWS Elastic Beanstalk blue-green deployment automation</p>
         <p class="view"><a href="https://github.com/ThoughtWorksStudios/eb_deployer">View the Project on GitHub <small>ThoughtWorksStudios/eb_deployer</small></a></p>
-        
         <ul>
           <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -29,16 +28,6 @@
       </header>
       <section>
         <h1>
-<navigation>
-  <ul>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#smoketest">Smoke Testing and Continuous Delivery</a></li>
-    <li><a href="#bluegreen">Blue Green Deployments</a></li>
-    <li><a href="#destroystack">Cleaning up</a></li>
-    <li><a href="#contributing">Contribute</a></li>
-  </ul>
-</navigation>
-          
 <a name="ebdeployer" class="anchor" href="#ebdeployer"><span class="octicon octicon-link"></span></a>EbDeployer</h1>
 
 <p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.</p>
@@ -48,23 +37,11 @@
 <h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Add this line to your application's Gemfile:</p>
-
-<pre><code>gem 'eb_deployer'
-</code></pre>
-
-<p>And then execute:</p>
-
-<pre><code>$ bundle
-</code></pre>
-
-<p>Or install it yourself as:</p>
-
 <pre><code>$ gem install eb_deployer
 </code></pre>
 
 <h2>
-<a name="usage" class="anchor" href="#usage" id="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <h3>
 <a name="step-one-aws-account-setup" class="anchor" href="#step-one-aws-account-setup"><span class="octicon octicon-link"></span></a>Step One: AWS Account Setup</h3>
@@ -74,79 +51,65 @@
 <h3>
 <a name="step-two-packaging" class="anchor" href="#step-two-packaging"><span class="octicon octicon-link"></span></a>Step Two: Packaging</h3>
 
-<p>You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack.</p>
+<p>You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack. (Please remember do rake assets:precompile first for rails app)</p>
 
 <h3>
-<a name="step-three-define-the-task" class="anchor" href="#step-three-define-the-task"><span class="octicon octicon-link"></span></a>Step Three: Define the task</h3>
+<a name="step-three-generate-configuration-and-configure-deployment-process" class="anchor" href="#step-three-generate-configuration-and-configure-deployment-process"><span class="octicon octicon-link"></span></a>Step Three: Generate configuration and Configure deployment process</h3>
 
-<p>Add a deploy task for deployment in your Rakefile</p>
-
-<pre><code>require 'digest'
-
-desc "deploy our beloved app to elastic beanstalk"
-task :deploy, [:package] do |t, args|
-  EbDeployer.deploy(:application =&gt; "MYAPP",
-                    :environment =&gt; "production",
-                    :solution_stack_name =&gt; &lt;SOLUTION_STACK_NAME&gt;
-                    :package =&gt; args[:package],
-                    :version_label =&gt; "dev-" + Digest::MD5.file(args[:package]).hexdigest)
-end
+<pre><code>$ eb_deploy
 </code></pre>
+
+<p>This will generate a default configuration at location 'config/eb_deployer.yml'. It is almost empty but working one. And it will generate settings for two environment 'dev' and 'production'. If you had time please try to read through it to see the options you can tweak.</p>
 
 <h3>
 <a name="step-four-fasten-your-seat-belt" class="anchor" href="#step-four-fasten-your-seat-belt"><span class="octicon octicon-link"></span></a>Step Four: Fasten your seat belt</h3>
 
-<p>run deploy task:</p>
+<p>run deploy</p>
 
-<pre><code>rake deploy[&lt;package built&gt;] AWS_ACCESS_KEY_ID=&lt;deployers_aws_key&gt; AWS_SECRET_ACCESS_KEY=&lt;secret&gt;
+<pre><code>$ eb_deploy -p &lt;package built&gt; -e &lt;environment&gt;
 </code></pre>
 
 <p>Then open aws console for Elastic Beanstalk to see what happened.</p>
 
 <h3>
-<a name="smoketest" class="anchor" href="#smoketest"><span class="octicon octicon-link"></span></a>Smoke Testing and Continuous Delivery</h3>
+<a name="smoke-testing-your-stack" class="anchor" href="#smoke-testing-your-stack"><span class="octicon octicon-link"></span></a>Smoke Testing your stack</h3>
 
-<p>EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly. 
-Adding a smoke test suite is also simple. All that you need to do is edit your rake task as follows:</p>
+<p>EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
+Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. The simplest thing you can do is using curl make sure landing page get loaded, e.g.:</p>
 
-<pre><code>desc "deploy our simple java app with one page"
-task :deploy, [:package] do |t, args|
-  EbDeployer.deploy(:application =&gt; "MYAPP",
-                    :environment =&gt; "production",
-                    :solution_stack_name =&gt; &lt;SOLUTION_STACK_NAME&gt;
-                    :package =&gt; args[:package],
-                    :version_label =&gt; "dev-" + Digest::MD5.file(args[:package]).hexdigest)
-                    :smoke_test =&gt; lambda { |host|
-                      Timeout.timeout(600) do
-                        until `curl http://#{host}`.include?('Hello, World')
-                          sleep 5
-                        end
-                      end
-                    })
-end                
+<pre><code>smoke_test: &gt;
+  curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
+  Timeout.timeout(600) do
+    while `#{curl_http_code}`.strip != '200'
+      sleep 5
+    end
+  end
 </code></pre>
 
-<p>You can add more smoke tests by calling arbitrary tasks from this rake task.
-Smoke testing gets you one step closer to continuous delivery.</p>
+<p>You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):</p>
+
+<pre><code>smoke_test: &gt;
+  `rake test:smoke HOST_NAME=#{host_name}`
+  raise("Smoke failed!") unless $?.success?
+</code></pre>
+
+<p>Smoke testing gets you one step closer to continuous delivery.</p>
 
 <h3>
-<a name="bluegreen" class="anchor" href="#bluegreen"><span class="octicon octicon-link"></span></a>Blue-Green deployment</h3>
+<a name="blue-green-deployment" class="anchor" href="#blue-green-deployment"><span class="octicon octicon-link"></span></a>Blue-Green deployment</h3>
 
-<p>Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments. </p>
+<p>Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments.</p>
 
-<p>To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime. </p>
+<p>To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime.</p>
 
 <p>Once this new stack is stable or has run for a while you can choose to delete the old stack. Or if you are doing continuous delivery you may be ready to another 'blue' deployment. You could just trigger another deployment and repeat this every hour/day/week... you get the idea.</p>
 
 <h3>
-<a name="destroystack" class="anchor" href="#destroystack" ><span class="octicon octicon-link"></span></a>Destroying a stack</h3>
+<a name="destroying-a-stack" class="anchor" href="#destroying-a-stack"><span class="octicon octicon-link"></span></a>Destroying a stack</h3>
 
 <p>So you are done with this application or environment, you can destroy it easily as well.</p>
 
-<pre><code>desc "clean up everything"
-task :teardown do |t, args|
-  EbDeployer.destroy(:application =&gt; "ebtest-simple")
-end
+<pre><code>$ eb_deployer -d -e &lt;environment&gt;
 </code></pre>
 
 <p>and you are done!</p>
