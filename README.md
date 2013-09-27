@@ -1,8 +1,8 @@
 # EbDeployer
 
-Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.
+Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing link to automate the whole flow out of box.
 
-ElasticBeanstalk Deployer thus allows you to do continuous delivery on AWS.
+EbDeployer thus allows you to do continuous delivery on AWS.
 
 ## Installation
 
@@ -23,7 +23,7 @@ You need package your application for Elastic Beanstalk stack first. For Java ap
 
     $ eb_deploy
 
-This will generate a default configuration at location 'config/eb_deployer.yml'. It is almost empty but working one. And it will generate settings for two environment 'dev' and 'production'. If you had time please try to read through it to see the options you can tweak.
+This will generate a default configuration at location 'config/eb_deployer.yml'. It is almost empty but working one. And it will generate settings for two environments 'development' and 'production'. Some options can be tweaked. The yml files includes documentation on how you can best suit it to your purpose.
 
 
 ### Step Four: Fasten your seat belt
@@ -31,13 +31,13 @@ run deploy
 
     $ eb_deploy -p <package built> -e <environment>
 
-Then open aws console for Elastic Beanstalk to see what happened.
+Then open aws console for Elastic Beanstalk to see the result of this deployment.
 
 
 ### Smoke Testing your stack
 
 EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
-Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. The simplest thing you can do is using curl make sure landing page get loaded, e.g.:
+Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. We show a simple curl based smoke test that helps you test if your app is up and responding to http. 
 
     smoke_test: >
       curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
@@ -48,6 +48,7 @@ Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_
       end
 
 
+Any rakeable test suite can be run as part of the smoke test(selenium, cucumber, capybara, and so on.)
 You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):
    
     smoke_test: >
