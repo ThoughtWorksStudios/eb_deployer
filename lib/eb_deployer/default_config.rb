@@ -7,6 +7,7 @@ module EbDeployer
     end
 
     def write_to(path)
+      FileUtils.mkdir_p(File.dirname(path))
       File.open(path, 'w') { |f| f << ERB.new(File.read(config_template)).result(binding) }
     end
 
