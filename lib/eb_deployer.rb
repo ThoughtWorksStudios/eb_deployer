@@ -8,12 +8,17 @@ require "eb_deployer/event_poller"
 require "eb_deployer/package"
 require 'eb_deployer/s3_driver'
 require 'eb_deployer/cloud_formation_driver'
+require 'eb_deployer/config_loader'
+require 'eb_deployer/default_config'
+require 'eb_deployer/smoke_test'
 require 'digest'
 require 'set'
 require 'time'
 require 'json'
 require 'timeout'
 require 'aws-sdk'
+require 'optparse'
+require 'erb'
 
 module EbDeployer
 
@@ -39,7 +44,7 @@ module EbDeployer
   end
 
 
-  # # 
+  # #
   # Deploy a package to specfied environments on elastic beanstalk
   #
   # Options available:
@@ -92,7 +97,7 @@ module EbDeployer
   # deploying.  Value of resources need to be hash with following
   # keys:
   #    :template => CloudFormation template file with JSON format
-  #    :parameters => A Hash, input values for the CloudFormation
+  #    :parameters (or :inputs) => A Hash, input values for the CloudFormation
   # template
   #    :transforms => A Hash with key map to your CloudFormation
   # template outputs and value as lambda that return a single or array of
@@ -186,5 +191,62 @@ module EbDeployer
     cf = opts[:cf_driver] || CloudFormationDriver.new
     Application.new(app, bs, s3).delete
   end
+
+  def self.cli
+    options = {
+      :action => :deploy,
+      :environment => 'dev',
+      :config_file => 'config/eb_deployer.yml'
+    }
+
+    parser = cli_parser(options)
+    parser.parse!
+    action = options.delete(:action)
+
+    unless File.exists?(options[:config_file])
+      puts "Generat default configuration one at location #{options[:config_file]}."
+      DefaultConfig.new(File.basename(Dir.pwd)).write_to(options[:config_file])
+      exit(2)
+    end
+
+    if !options[:package] && action == :deploy
+      puts "Missing options: -p (--package)"
+      puts parser
+      exit(-1)
+    end
+
+
+    self.send(action, ConfigLoader.new.load(options))
+  end
+
+  private
+
+  def self.cli_parser(options)
+    OptionParser.new do |opts|
+      opts.banner = "Usage: eb_deployer [options]"
+      opts.on("-p", "--package [FILE]", "Package to deploy, for example a war file for java application") do |v|
+        options[:package] = v
+      end
+
+      opts.on("-e", "--environment [ENV_NAME]", "(Default to 'dev') Environment to operating on, for example dev, staging or production. This must be defined in 'environments' section of the config file") do |v|
+        options[:environment] = v
+      end
+
+      opts.on("-c", "--config-file [FILE]", "eb_deployer config file. Default location is config/eb_deployer.yml") do |v|
+        options[:config_file] = v
+      end
+
+      opts.on("-d", "--destroy", "Destroy specified environment") do |v|
+        action = :destroy
+      end
+
+      opts.on("-v", "--version", "Print current version") do |v|
+        puts "eb_deployer v#{VERSION}"
+        exit(0)
+      end
+
+    end
+  end
+
 
 end

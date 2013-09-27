@@ -12,14 +12,17 @@ module EbDeployer
     end
 
     def provision(resources)
+      resources = symbolize_keys(resources)
       template = File.read(resources[:template])
-      transforms = resources[:transforms]
+      outputs = resources[:outputs] || {}
+      transforms = resources[:transforms] || {}
       capabilities = resources[:capabilities] || []
-      params = resources[:parameters] || {}
+      params = resources[:inputs] || resources[:parameters] || {}
 
       stack_exists? ? update_stack(template, params, capabilities) : create_stack(template, params, capabilities)
       wait_for_stack_op_terminate
-      transform_output_to_settings(transforms)
+
+      transform_output_to_settings(convert_to_transforms(outputs).merge(transforms))
     end
 
     def output(key)
@@ -29,6 +32,19 @@ module EbDeployer
     end
 
     private
+
+    #todo: remove duplication
+    def symbolize_keys(hash)
+      hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    end
+
+
+    def convert_to_transforms(outputs)
+      outputs.inject({}) do |memo, (key, value)|
+        memo[key] = lambda { |output_value| value.merge('value' => output_value) }
+        memo
+      end
+    end
 
     def update_stack(template, params, capabilities)
       @cf_driver.update_stack(@stack_name, template,

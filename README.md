@@ -6,16 +6,6 @@ ElasticBeanstalk Deployer thus allows you to do continuous delivery on AWS.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'eb_deployer'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
     $ gem install eb_deployer
 
 ## Usage
@@ -26,58 +16,48 @@ Create an AWS IAM user for deploy and give it privilege to operate Elastic Beans
 
 ### Step Two: Packaging
 
-You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack.
+You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack. (Please remember do rake assets:precompile first for rails app)
 
 
-### Step Three: Define the task
-Add a deploy task for deployment in your Rakefile
+### Step Three: Generate configuration and Configure deployment process
 
-    require 'digest'
-    require 'eb_deployer'
+    $ eb_deploy
 
-    desc "deploy our beloved app to elastic beanstalk"
-    task :deploy, [:package] do |t, args|
-      EbDeployer.deploy(:application => "MYAPP",
-                        :environment => "production",
-                        :solution_stack_name => <SOLUTION_STACK_NAME>
-                        :package => args[:package],
-                        :version_label => "dev-" + Digest::MD5.file(args[:package]).hexdigest)
-    end
+This will generate a default configuration at location 'config/eb_deployer.yml'. It is almost empty but working one. And it will generate settings for two environment 'dev' and 'production'. If you had time please try to read through it to see the options you can tweak.
+
 
 ### Step Four: Fasten your seat belt
-run deploy task:
+run deploy
+    $ eb_deploy -p <package built> -e <environment>
 
-    rake deploy[<package built>] AWS_ACCESS_KEY_ID=<deployers_aws_key> AWS_SECRET_ACCESS_KEY=<secret>
 Then open aws console for Elastic Beanstalk to see what happened.
 
 
 ### Smoke Testing your stack
 
-EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly. 
-Adding a smoke test suite is also simple. All that you need to do is edit your rake task as follows:
+EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
+Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. The simplest thing you can do is using curl make sure landing page get loaded, e.g.:
 
-    desc "deploy our simple java app with one page"
-    task :deploy, [:package] do |t, args|
-      EbDeployer.deploy(:application => "MYAPP",
-                        :environment => "production",
-                        :solution_stack_name => <SOLUTION_STACK_NAME>
-                        :package => args[:package],
-                        :version_label => "dev-" + Digest::MD5.file(args[:package]).hexdigest)
-                        :smoke_test => lambda { |host|
-                          Timeout.timeout(600) do
-                            until `curl http://#{host}`.include?('Hello, World')
-                              sleep 5
-                            end
-                          end
-                        })
-    end                
-You can add more smoke tests by calling arbitrary tasks from this rake task.
+   smoke_test: >
+     curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
+     Timeout.timeout(600) do
+       while `#{curl_http_code}`.strip != '200'
+         sleep 5
+       end
+     end
+
+
+You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):
+   smoke_test: >
+      `rake test:smoke HOST_NAME=#{host_name}`
+      raise("Smoke failed!") unless $?.success?
+
 Smoke testing gets you one step closer to continuous delivery.
-                      
-### Blue-Green deployment
-Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments. 
 
-To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime. 
+### Blue-Green deployment
+Since every deployment now runs smoke test, you now have a better safety net around your deployments. This allows us to trigger automatic blue-green deployments.
+
+To do this you need not do anything special. So far we have deployed the application only once. Let's call this the 'green' stack. Any subsequent calls to deployment will deployment a copy of this application to a new stack - the 'blue' stack. Smoke tests will be run on it and once everything passes the 'blue'(new) stack will be switched to the 'green' stack. Thus your new code will now be on the active stack and the user will experience no downtime.
 
 Once this new stack is stable or has run for a while you can choose to delete the old stack. Or if you are doing continuous delivery you may be ready to another 'blue' deployment. You could just trigger another deployment and repeat this every hour/day/week... you get the idea.
 
@@ -85,12 +65,8 @@ Once this new stack is stable or has run for a while you can choose to delete th
 
 ### Destroying a stack
 So you are done with this application or environment, you can destroy it easily as well.
+   $ eb_deployer -d -e <environment>
 
-    desc "clean up everything"
-    task :teardown do |t, args|
-      EbDeployer.destroy(:application => "ebtest-simple")
-    end
-    
 and you are done!
 
 Later tutorials coming soon will cover

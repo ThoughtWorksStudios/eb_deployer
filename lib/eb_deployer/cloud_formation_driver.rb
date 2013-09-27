@@ -26,7 +26,8 @@ module EbDeployer
     end
 
     def query_output(name, key)
-      stack(name).outputs.find { |o| o.key == key }.try(:value)
+      output = stack(name).outputs.find { |o| o.key == key }
+      output && output.value
     end
 
     private

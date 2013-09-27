@@ -1,16 +1,11 @@
-$:.unshift(File.expand_path("../../lib", __FILE__))
-require 'tempfile'
-require 'eb_deployer'
-require 'aws_driver_stubs'
-require 'minitest/autorun'
+require 'test_helper'
 
 class DeployTest < Minitest::Test
   def setup
     @eb_driver = EBStub.new
     @s3_driver = S3Stub.new
     @cf_driver = CFStub.new
-    @sample_package = '/tmp/app-package.war'
-    File.open(@sample_package, 'w') { |f| f << 's' * 100 }
+    @sample_package = sample_file('app-package.war')
   end
 
   def test_first_deplyment_create_eb_application

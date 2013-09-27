@@ -34,6 +34,10 @@ module EbDeployer
       @bs.environment_swap_cname(self.app, self.name, another.name)
     end
 
+    def log(msg)
+      puts "[#{Time.now.utc}][beanstalk:#{@name}] #{msg}"
+    end
+
     private
 
     def shorten(str, max_length, digest_length=5)
@@ -64,12 +68,8 @@ module EbDeployer
     end
 
     def smoke_test
-      if smoke = @creation_opts[:smoke_test]
-        host = @bs.environment_cname(@app, @name)
-        log("running smoke test for #{host}...")
-        smoke.call(host)
-        log("smoke test succeeded.")
-      end
+      host_name = @bs.environment_cname(@app, @name)
+      SmokeTest.new(@creation_opts[:smoke_test]).run(host_name, self)
     end
 
     def with_polling_events(terminate_pattern, &block)
@@ -97,12 +97,9 @@ module EbDeployer
       end
     end
 
-    def log(msg)
-      puts "[#{Time.now.utc}][beanstalk-#{@name}] #{msg}"
-    end
 
     def log_event(event)
-      puts "[#{event[:event_date]}][beanstalk-#{@name}] #{event[:message]}"
+      puts "[#{event[:event_date]}][beanstalk:#{@name}] #{event[:message]}"
     end
   end
 end
