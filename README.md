@@ -28,6 +28,7 @@ This will generate a default configuration at location 'config/eb_deployer.yml'.
 
 ### Step Four: Fasten your seat belt
 run deploy
+
     $ eb_deploy -p <package built> -e <environment>
 
 Then open aws console for Elastic Beanstalk to see what happened.
@@ -38,17 +39,18 @@ Then open aws console for Elastic Beanstalk to see what happened.
 EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
 Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. The simplest thing you can do is using curl make sure landing page get loaded, e.g.:
 
-   smoke_test: >
-     curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
-     Timeout.timeout(600) do
-       while `#{curl_http_code}`.strip != '200'
-         sleep 5
-       end
-     end
+    smoke_test: >
+      curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
+      Timeout.timeout(600) do
+        while `#{curl_http_code}`.strip != '200'
+          sleep 5
+        end
+      end
 
 
 You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):
-   smoke_test: >
+   
+    smoke_test: >
       `rake test:smoke HOST_NAME=#{host_name}`
       raise("Smoke failed!") unless $?.success?
 
@@ -65,7 +67,8 @@ Once this new stack is stable or has run for a while you can choose to delete th
 
 ### Destroying a stack
 So you are done with this application or environment, you can destroy it easily as well.
-   $ eb_deployer -d -e <environment>
+   
+    $ eb_deployer -d -e <environment>
 
 and you are done!
 
