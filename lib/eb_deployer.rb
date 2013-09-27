@@ -19,6 +19,7 @@ require 'timeout'
 require 'aws-sdk'
 require 'optparse'
 require 'erb'
+require 'fileutils'
 
 module EbDeployer
 
