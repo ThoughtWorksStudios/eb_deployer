@@ -30,9 +30,9 @@
         <h1>
 <a name="ebdeployer" class="anchor" href="#ebdeployer"><span class="octicon octicon-link"></span></a>EbDeployer</h1>
 
-<p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.</p>
+<p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing link to automate the whole flow out of box.</p>
 
-<p>ElasticBeanstalk Deployer thus allows you to do continuous delivery on AWS.</p>
+<p>EbDeployer thus allows you to do continuous delivery on AWS.</p>
 
 <h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
@@ -46,12 +46,12 @@
 <h3>
 <a name="step-one-aws-account-setup" class="anchor" href="#step-one-aws-account-setup"><span class="octicon octicon-link"></span></a>Step One: AWS Account Setup</h3>
 
-<p>Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later.</p>
+<p>Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later. Ensure your command line is primed with appropriate access_keys using one of techniques mentioned on <a href="http://ruby.awsblog.com/blog/tag/config">aws blog</a>.</p>
 
 <h3>
 <a name="step-two-packaging" class="anchor" href="#step-two-packaging"><span class="octicon octicon-link"></span></a>Step Two: Packaging</h3>
 
-<p>You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack. (Please remember do rake assets:precompile first for rails app)</p>
+<p>You need to package your application for Elastic Beanstalk stack first. For Java app a warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as a war ball using warbler and deploy to Java stack. (Please remember to run rake assets:precompile first for a rails app.)</p>
 
 <h3>
 <a name="step-three-generate-configuration-and-configure-deployment-process" class="anchor" href="#step-three-generate-configuration-and-configure-deployment-process"><span class="octicon octicon-link"></span></a>Step Three: Generate configuration and Configure deployment process</h3>
@@ -59,7 +59,7 @@
 <pre><code>$ eb_deploy
 </code></pre>
 
-<p>This will generate a default configuration at location 'config/eb_deployer.yml'. It is almost empty but working one. And it will generate settings for two environment 'dev' and 'production'. If you had time please try to read through it to see the options you can tweak.</p>
+<p>This will generate a default configuration at location 'config/eb_deployer.yml'. It is almost empty but working one. And it will generate settings for two environments 'development' and 'production'. Some options can be tweaked. The yml files includes documentation on how you can best suit it to your purpose.</p>
 
 <h3>
 <a name="step-four-fasten-your-seat-belt" class="anchor" href="#step-four-fasten-your-seat-belt"><span class="octicon octicon-link"></span></a>Step Four: Fasten your seat belt</h3>
@@ -69,13 +69,13 @@
 <pre><code>$ eb_deploy -p &lt;package built&gt; -e &lt;environment&gt;
 </code></pre>
 
-<p>Then open aws console for Elastic Beanstalk to see what happened.</p>
+<p>Then open aws console for Elastic Beanstalk to see the result of this deployment.</p>
 
 <h3>
 <a name="smoke-testing-your-stack" class="anchor" href="#smoke-testing-your-stack"><span class="octicon octicon-link"></span></a>Smoke Testing your stack</h3>
 
 <p>EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
-Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. The simplest thing you can do is using curl make sure landing page get loaded, e.g.:</p>
+Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. We show a simple curl based smoke test that helps you test if your app is up and responding to http. </p>
 
 <pre><code>smoke_test: &gt;
   curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
@@ -86,7 +86,8 @@ Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_
   end
 </code></pre>
 
-<p>You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):</p>
+<p>Any rakeable test suite can be run as part of the smoke test(selenium, cucumber, capybara, and so on.)
+You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):</p>
 
 <pre><code>smoke_test: &gt;
   `rake test:smoke HOST_NAME=#{host_name}`
