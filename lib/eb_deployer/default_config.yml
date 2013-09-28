@@ -9,32 +9,32 @@ common:
   # AWS region to deploy. Default to us-east-1
   # region: us-west-1
 
-  # There are two deployment strategies: blue-green or inplace-update.
-  # Blue green keep two elastic beanstalk environments and always deploy to
-  # inactive one, to achive zero downtime. inplace-update strategy
-  # will only keep one environment, and update the version inplace on
-  # deploy. inplace-update will save resources but will have downtime. Default
-  # strategy is blue-green. PS. All old environments need be destroyed when you
-  # switching between strategies.
+  # There are two deployment strategies: 'blue-green' or 'inplace-update'.
+  # Blue green deployments keep two elastic beanstalk environments and always deploy to
+  # inactive one, to achieve zero downtime. 
+  # Inplace-update strategy will only keep one environment, and update the version inplace on
+  # deploy. Inplace-update will save resources but will suffer from downtime. 
+  # (All old environments need be destroyed when you switching between strategies.)
+  # Default strategy is 'blue-green'.
   # strategy: blue-green
 
-  # If phoenix mode is turn on, it will terminate the old elastic
-  # beanstalk environment and recreate on deploy. For blue-green
-  # deployment it terminate the inactive environment first then
-  # recreate it. This is useful to avoiding configuration drift and
-  # accumulating state on the ec2 instances. Also it has the benifit of
+  # If phoenix mode is turned 'on', it will terminate the old elastic
+  # beanstalk environment and recreate a new one on deploy. For blue-green
+  # deployment it will terminate the inactive environment first then
+  # recreate it. This is useful to avoid configuration drift and
+  # accumulating state on the ec2 instances. Also it has the benefit of
   # keeping your ec2 instance system package upto date, because everytime ec2
-  # instance boot up from AMI it does a system update. Default is off but we suggest
-  # overriden it to on for production environment.
+  # instance boots up from AMI it does a system update. Default is 'off' but we suggest
+  # you override it to 'on' for production environment.
   # phoenix_mode: false
 
-  # Generating version label for package be deployed. A readable version label will
+  # Generating version label for package to be deployed. A readable version label will
   # provide better traceablity of your deployment process.
   # By default setting is:
   # version_label: <%%= package_digest %>
   # which means using MD5 digest of the package file. If you deploy using build
   # pipeline tool such as GO, switching to pipline counter is highly suggested to
-  # increase the readability. Following example read pipeline counter from environment
+  # increase the readability. Following example will read pipeline counter from environment
   # variable with a fall back to digest for local deployment:
   # version_label: <%%= ENV['GO_PIPELINE_COUNTER'] || package_digest %>
 
@@ -42,9 +42,9 @@ common:
   # Smoke test value should be a piece of ruby code with access to single variable
   # "host_name" -- environment DNS name. Smoke test snippet will be evaluated at
   # the end of the deployment for inplace-update deployment. For blue-green
-  # deployment it will run after inactive environment update finish and before
-  # switching.
-  # Defining a smoke test is high recommended for serious usage. The
+  # deployment it will run after inactive environment update is completed and before
+  # switching over.
+  # Defining a smoke test is highly recommended for serious usage. The
   # simplest one could just be checking server landing page using curl, e.g.
   # smoke_test: >
   #   curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
@@ -55,13 +55,13 @@ common:
   #   end
 
 
-  # Elastic Beanstalk settings that will apply to the environments you
+  # Elastic Beanstalk settings that will apply to the environments you are
   # deploying.
   # For all available options take a look at
   # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
   option_settings:
     # Following is an option_settings example which changes EC2 instance type
-    # from t1.micro (default) to m1.small. Intances with t1.micro type sometime
+    # from t1.micro (default) to m1.small. Instances with t1.micro type sometime
     # are not very responsible, so m1.small is suggested for saving time.
     # But if you care about the marginal cost difference you can comment this out to
     # go back to t1.micro.
@@ -102,7 +102,7 @@ environments:
     # strategy: inplace-update
   production:
     option_settings:
-      # example for overriding common option_settings: providing least redanduncy
+      # example for overriding common option_settings: providing least redundancy
       # in production environment.
       # - namespace: aws:autoscaling:asg
       #   option_name: MinSize

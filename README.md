@@ -12,11 +12,11 @@ EbDeployer thus allows you to do continuous delivery on AWS.
 
 ### Step One: AWS Account Setup
 
-Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later.
+Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later. Ensure your command line is primed with appropriate access_keys using one of techniques mentioned on [aws blog](http://ruby.awsblog.com/blog/tag/config).
 
 ### Step Two: Packaging
 
-You need package your application for Elastic Beanstalk stack first. For Java app an warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as war ball using warbler and deploy to Java stack. (Please remember do rake assets:precompile first for rails app)
+You need to package your application for Elastic Beanstalk stack first. For Java app a warball is appropriate. For Ruby on Rails app a tar.gz file is good. You can also package a Rails/Sinatra app as a war ball using warbler and deploy to Java stack. (Please remember to run rake assets:precompile first for a rails app.)
 
 
 ### Step Three: Generate configuration and Configure deployment process

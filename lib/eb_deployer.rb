@@ -205,7 +205,7 @@ module EbDeployer
     action = options.delete(:action)
 
     unless File.exists?(options[:config_file])
-      puts "Generat default configuration one at location #{options[:config_file]}."
+      puts "Generated default configuration at #{options[:config_file]}."
       DefaultConfig.new(File.basename(Dir.pwd)).write_to(options[:config_file])
       exit(2)
     end
