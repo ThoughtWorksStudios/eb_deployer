@@ -1,7 +1,8 @@
-# applicaiton name
+# Applicaiton name,  can only contain any combination of uppercase letters, lowercase
+# letters, numbers, dashes (-)
 application: eb-deployer-simple-java
 
-# common settings for all environments
+# Common settings for all environments
 common:
   # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
   # solution_stack_name: 64bit Amazon Linux running Tomcat 7
@@ -9,13 +10,13 @@ common:
   # AWS region to deploy. Default to us-east-1
   # region: us-west-1
 
-  # There are two deployment strategies: blue-green or inplace-update.
+  # There are two deployment strategies supported: blue-green and inplace-update.
   # Blue green keep two elastic beanstalk environments and always deploy to
   # inactive one, to achive zero downtime. inplace-update strategy
   # will only keep one environment, and update the version inplace on
   # deploy. inplace-update will save resources but will have downtime. Default
   # strategy is blue-green. PS. All old environments need be destroyed when you
-  # switching between strategies.
+  # switching between strategies, otherwise you will have DNS conflict.
   # strategy: blue-green
 
   # If phoenix mode is turn on, it will terminate the old elastic
@@ -23,13 +24,13 @@ common:
   # deployment it terminate the inactive environment first then
   # recreate it. This is useful to avoiding configuration drift and
   # accumulating state on the ec2 instances. Also it has the benifit of
-  # keeping your ec2 instance system package upto date, because everytime ec2
+  # keeping your EC2 instance system package upto date, because everytime EC2
   # instance boot up from AMI it does a system update. Default is off but we suggest
   # overriden it to on for production environment.
   # phoenix_mode: false
 
-  # Generating version label for package be deployed. A readable version label will
-  # provide better traceablity of your deployment process.
+  # Generating a version label for package being deployed. A readable version label
+  # will provide better traceablity of your deployment process.
   # By default setting is:
   # version_label: <%= package_digest %>
   # which means using MD5 digest of the package file. If you deploy using build
@@ -40,10 +41,10 @@ common:
 
 
   # Smoke test value should be a piece of ruby code with access to single variable
-  # "host_name" -- environment DNS name. Smoke test snippet will be evaluated at
+  # named "host_name" -- environment DNS name. Smoke test snippet will be evaluated at
   # the end of the deployment for inplace-update deployment. For blue-green
-  # deployment it will run after inactive environment update finish and before
-  # switching.
+  # deployment it will run after inactive environment deploy finish and before
+  # switching inactive and active environments.
   # Defining a smoke test is high recommended for serious usage. The
   # simplest one could just be checking server landing page using curl, e.g.
   smoke_test: >
