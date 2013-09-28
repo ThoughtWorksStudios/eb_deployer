@@ -12,7 +12,11 @@ EbDeployer thus allows you to do continuous delivery on AWS.
 
 ### Step One: AWS Account Setup
 
-Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later. Ensure your command line is primed with appropriate access_keys using one of techniques mentioned on [aws blog](http://ruby.awsblog.com/blog/tag/config).
+Create an AWS IAM user for deploy and give it privilege to operate Elastic Beanstalk. Download the access keys for executing the deployment tasks later. Ensure your command line is primed with appropriate access_keys using one of techniques mentioned on [aws blog](http://ruby.awsblog.com/blog/tag/config). For example using environment variable:
+
+    $ export AWS_ACCESS_KEY_ID=xxx
+    $ export AWS_SECRET_ACCESS_KEY=xxx
+
 
 ### Step Two: Packaging
 
