@@ -4,6 +4,7 @@ module EbDeployer
       @name = name
       @eb_driver = eb_driver
       @s3_driver = s3_driver
+      raise "application name can only contain any combination of uppercase letters, lowercase letters, numbers, dashes (-)" unless @name =~ /^[a-zA-Z0-9.-]+$/
     end
 
     def create_version(version_label, package)

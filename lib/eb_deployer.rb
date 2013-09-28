@@ -238,7 +238,7 @@ module EbDeployer
       end
 
       opts.on("-d", "--destroy", "Destroy specified environment") do |v|
-        action = :destroy
+        options[:action] = :destroy
       end
 
       opts.on("-v", "--version", "Print current version") do |v|

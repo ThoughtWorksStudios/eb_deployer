@@ -56,6 +56,7 @@ module EbDeployer
     end
 
     def package_digest(package)
+      return nil unless package
       Digest::MD5.file(package).hexdigest
     end
   end
