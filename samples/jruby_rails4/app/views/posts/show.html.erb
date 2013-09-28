@@ -1,0 +1,15 @@
+<h1> <%= @post.title %> </h1>
+
+<p>
+  <%= @post.text %>
+</p>
+
+
+<h4>Comments</h2>
+<%= render @post.comments %>
+
+<h4>Add a comment:</h2>
+<%= render "comments/form" %>
+
+<%= link_to 'Edit Post', edit_post_path(@post) %> |
+<%= link_to 'Back to Posts', posts_path %>
