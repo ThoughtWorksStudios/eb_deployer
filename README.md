@@ -78,7 +78,6 @@ So you are done with this application or environment, you can destroy it easily 
 and you are done!
 
 Later tutorials coming soon will cover
-* how to setup multiple environment suites: production, staging, and how to manage configurations for them
 * how to setup RDS or other AWS resource and share them between blue green environments
 
 Take a look at code if you can not wait for the documentation.
