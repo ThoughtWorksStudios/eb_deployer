@@ -49,7 +49,7 @@ common:
   smoke_test: |
     curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
     Timeout.timeout(600) do
-      until ['200', '302'].include?(`#{curl_http_code}`.strip)
+      until ['200', '301', '302'].include?(`#{curl_http_code}`.strip)
         sleep 5
       end
     end
@@ -61,7 +61,13 @@ common:
   # For all available options take a look at
   # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
   option_settings:
-    # Following is an option_settings example which changes EC2 instance type
+    # Following is an example of set EC2 ssh key name. This allow you ssh into the ec2
+    # instance. See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+    # - namespace: aws:autoscaling:launchconfiguration
+    #   option_name: EC2KeyName
+    #   value: <my-ec2-key-name>
+
+    # Following is an example which changes EC2 instance type
     # from t1.micro (default) to m1.small. Instances with t1.micro type sometime
     # are not very responsible, so m1.small is suggested for saving time.
     # But if you care about the marginal cost difference you can comment this out to
@@ -69,6 +75,7 @@ common:
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
       value: m1.small
+
 
   # If resources specified, eb_deployer will use the CloudFormation
   # template you provide to create a default CloudFormation stack with
@@ -88,7 +95,7 @@ common:
     # sample project which has a working example):
     # template: config/my_rds.json
     # inputs:
-    #   DBPassword: <%%= ENV.fetch("MYDBPASSWORD") %>
+    #   DBPassword: <%%= ENV["MYDBPASSWORD"] %>
     # outputs:
     #   RDSPassSecurityGroup:
     #     namespace: aws:autoscaling:launchconfiguration
