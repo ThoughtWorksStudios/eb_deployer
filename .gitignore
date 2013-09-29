@@ -17,3 +17,5 @@ test/version_tmp
 tmp
 /.rvmrc
 _site
+/samples/jruby_rails4/jruby_rails4.war
+/samples/jruby_rails4/public/assets/*

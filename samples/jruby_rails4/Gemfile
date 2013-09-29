@@ -6,6 +6,8 @@ gem 'rails', '4.0.0'
 # Use jdbcsqlite3 as the database for Active Record
 gem 'activerecord-jdbcsqlite3-adapter'
 
+gem 'activerecord-jdbcmysql-adapter'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'
 
@@ -32,6 +34,13 @@ group :doc do
   gem 'sdoc', require: false
 end
 
+
+group :development do
+  gem 'warbler'
+  gem 'eb_deployer'
+end
+
+gem 'rubyzip', '< 1.0.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
@@ -40,4 +49,3 @@ end
 
 # Use Capistrano for deployment
 # gem 'capistrano', group: :development
-
