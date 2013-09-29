@@ -38,15 +38,15 @@ run deploy
 Then open aws console for Elastic Beanstalk to see the result of this deployment.
 
 
-### Smoke Testing your stack
+### Conifgure Smoke Testing your stack
 
 EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
-Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. We show a simple curl based smoke test that helps you test if your app is up and responding to http. 
+Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. We show a simple curl based smoke test that helps you test if your app is up and responding to http.
 
-    smoke_test: >
+    smoke_test: |
       curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
       Timeout.timeout(600) do
-        while `#{curl_http_code}`.strip != '200'
+        until ['200', '302'].include?(`#{curl_http_code}`.strip)
           sleep 5
         end
       end
@@ -54,8 +54,8 @@ Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_
 
 Any rakeable test suite can be run as part of the smoke test(selenium, cucumber, capybara, and so on.)
 You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):
-   
-    smoke_test: >
+
+    smoke_test: |
       `rake test:smoke HOST_NAME=#{host_name}`
       raise("Smoke failed!") unless $?.success?
 
@@ -72,7 +72,7 @@ Once this new stack is stable or has run for a while you can choose to delete th
 
 ### Destroying a stack
 So you are done with this application or environment, you can destroy it easily as well.
-   
+
     $ eb_deployer -d -e <environment>
 
 and you are done!
