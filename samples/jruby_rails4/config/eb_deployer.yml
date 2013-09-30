@@ -70,7 +70,19 @@ common:
 
     # - namespace: aws:autoscaling:launchconfiguration
     #   option_name: EC2KeyName
-    #   value: luau-us-east-1
+    #   value: my-ec2-keypair-in-this-region
+    
+    # jvm settings
+    - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+      option_name: Xms
+      value: 512m
+    - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+      option_name: Xmx
+      value: 1024m
+    - namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+      option_name: XX:MaxPermSize
+      value: 128m
+
 
 
   # If resources specified, eb_deployer will use the CloudFormation
