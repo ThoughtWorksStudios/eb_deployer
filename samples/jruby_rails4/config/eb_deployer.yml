@@ -89,7 +89,7 @@ common:
     # For example creating a RDS instance for blue green deployment:
     template: config/my_rds.json
     inputs:
-      DBPassword: <%= ENV.fetch('MYDBPASSWORD') %>
+      DBPassword: <%= ENV['MYDBPASSWORD'] %>
     outputs:
       RDSPassSecurityGroup:
         namespace: aws:autoscaling:launchconfiguration
