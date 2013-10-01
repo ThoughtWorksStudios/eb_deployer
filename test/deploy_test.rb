@@ -97,7 +97,7 @@ class DeployTest < Minitest::Test
   def test_blue_green_deployment_strategy_should_create_blue_env_on_first_deployment
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 42)
 
     assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production-a'))
@@ -108,12 +108,12 @@ class DeployTest < Minitest::Test
   def test_blue_green_deployment_should_create_green_env_if_blue_exists
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 42)
 
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 43)
 
     assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production-a'))
@@ -124,12 +124,12 @@ class DeployTest < Minitest::Test
   def test_blue_green_deployment_should_swap_cname_to_make_active_most_recent_updated_env
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 42)
 
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 43)
 
     assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-a')))
@@ -139,7 +139,7 @@ class DeployTest < Minitest::Test
 
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 44)
 
     assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-b')))
@@ -154,7 +154,7 @@ class DeployTest < Minitest::Test
     [42, 43, 44].each do |version_label|
       deploy(:application => 'simple',
              :environment => "production",
-             :strategy => 'blue_green',
+             :strategy => 'blue-green',
              :smoke_test => smoke_test,
              :version_label => version_label)
     end
@@ -248,13 +248,13 @@ class DeployTest < Minitest::Test
   def test_blue_green_deployment_should_delete_and_recreate_inactive_env_if_phoenix_mode_is_enabled
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 42,
            :phoenix_mode => true)
 
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 43,
            :phoenix_mode => true)
 
@@ -266,7 +266,7 @@ class DeployTest < Minitest::Test
 
     deploy(:application => 'simple',
            :environment => "production",
-           :strategy => 'blue_green',
+           :strategy => 'blue-green',
            :version_label => 44,
            :phoenix_mode => true)
 
@@ -295,7 +295,7 @@ class DeployTest < Minitest::Test
 
   def deploy(opts)
     EbDeployer.deploy({:package => @sample_package,
-                        :strategy => :inplace_update,
+                        :strategy => :'inplace-update',
                         :version_label => 1}.merge(opts).merge(stubs))
   end
 

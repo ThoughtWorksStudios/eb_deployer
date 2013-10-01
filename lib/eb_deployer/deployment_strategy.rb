@@ -58,13 +58,13 @@ module EbDeployer
     end
 
     def self.create(strategy_name, app, env_name, eb_driver, env_creation_opts={})
-      case strategy_name.to_sym
-      when :inplace_update
+      case strategy_name.to_s
+      when 'inplace_update', 'inplace-update'
         InplaceUpdate.new(app, env_name, eb_driver, env_creation_opts)
-      when :blue_green
+      when 'blue_green', 'blue-green'
         BlueGreen.new(app, env_name, eb_driver, env_creation_opts)
       else
-        raise 'strategy_name:' + strategy_name + ' not supported'
+        raise 'strategy_name: ' + strategy_name.to_s + ' not supported'
       end
 
     end
