@@ -23,15 +23,15 @@ require 'fileutils'
 
 module EbDeployer
 
-  ##
-  # Query ouput value of the cloud formation stack
-  # arguments:
-  #  key:    CloudFormation ouput key
-  #  options: a hash
-  #     :application     application name
-  #     :environment     environment name (e.g. staging, production)
   #
-
+  # Query ouput value of the cloud formation stack
+  #
+  # @param [String] key CloudFormation output key
+  # @param [Hash] opts
+  # @option opts [Symbol] :application application name
+  # @option opts [Symbol] :environment environment name (e.g. staging, production)
+  # @option opts [Symbol] :region AWS Region (e.g. "us-west-2", "us-east-1")
+  # 
   def self.query_resource_output(key, opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
@@ -45,104 +45,108 @@ module EbDeployer
   end
 
 
-  # #
+  # 
   # Deploy a package to specfied environments on elastic beanstalk
   #
-  # Options available:
+  # @param [Hash] opts
   #
-  # :application (required)
-  # Application name, this used for isolate packages and contribute
-  # to your elastic beanstalk cname for environments
+  # @option opts [Symbol] :application *required* Application name, this
+  #   used for isolate packages and contribute to your elastic beanstalk cname
+  #   for environments
   #
-  # :environment (required)
-  # Environment for same application, e.g. testing, staging,
-  # production. This will map to 2 elastic beanstalk environments
-  # (env-a-xxx, env-b-xxx) if blue-green deployment strategy specified
+  # @option opts [Symbol] :environment *required* Environment for same
+  #   application, e.g. testing, staging, production. This will map to 2 elastic
+  #   beanstalk environments (env-a-xxx, env-b-xxx) if blue-green deployment
+  #   strategy specified
   #
-  # :package (required)        package for the application which should be
-  # suitable for elastic beanstalk deploying. For example, a war file
-  # should be provided for java solution stacks and a tar gz file
-  # should be provided for rails stack.
+  # @option opts [Symbol] :package *required* package for the application
+  #   which should be suitable for elastic beanstalk deploying. For example, a
+  #   war file should be provided for java solution stacks and a ZIP file
+  #   should be provided for Rails or Sinatra stack.
   #
-  # :version_label (required)
-  # Version label give the package uploaded a unique identifier.
-  # Should use something related to pipeline counter if you have build
-  # pipeline setup to build the installer. For the convient of dev we
-  # recommend use md5 digest of the installer so that everytime you
-  # upload new installer it forms a new version. e.g.
+  # @option opts [Symbol] :option_settings  (optional) Elastic Beanstalk
+  #   settings that will apply to the environments you deploying. Value should be
+  #   array of hash with format such as:
   #
-  #     :version_label => ENV['MY_PIPELINE_COUNTER']
-  #                      || "dev-" + Digest::MD5.file(my_package).hexdigest
-  #
-  # :solution_stack_name (optional default "64bit Amazon Linux running Tomcat 7")
-  # The elastic beanstalk solution stack you want to deploy on top of.
-  # Current possible values include:
-  #
-  # :option_settings (or :settings)  (optional)
-  # Elastic Beanstalk settings that will apply to the environments you
-  # deploying. Value should be array of hash with format such as:
   #     [{
   #        :namespace => 'aws:autoscaling:launchconfiguration',
   #        :option_name => 'InstanceType',
   #        :value => 'm1.small' }]
-  # When there are many, Using an external yaml file to hold those
-  # configuration is recommended. Such as:
+  #
+  #   When there are many, Using an external yaml file to hold those
+  #   configuration is recommended. Such as:
+  #
   #     YAML.load(File.read("my_settings_file.yml"))
-  # For all available options take a look at
-  # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
   #
-  # :resources (optional)
-  # If :resources specified, EBDeployer will use the CloudFormation
-  # template you provide to create a default CloudFormation stack with
-  # name <application_name>-<env-name> for the environment current
-  # deploying.  Value of resources need to be hash with following
-  # keys:
-  #    :template => CloudFormation template file with JSON format
-  #    :parameters (or :inputs) => A Hash, input values for the CloudFormation
-  # template
-  #    :transforms => A Hash with key map to your CloudFormation
-  # template outputs and value as lambda that return a single or array of
-  # elastic beanstalk settings.
-  #    :capabilities => An array. You need set it to ['CAPABILITY_IAM']
-  # if you want to provision IAM Instance Profile.
+  #   For all available options take a look at
+  #   http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
   #
-  # :strategy (optional default :blue-green)
-  # There are two options: blue-green or inplace-update. Blue green
-  # keep two elastic beanstalk environments and always deploy to
-  # inactive one, to achive zero downtime. inplace-update strategy
-  # will only keep one environment, and update the version inplace on
-  # deploy. this will save resources but will have downtime.
-  #
-  # :phoenix_mode (optional default false)
-  # If phoenix mode is turn on, it will terminate the old elastic
-  # beanstalk environment and recreate on deploy. For blue-green
-  # deployment it terminate the inactive environment first then
-  # recreate it. This is useful to avoiding configuration drift and
-  # accumulating state on the ec2 instances. Also it has the benifit of
-  # keeping your ec2 instance system package upto date, because everytime ec2
-  # instance boot up from AMI it does a system update.
-  #
-  # :smoke_test (optional)
-  # Value should be a proc or a lambda which accept single argument that will
-  # passed in as environment DNS name. Smoke test proc or lambda will be
-  # called at the end of the deployment for inplace-update deployment
-  # strategy. For blue-green deployment it will run after inactive
-  # environment update finish and before switching.
-  # Defining a smoke test is high recommended for serious usage. The
-  # simplest one could just be checking the server is up using curl, e.g.
-  #
-  #  :smoke_test => lambda { |host|
-  #    curl_http_code = "curl -k -s -o /dev/null -w \"%{http_code}\" https://#{host}"
-  #    Timeout.timeout(600) do
-  #      while `#{curl_http_code}`.strip != '200'
-  #        sleep 5
-  #      end
-  #    end
-  #  }
+  # @option opts [Symbol] :phoenix_mode (false) If phoenix mode is turn on, it
+  #   will terminate the old elastic beanstalk environment and recreate on
+  #   deploy. For blue-green deployment it terminate the inactive environment
+  #   first then recreate it. This is useful to avoiding configuration drift and
+  #   accumulating state on the EC2 instances. Also it has the benifit of keeping
+  #   your EC2 instance system package upto date, because everytime EC2 instance
+  #   boot up from AMI it does a system update.
   #
   #
+  # @option opts [Symbol] :region set the region for application deployment
+  #   (e.g. "us-west-2", "us-east-1"). See available zones at
+  #   http://aws.amazon.com/elasticbeanstalk/faqs/#regions
   #
-
+  # @option opts [Symbol] :resources If :resources specified, EBDeployer will
+  #   use the CloudFormation template you provide to create a default
+  #   CloudFormation stack with name <application_name>-<env-name> for the
+  #   environment current deploying.  Value of resources need to be hash with
+  #   following keys:
+  #
+  #     :template => CloudFormation template file with JSON format
+  #     :parameters (or :inputs) => A Hash, input values for the CloudFormation template
+  #     :transforms => A Hash with key map to your CloudFormation
+  #   template outputs and value as lambda that return a single or array of
+  #   elastic beanstalk settings.
+  #
+  #     :capabilities => An array. You need set it to ['CAPABILITY_IAM']
+  #
+  #   if you want to provision IAM Instance Profile.
+  #
+  # @option opts [Symbol] :settings See `option_settings`
+  #
+  # @option opts [Symbol] :smoke_test Value should be a proc or a lambda which
+  #   accept single argument that will passed in as environment DNS name. Smoke
+  #   test proc or lambda will be called at the end of the deployment for
+  #   inplace-update deployment strategy. For blue-green deployment it will run
+  #   after inactive environment update finish and before switching.  Defining a
+  #   smoke test is high recommended for serious usage. The simplest one could
+  #   just be checking the server is up using curl, e.g.
+  #
+  #     :smoke_test => lambda { |host|
+  #       curl_http_code = "curl -k -s -o /dev/null -w \"%{http_code}\" https://#{host}"
+  #       Timeout.timeout(600) do
+  #         while `#{curl_http_code}`.strip != '200'
+  #           sleep 5
+  #         end
+  #       end
+  #     }
+  #
+  # @option opts [Symbol] :strategy (:blue-green) There are two options:
+  #   blue-green or inplace-update. Blue green keep two elastic beanstalk
+  #   environments and always deploy to inactive one, to achive zero downtime.
+  #   inplace-update strategy will only keep one environment, and update the
+  #   version inplace on deploy. this will save resources but will have downtime.
+  #
+  # @option opts [Symbol] :solution_stack_name ("64bit Amazon Linux running Tomcat 7")
+  #   The elastic beanstalk solution stack you want to deploy on top of.
+  #
+  # @option opts [Symbol] :version_label *required*. Version label give the
+  #   package uploaded a unique identifier.  Should use something related to
+  #   pipeline counter if you have build pipeline setup to build the installer.
+  #   For the convient of dev we recommend use md5 digest of the installer so
+  #   that everytime you upload new installer it forms a new version. e.g.
+  #
+  #      :version_label => ENV['MY_PIPELINE_COUNTER']
+  #                       || "dev-" + Digest::MD5.file(my_package).hexdigest
+  #
   def self.deploy(opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
