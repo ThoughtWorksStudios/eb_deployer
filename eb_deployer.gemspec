@@ -7,6 +7,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{For automate blue green deployment flow on Elasti Beanstalk.}
   gem.summary       = %q{Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing top to automate the whole flow out of box.}
   gem.homepage      = "https://github.com/ThoughtWorksStudios/eb_deployer"
+  gem.license = 'MIT'
 
   gem.add_runtime_dependency 'aws-sdk'
   gem.add_development_dependency 'minitest'
