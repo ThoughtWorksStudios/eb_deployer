@@ -195,6 +195,13 @@ class DeployTest < Minitest::Test
     assert_equal({'a' => 1 },  @cf_driver.stack_config('simple-production')[:parameters])
   end
 
+  def test_set_s3_bucket_name_on_deployment
+    deploy(:application => 'simple',
+           :environment => "production",
+           :bucket => 'thoughtworks.simple')
+
+    assert @s3_driver.bucket_exists?('thoughtworks.simple.packages')
+  end
 
   def test_transforms_resource_provsion_output_to_elastic_beanstalk_settings
     cf_template = temp_file(JSON.dump({
