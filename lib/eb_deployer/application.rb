@@ -1,16 +1,17 @@
 module EbDeployer
   class Application
-    def initialize(name, eb_driver, s3_driver)
+    def initialize(name, eb_driver, s3_driver, bucket = nil)
       @name = name
       @eb_driver = eb_driver
       @s3_driver = s3_driver
+      @bucket = bucket
       raise "application name can only contain any combination of uppercase letters, lowercase letters, numbers, dashes (-)" unless @name =~ /^[a-zA-Z0-9.-]+$/
     end
 
     def create_version(version_label, package)
       create_application_if_not_exists
 
-      package = Package.new(package, @name + "-packages", @s3_driver)
+      package = Package.new(package, @bucket + ".packages", @s3_driver)
       package.upload
 
       unless @eb_driver.application_version_labels.include?(version_label)

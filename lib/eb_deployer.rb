@@ -112,6 +112,11 @@ module EbDeployer
   #
   # @option opts [Symbol] :settings See `option_settings`
   #
+  # @option opts [Symbol] :bucket Name of s3 bucket where uploaded application
+  # packages will be stored. Note that the string ".packages" will be added as
+  # a suffix to your bucket. So, if "thoughtworks.simple" is passed as the bucket name,
+  # the actual s3 bucket name will be thoughtworks.simple.packages. 
+  #
   # @option opts [Symbol] :smoke_test Value should be a proc or a lambda which
   #   accept single argument that will passed in as environment DNS name. Smoke
   #   test proc or lambda will be called at the end of the deployment for
@@ -166,8 +171,9 @@ module EbDeployer
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
     phoenix_mode = opts[:phoenix_mode]
+    bucket = opts[:bucket] || app
 
-    application = Application.new(app, bs, s3)
+    application = Application.new(app, bs, s3, bucket)
 
     cf = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
 
