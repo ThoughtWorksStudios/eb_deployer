@@ -31,7 +31,7 @@ module EbDeployer
   # @option opts [Symbol] :application application name
   # @option opts [Symbol] :environment environment name (e.g. staging, production)
   # @option opts [Symbol] :region AWS Region (e.g. "us-west-2", "us-east-1")
-  # 
+  #
   def self.query_resource_output(key, opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
@@ -45,7 +45,7 @@ module EbDeployer
   end
 
 
-  # 
+  #
   # Deploy a package to specfied environments on elastic beanstalk
   #
   # @param [Hash] opts
@@ -112,10 +112,10 @@ module EbDeployer
   #
   # @option opts [Symbol] :settings See `option_settings`
   #
-  # @option opts [Symbol] :bucket Name of s3 bucket where uploaded application
+  # @option opts [Symbol] :package_bucket Name of s3 bucket where uploaded application
   # packages will be stored. Note that the string ".packages" will be added as
   # a suffix to your bucket. So, if "thoughtworks.simple" is passed as the bucket name,
-  # the actual s3 bucket name will be thoughtworks.simple.packages. 
+  # the actual s3 bucket name will be thoughtworks.simple.packages.
   #
   # @option opts [Symbol] :smoke_test Value should be a proc or a lambda which
   #   accept single argument that will passed in as environment DNS name. Smoke
@@ -171,7 +171,7 @@ module EbDeployer
     cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
     smoke_test = opts[:smoke_test] || Proc.new {}
     phoenix_mode = opts[:phoenix_mode]
-    bucket = opts[:bucket] || app
+    bucket = opts[:package_bucket] || app
 
     application = Application.new(app, bs, s3, bucket)
 

@@ -198,7 +198,7 @@ class DeployTest < Minitest::Test
   def test_set_s3_bucket_name_on_deployment
     deploy(:application => 'simple',
            :environment => "production",
-           :bucket => 'thoughtworks.simple')
+           :package_bucket => 'thoughtworks.simple')
 
     assert @s3_driver.bucket_exists?('thoughtworks.simple.packages')
   end

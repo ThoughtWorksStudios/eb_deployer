@@ -30,7 +30,7 @@ YAML
 application: myapp
 common:
   strategy: inplace-update
-  bucket: thoughtworks
+  package_bucket: thoughtworks
   phoenix_mode: true
   option_settings:
     - namespace: aws:autoscaling:launchconfiguration
@@ -42,7 +42,7 @@ environments:
   production:
 YAML
     assert_equal('inplace-update', config[:strategy])
-    assert_equal('thoughtworks', config[:bucket])
+    assert_equal('thoughtworks', config[:package_bucket])
     assert_equal([{'namespace' => 'aws:autoscaling:launchconfiguration',
                     'option_name' => 'InstanceType',
                     'value' => 'm1.small'}], config[:option_settings])
