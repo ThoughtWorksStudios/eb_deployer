@@ -9,9 +9,8 @@ This is a demo app for eb_deployer to demo how to use warbler(with jruby_rack) a
 
 ## Configuration added:
 
-### RDS database
-    config/my_rds.json  is a CloudFormation template for mysql RDS instance. Take a look at resources section of config/eb_deployer.yml to see how inputs and outputs of the template is handled.
-    Also config/database.yml is changed to configure the production database connection.
+* RDS database: config/my_rds.json  is a CloudFormation template for mysql RDS instance. Take a look at resources section of config/eb_deployer.yml to see how inputs and outputs of the template is handled.
+Also config/database.yml is changed to configure the production database connection.
 
 
 ## Deploy process:
