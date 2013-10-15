@@ -29,6 +29,7 @@ Also config/database.yml is changed to configure the production database connect
 * In AWS ElasticBeanstalk console, find your environment, copy out the value of "databaseConfig" under Configuration ->  Software Configuration -> Environment Properties
 * Run database migration
 
-    $ RAILS_ENV=production JAVA_OPTS='-DdatabaseConfig=<value>' rake db:migrate
+ 
+        $ RAILS_ENV=production JAVA_OPTS='-DdatabaseConfig=<value>' rake db:migrate
 
 * Change your RDS security group to shutdown remote access.
