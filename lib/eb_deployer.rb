@@ -214,7 +214,14 @@ module EbDeployer
     parser.parse!
     action = options.delete(:action)
 
-    unless File.exists?(options[:config_file])
+    if File.exists?(options[:config_file])
+      if !options[:package]
+        puts "Found configuration at #{options[:config_file]}."
+        puts "Now execute 'eb_deploy -p <package name>' to deploy"
+        puts "'eb_deploy --help') for more options"
+        exit(2)
+      end
+    else 
       puts "Generated default configuration at #{options[:config_file]}."
       DefaultConfig.new(File.basename(Dir.pwd)).write_to(options[:config_file])
       exit(2)
