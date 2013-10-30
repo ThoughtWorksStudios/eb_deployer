@@ -195,6 +195,31 @@ class DeployTest < Minitest::Test
     assert_equal({'a' => 1 },  @cf_driver.stack_config('simple-production')[:parameters])
   end
 
+  def test_skip_resource_update
+    cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}}}))
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+             :template => cf_template,
+             :parameters => {'a' => 1 }
+           })
+    assert_equal(1, @cf_driver.stack_config('simple-production')[:parameters]['a'])
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+             :template => cf_template,
+             :parameters => {'a' => 2 }
+           })
+    assert_equal(2, @cf_driver.stack_config('simple-production')[:parameters]['a'])
+    deploy(:application => 'simple',
+           :environment => "production",
+           :skip_resource_stack_update => true,
+           :resources => {
+             :template => cf_template,
+             :parameters => {'a' => 3 }
+           })
+    assert_equal(2, @cf_driver.stack_config('simple-production')[:parameters]['a'])
+  end
+
+
   def test_set_s3_bucket_name_on_deployment
     deploy(:application => 'simple',
            :environment => "production",

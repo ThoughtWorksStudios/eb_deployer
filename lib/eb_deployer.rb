@@ -172,6 +172,7 @@ module EbDeployer
     smoke_test = opts[:smoke_test] || Proc.new {}
     phoenix_mode = opts[:phoenix_mode]
     bucket = opts[:package_bucket] || app
+    skip_resource = opts[:skip_resource_stack_update]
 
     application = Application.new(app, bs, s3, bucket)
 
@@ -183,7 +184,7 @@ module EbDeployer
                                          :smoke_test => smoke_test,
                                          :phoenix_mode => phoenix_mode)
 
-    if resources = opts[:resources]
+    if !skip_resource && resources = opts[:resources]
       env_settings += cf.provision(resources)
     end
 
@@ -221,7 +222,7 @@ module EbDeployer
         puts "'eb_deploy --help') for more options"
         exit(2)
       end
-    else 
+    else
       puts "Generated default configuration at #{options[:config_file]}."
       DefaultConfig.new(File.basename(Dir.pwd)).write_to(options[:config_file])
       exit(2)
@@ -256,6 +257,10 @@ module EbDeployer
 
       opts.on("-d", "--destroy", "Destroy specified environment") do |v|
         options[:action] = :destroy
+      end
+
+      opts.on("--skip-resource-stack-update", "skip cloud-formation stack update. (only for extreme situation like hitting a cloudformation bug)") do |v|
+        options[:skip_resource_stack_update] = true
       end
 
       opts.on("-v", "--version", "Print current version") do |v|
