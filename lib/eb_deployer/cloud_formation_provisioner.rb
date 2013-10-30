@@ -14,14 +14,15 @@ module EbDeployer
     def provision(resources)
       resources = symbolize_keys(resources)
       template = File.read(resources[:template])
-      outputs = resources[:outputs] || {}
-      transforms = resources[:transforms] || {}
       capabilities = resources[:capabilities] || []
       params = resources[:inputs] || resources[:parameters] || {}
-
       stack_exists? ? update_stack(template, params, capabilities) : create_stack(template, params, capabilities)
       wait_for_stack_op_terminate
+    end
 
+    def transform_outputs(resources)
+      outputs = resources[:outputs] || {}
+      transforms = resources[:transforms] || {}
       transform_output_to_settings(convert_to_transforms(outputs).merge(transforms))
     end
 

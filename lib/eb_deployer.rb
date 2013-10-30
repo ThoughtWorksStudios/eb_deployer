@@ -184,8 +184,9 @@ module EbDeployer
                                          :smoke_test => smoke_test,
                                          :phoenix_mode => phoenix_mode)
 
-    if !skip_resource && resources = opts[:resources]
-      env_settings += cf.provision(resources)
+    if resources = opts[:resources]
+      cf.provision(resources) unless skip_resource
+      env_settings += cf.transform_outputs(resources)
     end
 
     application.create_version(version_label, opts[:package])

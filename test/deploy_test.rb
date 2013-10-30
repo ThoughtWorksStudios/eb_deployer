@@ -219,6 +219,27 @@ class DeployTest < Minitest::Test
     assert_equal(2, @cf_driver.stack_config('simple-production')[:parameters]['a'])
   end
 
+  def test_should_still_query_output_to_set_eb_options_even_skip_resources_update_is_specified
+    cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}},
+                                      'Outputs' => {'O1' => {}, 'O2' => {}}}))
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+             :template => cf_template
+           })
+
+    deploy(:application => 'simple', :environment => "production",
+           :skip_resource_stack_update => true,
+           :resources => {
+             :template => cf_template,
+             :transforms => {
+               'O2' => lambda { |v| {:namespace => 'aws.foo', :option_name => 'o2', :value => "transformed " + v} }
+             }
+           })
+
+    assert @eb_driver.environment_settings('simple', eb_envname('simple', 'production')).
+      include?({:namespace => 'aws.foo', :option_name => 'o2', :value => 'transformed value of O2'})
+  end
+
 
   def test_set_s3_bucket_name_on_deployment
     deploy(:application => 'simple',
