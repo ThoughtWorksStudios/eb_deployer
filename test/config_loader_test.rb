@@ -108,6 +108,20 @@ YAML
                     'value' => "2"}], config[:option_settings])
   end
 
+  def test_env_is_required
+   error = assert_raises(RuntimeError) {
+      @loader.load(generate_input(<<-YAML, :environment => 'non_existant'))
+application: myapp
+common:
+  strategy: inplace-update
+environments:
+  dev:
+YAML
+    }
+
+    assert_match(/non_existant/, error.message)
+  end
+
   private
 
   def md5_digest(file)
