@@ -29,7 +29,7 @@ module EbDeployer
 
       env = options[:environment]
       envs = config_settings.delete(:environments)
-      raise 'Environment #{evn} is not defined in #{config_file}' unless envs.has_key?(env)
+      raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
       env_settings = symbolize_keys(envs[env] || {})
       env_option_settings = env_settings.delete(:option_settings) || []
 
