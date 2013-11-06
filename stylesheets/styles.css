@@ -21,8 +21,7 @@ header, section, footer {
 }
 
 a {
-  color: #fff;
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 p {

@@ -17,13 +17,11 @@
   <body>
     <div class="wrapper">
       <header>
-      <img src="images/TW-logo-400.png" id="brand"/>
-       <img src="images/ebdeployer.png" id="logo"/>
+        <a href="http://www.thoughtworks.com"><img src="images/TW-logo-400.png" id="brand"/></a>
+        <a href="https://github.com/ThoughtWorksStudios/eb_deployer"><img src="images/ebdeployer.png" id="logo"/></a>
         <p>AWS Elastic Beanstalk blue-green deployment automation</p>
-        <p class="view"><a href="https://github.com/ThoughtWorksStudios/eb_deployer">View the Project on GitHub <small>ThoughtWorksStudios/eb_deployer</small></a></p>
         <ul>
-          <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/zipball/master">Download ZIP File</a></li>
-          <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer/tarball/master">Download TAR Ball</a></li>
+          <li><a href="http://rubygems.org/gems/eb_deployer">eb_deployer gem</a></li>
           <li><a href="https://github.com/ThoughtWorksStudios/eb_deployer">View On GitHub</a></li>
         </ul>
       </header>
@@ -31,7 +29,7 @@
         <h1>
 <a name="ebdeployer" class="anchor" href="http://thoughtworksstudios.github.io/eb_deployer/#ebdeployer"><span class="octicon octicon-link"></span></a>Why we built it?</h1>
 
-<p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing link to automate the whole flow out of box.</p>
+<p>Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing <a href="http://martinfowler.com/bliki/BlueGreenDeployment.html">Blue-Green deployments</a>, and EbDeployer add a missing link to automate the whole flow out of box.</p>
 
 <p>EbDeployer thus allows you to do continuous delivery on AWS.</p>
 
@@ -75,7 +73,7 @@
 <h3>
 <a name="smoke-testing-your-stack" class="anchor" href="http://thoughtworksstudios.github.io/eb_deployer/#smoke-testing-your-stack"><span class="octicon octicon-link"></span></a>Smoke Testing your stack</h3>
 
-<p>EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
+<p>EbDeployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
 Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. We show a simple curl based smoke test that helps you test if your app is up and responding to http. </p>
 
 <pre><code>smoke_test: &gt;
@@ -87,7 +85,7 @@ Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_
   end
 </code></pre>
 
-<p>Any rakeable test suite can be run as part of the smoke test(selenium, cucumber, capybara, and so on.)
+<p>Any rakeable test suite can be run as part of the smoke test(<a href="http://www.thoughtworks.com/products/twist-agile-testing">Twist</a>, Selenium, Cucumber, Capybara, and so on.)
 You can add more smoke tests by calling arbitrary rake tasks (Please make sure check return status):</p>
 
 <pre><code>smoke_test: &gt;
