@@ -29,6 +29,22 @@ module EbDeployer
       end
     end
 
+    def versions
+      @eb_driver.application_versions(@name).map do |apv|
+        {
+          :version => apv[:version_label],
+          :date_created => apv[:date_created],
+          :date_updated => apv[:date_updated]
+        }
+      end
+    end
+
+    def remove(versions, delete_from_s3)
+      versions.each do |version|
+        @eb_driver.delete_application_version(@name, version, delete_from_s3)
+      end
+    end
+
     private
 
     def create_application_if_not_exists
