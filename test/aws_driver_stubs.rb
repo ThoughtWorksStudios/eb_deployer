@@ -4,6 +4,7 @@ class EBStub
     @envs = {}
     @versions = {}
     @envs_been_deleted = {}
+    @versions_deleted = {}
   end
 
   def create_application(app)
@@ -48,11 +49,26 @@ class EBStub
 
   def create_application_version(app_name, version_label, source_bundle)
     @versions[app_name] ||= []
-    @versions[app_name] = { version_label => source_bundle }
+    @versions[app_name] = {
+      :version_label => version_label,
+      :source_bundle => source_bundle,
+      :date_created => Time.now,
+      :date_updated => Time.now
+    }
+  end
+
+  def delete_application_version(app_name, version, delete_source_bundle)
+    @versions_deleted[app_name] ||= []
+    @versions_deleted[app_name] << version
+    @versions.delete(app_name)
   end
 
   def application_version_labels(app_name)
-    @versions.values.map(&:keys).flatten
+    if @versions[app_name]
+      @versions[app_name][:version_label]
+    else
+      []
+    end
   end
 
   def fetch_events(app_name, env_name, options={})
@@ -88,7 +104,6 @@ class EBStub
     'Green'
   end
 
-
   #test only
   def environment_verion_label(app_name, env_name)
     @envs[env_key(app_name, env_name)][:version]
@@ -108,6 +123,10 @@ class EBStub
 
   def environments_been_deleted(app)
     @envs_been_deleted[app] || []
+  end
+
+  def versions_deleted(app_name)
+    @versions_deleted[app_name]
   end
 
   private
