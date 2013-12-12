@@ -52,8 +52,13 @@ module EbDeployer
                                          :version_label => version_label)
     end
 
-    def application_version_labels
-      @client.describe_application_versions[:application_versions].map { |apv| apv[:version_label] }
+    def application_version_labels(app_name)
+      application_versions(app_name).map { |apv| apv[:version_label] }
+    end
+
+    def application_versions(app_name)
+      request = { :application_name => app_name }
+      @client.describe_application_versions(request)[:application_versions]
     end
 
     def fetch_events(app_name, env_name, params, &block)

@@ -14,7 +14,7 @@ module EbDeployer
       package = Package.new(package, @bucket + ".packages", @s3_driver)
       package.upload
 
-      unless @eb_driver.application_version_labels.include?(version_label)
+      unless @eb_driver.application_version_labels(@name).include?(version_label)
         @eb_driver.create_application_version(@name, version_label, package.source_bundle)
       end
     end

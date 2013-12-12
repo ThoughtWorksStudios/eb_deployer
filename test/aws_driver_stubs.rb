@@ -51,7 +51,7 @@ class EBStub
     @versions[app_name] = { version_label => source_bundle }
   end
 
-  def application_version_labels
+  def application_version_labels(app_name)
     @versions.values.map(&:keys).flatten
   end
 
