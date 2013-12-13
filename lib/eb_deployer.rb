@@ -153,6 +153,9 @@ module EbDeployer
   #      :version_label => ENV['MY_PIPELINE_COUNTER']
   #                       || "dev-" + Digest::MD5.file(my_package).hexdigest
   #
+  # @option opts [Symbol :keep_latest.  Specifies the maximum number of versions to
+  #   keep.  Older versions are removed and deleted from the S3 source bucket as well.
+  #   If specified as zero or not specified, all versions will be kept.
   def self.deploy(opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
