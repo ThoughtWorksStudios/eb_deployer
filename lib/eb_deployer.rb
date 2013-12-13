@@ -11,6 +11,7 @@ require 'eb_deployer/cloud_formation_driver'
 require 'eb_deployer/config_loader'
 require 'eb_deployer/default_config'
 require 'eb_deployer/smoke_test'
+require 'eb_deployer/version_cleaner'
 require 'digest'
 require 'set'
 require 'time'
@@ -173,6 +174,7 @@ module EbDeployer
     phoenix_mode = opts[:phoenix_mode]
     bucket = opts[:package_bucket] || app
     skip_resource = opts[:skip_resource_stack_update]
+    keep_latest = opts[:keep_latest] || 0
 
     application = Application.new(app, bs, s3, bucket)
 
@@ -184,6 +186,8 @@ module EbDeployer
                                          :smoke_test => smoke_test,
                                          :phoenix_mode => phoenix_mode)
 
+    cleaner = VersionCleaner.new(application, keep_latest)
+
     if resources = opts[:resources]
       cf.provision(resources) unless skip_resource
       env_settings += cf.transform_outputs(resources)
@@ -191,6 +195,7 @@ module EbDeployer
 
     application.create_version(version_label, opts[:package])
     strategy.deploy(version_label, env_settings)
+    cleaner.clean
   end
 
   def self.destroy(opts)

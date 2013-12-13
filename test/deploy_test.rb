@@ -60,6 +60,23 @@ class DeployTest < Minitest::Test
     assert_equal '2', @eb_driver.environment_verion_label('simple', eb_envname('simple', 'production'))
   end
 
+  def test_should_keep_only_number_of_versions_specified
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 1)
+
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 2)
+
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 3,
+           :keep_latest => 2)
+
+    assert_equal '1', @eb_driver.versions_deleted('simple').first
+  end
+
   def test_default_cname_that_deployed_should_app_env_name
     deploy(:application => 'simple',
            :environment => "production",

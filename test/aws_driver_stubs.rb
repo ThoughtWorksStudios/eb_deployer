@@ -49,7 +49,7 @@ class EBStub
 
   def create_application_version(app_name, version_label, source_bundle)
     @versions[app_name] ||= []
-    @versions[app_name] = {
+    @versions[app_name] << {
       :version_label => version_label,
       :source_bundle => source_bundle,
       :date_created => Time.now,
@@ -60,12 +60,15 @@ class EBStub
   def delete_application_version(app_name, version, delete_source_bundle)
     @versions_deleted[app_name] ||= []
     @versions_deleted[app_name] << version
-    @versions.delete(app_name)
+  end
+
+  def application_versions(app_name)
+    @versions[app_name]
   end
 
   def application_version_labels(app_name)
     if @versions[app_name]
-      @versions[app_name][:version_label]
+      @versions[app_name].map { |appv| appv[:version_label]}
     else
       []
     end
