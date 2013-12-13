@@ -60,6 +60,7 @@ class EBStub
   def delete_application_version(app_name, version, delete_source_bundle)
     @versions_deleted[app_name] ||= []
     @versions_deleted[app_name] << version
+    @versions[app_name].delete_if { |apv| apv[:version_label] == version }
   end
 
   def application_versions(app_name)

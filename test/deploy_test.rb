@@ -60,6 +60,14 @@ class DeployTest < Minitest::Test
     assert_equal '2', @eb_driver.environment_verion_label('simple', eb_envname('simple', 'production'))
   end
 
+  def test_version_prefix_should_be_prepended_to_version_label
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 1,
+           :version_prefix => "prod-")
+    assert_equal 'prod-1', @eb_driver.environment_verion_label('simple', eb_envname('simple', 'production'))
+  end
+
   def test_should_keep_only_number_of_versions_specified
     deploy(:application => 'simple',
            :environment => "production",
@@ -75,6 +83,30 @@ class DeployTest < Minitest::Test
            :keep_latest => 2)
 
     assert_equal '1', @eb_driver.versions_deleted('simple').first
+  end
+
+  def test_should_only_remove_versions_with_matching_prefix
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 1,
+           :version_prefix => "prod1-",
+           :keep_latest => 1)
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 2,
+           :version_prefix => "prod1-",
+           :keep_latest => 1)
+    deploy(:application => 'simple',
+           :environment => "production",
+           :version_label => 1,
+           :version_prefix => "prod2-",
+           :keep_latest => 1)
+
+    assert_equal 'prod1-1', @eb_driver.versions_deleted('simple').first
+    assert_equal 1, @eb_driver.versions_deleted('simple').count
+
+    app_versions = @eb_driver.application_versions('simple').map { |apv| apv[:version_label] }
+    assert_equal ["prod1-2", "prod2-1"], app_versions
   end
 
   def test_default_cname_that_deployed_should_app_env_name
