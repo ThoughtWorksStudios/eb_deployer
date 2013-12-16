@@ -42,6 +42,7 @@ module EbDeployer
     def remove(versions, delete_from_s3)
       versions.each do |version|
         begin
+          puts "Removing #{@name} #{version}"
           @eb_driver.delete_application_version(@name, version, delete_from_s3)
         rescue Exception => e
           puts "Encountered #{e.class} trying to delete #{@name} version #{version}"
