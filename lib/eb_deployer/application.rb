@@ -42,11 +42,10 @@ module EbDeployer
     def remove(versions, delete_from_s3)
       versions.each do |version|
         begin
-          puts "Removing #{@name} #{version}"
+          log("Removing #{version}")
           @eb_driver.delete_application_version(@name, version, delete_from_s3)
-        rescue Exception => e
-          puts "Encountered #{e.class} trying to delete #{@name} version #{version}"
-          puts "#{e.message}"
+        rescue AWS::ElasticBeanstalk::Errors::SourceBundleDeletionFailure => e
+          log(e.message)
         end
       end
     end
@@ -57,6 +56,10 @@ module EbDeployer
       unless @eb_driver.application_exists?(@name)
         @eb_driver.create_application(@name)
       end
+    end
+
+    def log(msg)
+      puts "[#{Time.now.utc}][application:#{@name}] #{msg}"
     end
   end
 end
