@@ -11,6 +11,7 @@ require 'eb_deployer/cloud_formation_driver'
 require 'eb_deployer/config_loader'
 require 'eb_deployer/default_config'
 require 'eb_deployer/smoke_test'
+require 'eb_deployer/version_cleaner'
 require 'digest'
 require 'set'
 require 'time'
@@ -152,6 +153,14 @@ module EbDeployer
   #      :version_label => ENV['MY_PIPELINE_COUNTER']
   #                       || "dev-" + Digest::MD5.file(my_package).hexdigest
   #
+  # @options opts [Symbol] :version_prefix. Specifies a prefix to prepend to the
+  #   version label.  This can be useful when multiple environments are sharing
+  #   an application stack.
+  #
+  # @option opts [Symbol :keep_latest.  Specifies the maximum number of versions to
+  #   keep.  Older versions are removed and deleted from the S3 source bucket as well.
+  #   If specified as zero or not specified, all versions will be kept.  If a
+  #   version_prefix is given, only removes version starting with the prefix.
   def self.deploy(opts)
     # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
@@ -164,7 +173,8 @@ module EbDeployer
     stack_name = opts[:solution_stack_name] || "64bit Amazon Linux running Tomcat 7"
     app = opts[:application]
     env_name = opts[:environment]
-    version_label = opts[:version_label].to_s.strip
+    version_prefix = opts[:version_prefix].to_s.strip
+    version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
     cname = opts[:cname]
     env_settings = opts[:option_settings] || opts[:settings] || []
     strategy_name = opts[:strategy] || :blue_green
@@ -173,6 +183,7 @@ module EbDeployer
     phoenix_mode = opts[:phoenix_mode]
     bucket = opts[:package_bucket] || app
     skip_resource = opts[:skip_resource_stack_update]
+    keep_latest = opts[:keep_latest].to_i || 0
 
     application = Application.new(app, bs, s3, bucket)
 
@@ -184,6 +195,8 @@ module EbDeployer
                                          :smoke_test => smoke_test,
                                          :phoenix_mode => phoenix_mode)
 
+    cleaner = VersionCleaner.new(application, keep_latest)
+
     if resources = opts[:resources]
       cf.provision(resources) unless skip_resource
       env_settings += cf.transform_outputs(resources)
@@ -191,6 +204,7 @@ module EbDeployer
 
     application.create_version(version_label, opts[:package])
     strategy.deploy(version_label, env_settings)
+    cleaner.clean(version_prefix)
   end
 
   def self.destroy(opts)

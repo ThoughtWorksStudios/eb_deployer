@@ -14,7 +14,7 @@ module EbDeployer
       package = Package.new(package, @bucket + ".packages", @s3_driver)
       package.upload
 
-      unless @eb_driver.application_version_labels.include?(version_label)
+      unless @eb_driver.application_version_labels(@name).include?(version_label)
         @eb_driver.create_application_version(@name, version_label, package.source_bundle)
       end
     end
@@ -29,12 +29,37 @@ module EbDeployer
       end
     end
 
+    def versions
+      @eb_driver.application_versions(@name).map do |apv|
+        {
+          :version => apv[:version_label],
+          :date_created => apv[:date_created],
+          :date_updated => apv[:date_updated]
+        }
+      end
+    end
+
+    def remove(versions, delete_from_s3)
+      versions.each do |version|
+        begin
+          log("Removing #{version}")
+          @eb_driver.delete_application_version(@name, version, delete_from_s3)
+        rescue AWS::ElasticBeanstalk::Errors::SourceBundleDeletionFailure => e
+          log(e.message)
+        end
+      end
+    end
+
     private
 
     def create_application_if_not_exists
       unless @eb_driver.application_exists?(@name)
         @eb_driver.create_application(@name)
       end
+    end
+
+    def log(msg)
+      puts "[#{Time.now.utc}][application:#{@name}] #{msg}"
     end
   end
 end

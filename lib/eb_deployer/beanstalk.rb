@@ -46,14 +46,28 @@ module EbDeployer
       @client.terminate_environment(:environment_name => env_name)
     end
 
+    def delete_application_version(app_name, version, delete_source_bundle)
+      request = {
+        :application_name => app_name,
+        :version_label => version,
+        :delete_source_bundle => delete_source_bundle
+      }
+      @client.delete_application_version(request)
+    end
+
     def create_application_version(app_name, version_label, source_bundle)
       @client.create_application_version(:application_name => app_name,
                                          :source_bundle => source_bundle,
                                          :version_label => version_label)
     end
 
-    def application_version_labels
-      @client.describe_application_versions[:application_versions].map { |apv| apv[:version_label] }
+    def application_version_labels(app_name)
+      application_versions(app_name).map { |apv| apv[:version_label] }
+    end
+
+    def application_versions(app_name)
+      request = { :application_name => app_name }
+      @client.describe_application_versions(request)[:application_versions]
     end
 
     def fetch_events(app_name, env_name, params, &block)
