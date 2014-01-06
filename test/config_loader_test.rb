@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ConfigLoaderTest < Minitest::Test
+class ConfigLoaderTest < MiniTest::Unit::TestCase
   def setup
     @loader = EbDeployer::ConfigLoader.new
     @sample_package = sample_file('app-package.war')

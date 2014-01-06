@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CloudFormationProvisionerTest < Minitest::Test
+class CloudFormationProvisionerTest < MiniTest::Unit::TestCase
   def setup
     @cf = CFStub.new
     @provisioner = EbDeployer::CloudFormationProvisioner.new("myresources", @cf)

@@ -7,7 +7,7 @@ require 'minitest/autorun'
 require 'minitest/pride'
 
 
-class Minitest::Test
+class MiniTest::Unit::TestCase
   def sample_file(file_name, content='s' * 100)
     path = File.join('/tmp', file_name)
     File.open(path, 'w') { |f| f << content }
