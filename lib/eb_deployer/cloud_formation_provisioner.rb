@@ -88,7 +88,7 @@ module EbDeployer
     end
 
     def log(msg)
-      puts "[#{Time.now.utc}][resources-stack] #{msg}"
+      puts "[#{Time.now.utc}][cloud_formation_provisioner] #{msg}"
     end
   end
 end

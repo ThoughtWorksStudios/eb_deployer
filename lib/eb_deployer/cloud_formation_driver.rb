@@ -41,7 +41,7 @@ module EbDeployer
     end
 
     def log(msg)
-      puts "[#{Time.now.utc}][cloud_formation] #{msg}"
+      puts "[#{Time.now.utc}][cloud_formation_driver] #{msg}"
     end
   end
 

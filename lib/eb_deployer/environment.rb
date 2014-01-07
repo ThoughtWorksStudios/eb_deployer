@@ -36,7 +36,7 @@ module EbDeployer
     end
 
     def log(msg)
-      puts "[#{Time.now.utc}][beanstalk:#{@name}] #{msg}"
+      puts "[#{Time.now.utc}][environment:#{@name}] #{msg}"
     end
 
     private
@@ -100,7 +100,7 @@ module EbDeployer
 
 
     def log_event(event)
-      puts "[#{event[:event_date]}][beanstalk:#{@name}] #{event[:message]}"
+      puts "[#{event[:event_date]}][environment:#{@name}] #{event[:message]}"
     end
   end
 end

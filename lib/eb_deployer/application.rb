@@ -15,6 +15,7 @@ module EbDeployer
       package.upload
 
       unless @eb_driver.application_version_labels(@name).include?(version_label)
+        log("Create application version with label #{version_label}")
         @eb_driver.create_application_version(@name, version_label, package.source_bundle)
       end
     end
@@ -22,9 +23,11 @@ module EbDeployer
     def delete
       if @eb_driver.application_exists?(@name)
         @eb_driver.environment_names_for_application(@name).each do |env|
+          log("Terminating environment #{env}")
           @eb_driver.delete_environment(@name, env)
         end
 
+        log("Deleting application")
         @eb_driver.delete_application(@name)
       end
     end
@@ -54,6 +57,7 @@ module EbDeployer
 
     def create_application_if_not_exists
       unless @eb_driver.application_exists?(@name)
+        log("Creating application")
         @eb_driver.create_application(@name)
       end
     end
