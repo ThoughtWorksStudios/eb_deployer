@@ -19,3 +19,5 @@ tmp
 _site
 /samples/jruby_rails4/jruby_rails4.war
 /samples/jruby_rails4/public/assets/*
+/TAGS
+/.aws

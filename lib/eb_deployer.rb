@@ -154,10 +154,10 @@ module EbDeployer
   #                       || "dev-" + Digest::MD5.file(my_package).hexdigest
   #
   # @options opts [Symbol] :version_prefix. Specifies a prefix to prepend to the
-  #   version label.  This can be useful when multiple environments are sharing
-  #   an application stack.
+  #   version label. This can be useful if you want to use different binaries for
+  #   different environments.
   #
-  # @option opts [Symbol :keep_latest.  Specifies the maximum number of versions to
+  # @option opts [Symbol] :keep_latest. Specifies the maximum number of versions to
   #   keep.  Older versions are removed and deleted from the S3 source bucket as well.
   #   If specified as zero or not specified, all versions will be kept.  If a
   #   version_prefix is given, only removes version starting with the prefix.

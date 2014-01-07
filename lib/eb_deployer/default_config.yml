@@ -34,6 +34,17 @@ common:
   # you override it to 'on' for production environment.
   # phoenix_mode: false
 
+  # Specifies the maximum number of versions to keep. Older versions are removed
+  # and deleted from the S3 source bucket as well. If specified as zero or not
+  # specified, all versions will be kept.  If a version_prefix is given, only removes
+  # version starting with the prefix.
+  # keep_latest: 200
+
+  # Specifies a prefix to prepend to the version label.
+  # This can be useful if you want to use different binaries for different
+  # environments.
+  # version_prefix:
+
   # Generating version label for package to be deployed. A readable version label will
   # provide better traceablity of your deployment process.
   # By default setting is:
