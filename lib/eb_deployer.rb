@@ -240,7 +240,7 @@ module EbDeployer
 
     if !options[:package] && action == :deploy
       puts "Missing options: -p (--package)"
-      puts "'eb_deploy --help' for detials"
+      puts "'eb_deploy --help' for details"
       puts parser
       exit(-1)
     end
@@ -253,7 +253,7 @@ module EbDeployer
   def self.cli_parser(options)
     OptionParser.new do |opts|
       opts.banner = "Usage: eb_deployer [options]"
-      opts.on("-p", "--package [FILE]", "Package to deploy, for example a war file for java application") do |v|
+      opts.on("-p", "--package [FILE]", "Package to deploy, for example a war file for java application or yaml specification for package location on s3, see -h for format") do |v|
         options[:package] = v
       end
 
@@ -278,6 +278,13 @@ module EbDeployer
         exit(0)
       end
 
+      opts.on("-h", "--help", "help")  do
+        puts opts
+        puts ""
+        puts "YAML package file format:"
+        puts "s3_bucket: <bucket_name>"
+        puts "s3_key: <object_path>"
+      end
     end
   end
 

@@ -8,7 +8,22 @@ class DeployTest < MiniTest::Unit::TestCase
     @sample_package = sample_file('app-package.war')
   end
 
-  def test_first_deplyment_create_eb_application
+  def test_deployment_with_s3_package_specification
+    File.open('mingle_package.yml', 'w') do |f|
+      f.write("s3_bucket: test-bucket\n")
+      f.write("s3_key: test-mingle.war")
+    end
+
+    deploy(:application => 'simple', :environment => "production",
+           :package => 'mingle_package.yml', :version_label => 1)
+    assert @eb_driver.application_exists?('simple')
+    last_version = @eb_driver.application_versions('simple').last
+    assert_equal({'s3_bucket' => 'test-bucket', 's3_key' => 'test-mingle.war'}, last_version[:source_bundle])
+  ensure
+    FileUtils.rm_rf('mingle_package.yml')
+  end
+
+  def test_first_deployment_create_eb_application
     assert !@eb_driver.application_exists?('simple')
     deploy(:application => 'simple', :environment => "production")
     assert @eb_driver.application_exists?('simple')

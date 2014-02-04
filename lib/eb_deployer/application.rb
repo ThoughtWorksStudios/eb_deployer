@@ -11,12 +11,17 @@ module EbDeployer
     def create_version(version_label, package)
       create_application_if_not_exists
 
-      package = Package.new(package, @bucket + ".packages", @s3_driver)
-      package.upload
+      source_bundle = if package =~ /\.yml$/
+                        YAML.load(File.read(package))
+                      else
+                        package = Package.new(package, @bucket + ".packages", @s3_driver)
+                        package.upload
+                        package.source_bundle
+                      end
 
       unless @eb_driver.application_version_labels(@name).include?(version_label)
         log("Create application version with label #{version_label}")
-        @eb_driver.create_application_version(@name, version_label, package.source_bundle)
+        @eb_driver.create_application_version(@name, version_label, source_bundle)
       end
     end
 
