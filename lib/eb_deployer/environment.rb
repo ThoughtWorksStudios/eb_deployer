@@ -1,6 +1,7 @@
 module EbDeployer
   class Environment
     attr_reader :app, :name
+    attr_writer :event_poller
 
     def self.unique_ebenv_name(app_name, env_name)
       raise "Environment name #{env_name} is too long, it must be under 15 chars" if env_name.size > 15
@@ -15,7 +16,7 @@ module EbDeployer
       @creation_opts = creation_opts
     end
 
-    def deploy(version_label, settings)
+    def deploy(version_label, settings={})
       terminate if @creation_opts[:phoenix_mode]
       create_or_update_env(version_label, settings)
       smoke_test
@@ -39,15 +40,6 @@ module EbDeployer
       puts "[#{Time.now.utc}][environment:#{@name}] #{msg}"
     end
 
-    private
-
-    def shorten(str, max_length, digest_length=5)
-      raise "max length (#{max_length}) should be larger than digest_length (#{digest_length})" if max_length < digest_length
-      return self if str.size <= max_length
-      sha1 = Digest::SHA1.hexdigest(str)
-      sha1[0..(digest_length - 1)] + str[(max_length - digest_length - 1)..-1]
-    end
-
     def terminate
       if @bs.environment_exists?(@app, @name)
         with_polling_events(/terminateEnvironment completed successfully/i) do
@@ -55,6 +47,9 @@ module EbDeployer
         end
       end
     end
+
+
+    private
 
     def create_or_update_env(version_label, settings)
       if @bs.environment_exists?(@app, @name)
@@ -76,8 +71,14 @@ module EbDeployer
     def with_polling_events(terminate_pattern, &block)
       event_start_time = Time.now
       yield
-      EventPoller.new(@app, @name, @bs).poll(event_start_time) do |event|
-        raise event[:message] if event[:message] =~ /Failed to deploy application/
+      event_poller.poll(event_start_time) do |event|
+        if event[:message] =~ /Failed to deploy application/
+          raise event[:message]
+        end
+
+        if event[:message] =~ /Command failed on instance/
+          raise "Elasticbeanstalk instance provision failed (maybe a problem with your .ebextension files). The original message: #{event[:message]}"
+        end
 
         log_event(event)
         break if event[:message] =~ terminate_pattern
@@ -96,6 +97,10 @@ module EbDeployer
 
         log("health status: #{current_health_status}")
       end
+    end
+
+    def event_poller
+      @event_poller || EventPoller.new(@app, @name, @bs)
     end
 
 

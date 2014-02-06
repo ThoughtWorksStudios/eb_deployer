@@ -400,10 +400,6 @@ class DeployTest < MiniTest::Unit::TestCase
     f
   end
 
-  def eb_envname(app_name, env_name)
-    EbDeployer::Environment.unique_ebenv_name(app_name, env_name)
-  end
-
   def query_resource_output(key, opts)
     EbDeployer.query_resource_output(key, {:bs_driver => @eb_driver,
                                        :s3_driver => @s3_driver,
@@ -419,7 +415,6 @@ class DeployTest < MiniTest::Unit::TestCase
   def destroy(opts)
     EbDeployer.destroy(opts.merge(stubs))
   end
-
 
   def stubs
     { :bs_driver => @eb_driver,

@@ -26,6 +26,7 @@ class EBStub
     raise "env name #{env} is longer than 23 chars" if env.size > 23
     raise "app not exists" unless application_exists?(app)
     @envs[env_key(app, env)] = {
+      :name => env,
       :application => app,
       :solution_stack => solution_stack,
       :version => version,
@@ -34,7 +35,7 @@ class EBStub
   end
 
   def delete_environment(app, env)
-    @envs.delete(env)
+    @envs.delete(env_key(app, env))
     @envs_been_deleted[app] ||= []
     @envs_been_deleted[app] << env
   end
@@ -119,8 +120,8 @@ class EBStub
 
   def environment_names_for_application(app)
     @envs.inject([]) do |memo, pair|
-      env_name, env = pair
-      memo << env_name if env[:application] == app
+      key, env = pair
+      memo << env[:name] if env[:application] == app
       memo
     end
   end

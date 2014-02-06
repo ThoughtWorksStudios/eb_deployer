@@ -13,4 +13,9 @@ class MiniTest::Unit::TestCase
     File.open(path, 'w') { |f| f << content }
     path
   end
+
+  def eb_envname(app_name, env_name)
+    EbDeployer::Environment.unique_ebenv_name(app_name, env_name)
+  end
+
 end
