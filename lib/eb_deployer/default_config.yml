@@ -102,9 +102,8 @@ common:
   # keys:
   #    template => CloudFormation template file with JSON format
   #    inputs => A Hash, input values for the CloudFormation template
-  #    outputs => A Hash with key map to your CloudFormation
-  # template outputs and value as elastic beanstalk settings namespace and option_name.
-  #    :capabilities => An array. You need set it to ['CAPABILITY_IAM'] if the
+  #    outputs => A Hash with key map to your CloudFormation template outputs and value as elastic beanstalk settings namespace and option_name.
+  #    capabilities => An array. You need set it to ['CAPABILITY_IAM'] if the
   # template include IAM Instance Profile.
   resources:
 
