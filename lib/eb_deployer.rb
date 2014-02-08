@@ -34,7 +34,6 @@ module EbDeployer
   # @option opts [Symbol] :region AWS Region (e.g. "us-west-2", "us-east-1")
   #
   def self.query_resource_output(key, opts)
-    # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
       AWS.config(:region => region)
     end
@@ -162,7 +161,6 @@ module EbDeployer
   #   If specified as zero or not specified, all versions will be kept.  If a
   #   version_prefix is given, only removes version starting with the prefix.
   def self.deploy(opts)
-    # AWS.config(:logger => Logger.new($stdout))
     if region = opts[:region]
       AWS.config(:region => region)
     end
@@ -276,6 +274,13 @@ module EbDeployer
       opts.on("-v", "--version", "Print current version") do |v|
         puts "eb_deployer v#{VERSION}"
         exit(0)
+      end
+
+      opts.on("--debug", "Output AWS debug log") do |d|
+        require 'logger'
+        logger = Logger.new($stdout)
+        logger.level = Logger::DEBUG
+        AWS.config(:logger => logger)
       end
 
       opts.on("-h", "--help", "help")  do
