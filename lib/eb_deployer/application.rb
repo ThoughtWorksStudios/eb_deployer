@@ -11,7 +11,7 @@ module EbDeployer
     def create_version(version_label, package)
       create_application_if_not_exists
 
-      source_bundle = if package =~ /\.yml$/
+      source_bundle = if File.extname(package) == '.yml'
                         YAML.load(File.read(package))
                       else
                         package = Package.new(package, @bucket + ".packages", @s3_driver)

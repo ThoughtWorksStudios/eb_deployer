@@ -155,6 +155,10 @@ class S3Stub
     @buckets.has_key?(bucket_name)
   end
 
+  def objects(bucket_name)
+    @buckets[bucket_name]
+  end
+
   def object_length(bucket_name, obj_name)
     @buckets[bucket_name][obj_name] && File.size(@buckets[bucket_name][obj_name])
   end
@@ -162,6 +166,7 @@ class S3Stub
   def upload_file(bucket_name, obj_name, file)
     @buckets[bucket_name][obj_name] = file
   end
+
 end
 
 class CFStub

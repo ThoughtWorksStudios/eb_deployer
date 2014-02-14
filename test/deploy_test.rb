@@ -392,6 +392,17 @@ class DeployTest < MiniTest::Unit::TestCase
     assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', inactive_env)
   end
 
+  def test_pass_pathname_as_package_file
+    deploy(:package => Pathname.new(@sample_package),
+           :application => 'simple',
+           :environment => "production",
+           :package_bucket => 'thoughtworks.simple')
+
+    s3_objects = @s3_driver.objects('thoughtworks.simple.packages')
+    assert_equal 1, s3_objects.size
+    assert_equal @sample_package, s3_objects.values.first.to_s
+  end
+
   private
 
   def temp_file(content)
