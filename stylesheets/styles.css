@@ -278,3 +278,17 @@ footer p + p {
     content: 'at http://github.com/';
   }
 }
+
+.actions {
+  width: 100%;
+  margin: 5px;
+  height: 180px;
+}
+.actions .action {
+    width: 30%;
+    float: left;
+    height: 100%;
+    text-align: center;
+    margin: 5px;
+    border: black 1px solid;
+}
