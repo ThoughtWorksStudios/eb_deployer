@@ -36,7 +36,8 @@ strong {
 
 header {
   position: relative;
-  padding: 25px 25px 15px;
+  padding: 25px 10px 5px 10px;
+  border-bottom: 1px solid black;
 }
 header h1 {
   margin: 0;
@@ -47,27 +48,26 @@ header h1 {
   border-top: 3px solid black;
   padding-top: 15px;
 }
-#brand {
+.brand {
   width: 120px;
   display: block;
   margin-bottom: 40px;
   float: right;
 }
-#logo {
+.logo {
   width: 375px;
 }
 img {
   -ms-interpolation-mode: bicubic;
   image-rendering:optimizeQuality;
-  image-rendering: -webkit-optimize-contrast; }
+  image-rendering: -webkit-optimize-contrast;
+}
 header.without-description h1 {
   margin: 10px 0;
 }
 header p {
   margin: 0;
   font-size: 16px;
-  border-bottom: 1px solid black;
-  padding-bottom: 15px;
   font-style: italic;
 }
 header p.view {
@@ -290,5 +290,22 @@ footer p + p {
     height: 100%;
     text-align: center;
     margin: 5px;
+    padding-top: 5px;
     border: black 1px solid;
+    font-weight: bold;
+    vertical-align:middle;
+}
+
+.action img {
+    height:120px;
+}
+
+.action p a{
+  font-weight: bold;
+  height: 140px;
+}
+
+.gems-command {
+  vertical-align: middle;
+  line-height: 10em;
 }
