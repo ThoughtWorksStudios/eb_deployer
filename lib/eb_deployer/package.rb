@@ -1,7 +1,7 @@
 module EbDeployer
   class Package
-    def initialize(file, bucket_name, s3_driver)
-      @file, @bucket_name = file, bucket_name
+    def initialize(file, version_label, bucket_name, s3_driver)
+      @file, @version_label, @bucket_name = file, version_label, bucket_name
       @s3 = s3_driver
     end
 
@@ -17,7 +17,7 @@ module EbDeployer
     private
 
     def s3_path
-      @_s3_path ||= Digest::MD5.file(@file).hexdigest + "-" + File.basename(@file)
+      @_s3_path ||= @version_label or Digest::MD5.file(@file).hexdigest + "-" + File.basename(@file)
     end
 
     def ensure_bucket(bucket_name)
@@ -25,7 +25,7 @@ module EbDeployer
     end
 
     def upload_if_not_exists(file, bucket_name)
-      if @s3.object_length(@bucket_name, s3_path) != File.size(file)
+      unless @s3.object_exists?(bucket_name, s3_path)
         log("start uploading to s3 bucket #{@bucket_name}...")
         @s3.upload_file(@bucket_name, s3_path, file)
         log("uploading finished")

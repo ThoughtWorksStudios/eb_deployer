@@ -8,6 +8,10 @@ module EbDeployer
       buckets[bucket_name].exists?
     end
 
+    def object_exists?(bucket_name, object_name)
+      buckets[bucket_name].objects[object_name].exists?
+    end
+
     def object_length(bucket_name, obj_name)
       obj(bucket_name, obj_name).content_length rescue nil
     end

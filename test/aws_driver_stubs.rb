@@ -159,6 +159,10 @@ class S3Stub
     @buckets[bucket_name]
   end
 
+  def object_exists?(bucket_name, obj_name)
+    @buckets[bucket_name].has_key?(obj_name)
+  end
+
   def object_length(bucket_name, obj_name)
     @buckets[bucket_name][obj_name] && File.size(@buckets[bucket_name][obj_name])
   end
