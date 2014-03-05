@@ -27,16 +27,21 @@ module EbDeployer
       common_settings = symbolize_keys(config_settings.delete(:common))
       common_settings[:version_label] ||= package_digest
 
-      env = options[:environment]
       envs = config_settings.delete(:environments)
-      raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
-      env_settings = symbolize_keys(envs[env] || {})
-      env_option_settings = env_settings.delete(:option_settings) || []
+      ret = options.merge(config_settings).merge(common_settings)
+      unless ret.delete(:all_envs)
+        env = ret[:environment]
+        raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
+        env_settings = symbolize_keys(envs[env] || {})
+        env_option_settings = env_settings.delete(:option_settings) || []
 
-      ret = options.merge(config_settings).merge(common_settings).merge(env_settings)
+        ret.merge!(env_settings)
 
-      ret[:option_settings] ||= []
-      ret[:option_settings] += env_option_settings
+        ret[:option_settings] ||= []
+        ret[:option_settings] += env_option_settings
+      else
+        ret.delete(:environment)
+      end
       ret
     end
 

@@ -40,7 +40,7 @@ module EbDeployer
           @eb_driver.delete_environment(@name, env)
         end
 
-        if env_name.nil? || (available_envs - [env_name]).empty?
+        if env_name.nil?
           log("Deleting application")
           @eb_driver.delete_application(@name)
         end
