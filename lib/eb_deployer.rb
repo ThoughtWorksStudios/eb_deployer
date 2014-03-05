@@ -214,7 +214,7 @@ module EbDeployer
     bs = opts[:bs_driver] || Beanstalk.new
     s3 = opts[:s3_driver] || S3Driver.new
     cf = opts[:cf_driver] || CloudFormationDriver.new
-    Application.new(app, bs, s3).delete
+    Application.new(app, bs, s3).delete(opts[:environment])
   end
 
   def self.cli
@@ -255,7 +255,7 @@ module EbDeployer
         options[:package] = v
       end
 
-      opts.on("-e", "--environment [ENV_NAME]", "(Default to 'dev') Environment to operating on, for example dev, staging or production. This must be defined in 'environments' section of the config file") do |v|
+      opts.on("-e", "--environment [ENV_NAME]", "(Defaults to 'dev') Environment on which to operate (e.g. dev, staging, production). This must be defined in 'environments' section of the config file") do |v|
         options[:environment] = v
       end
 
