@@ -403,6 +403,22 @@ class DeployTest < MiniTest::Unit::TestCase
     assert_equal @sample_package, s3_objects.values.first.to_s
   end
 
+  def test_pass_s3_object_name_as_package_file
+    package_name = '512.zip'
+
+    @s3_driver.create_bucket('thoughtworks.simple')
+    @s3_driver.upload_file('thoughtworks.simple', package_name, true)
+
+    deploy(:package => package_name,
+           :application => 'simple',
+           :environment => "production",
+           :package_bucket => 'thoughtworks.simple')
+
+    s3_objects = @s3_driver.objects('thoughtworks.simple.packages')
+    assert_equal 1, s3_objects.size
+    assert_equal package_name, s3_objects.values.first.to_s
+  end
+
   private
 
   def temp_file(content)
