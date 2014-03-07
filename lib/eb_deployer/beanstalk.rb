@@ -1,15 +1,6 @@
 module EbDeployer
   class Beanstalk
-    TIERS = [
-      {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
-      {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
-    ]
-
     attr_reader :client
-
-    def self.environment_tier(name)
-      TIERS.find {|t| t[:name].downcase == name.downcase}
-    end
 
     def initialize(client=AWS::ElasticBeanstalk.new.client)
       @client = client
@@ -32,9 +23,10 @@ module EbDeployer
       request = {
         :environment_id => env_id,
         :version_label => version,
-        :option_settings => settings
+        :option_settings => settings,
+        :tier => tier
       }
-      request[:tier] = self.class.environment_tier(tier) if tier
+
       @client.update_environment(request)
     end
 
@@ -52,15 +44,10 @@ module EbDeployer
         :environment_name => env_name,
         :solution_stack_name => stack_name,
         :version_label => version,
-        :option_settings => settings
+        :option_settings => settings,
+        :tier => tier,
+        :cname_prefix => cname_prefix
       }
-
-      if tier
-        request[:tier] = self.class.environment_tier(tier)
-        request[:cname_prefix] = cname_prefix if tier.downcase == "webserver"
-      else
-        request[:cname_prefix] = cname_prefix
-      end
 
       @client.create_environment(request)
     end

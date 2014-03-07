@@ -24,6 +24,15 @@ require 'fileutils'
 
 module EbDeployer
 
+  TIERS = [
+    {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
+    {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
+  ]
+
+  def environment_tier(name)
+    TIERS.find {|t| t[:name].downcase == name.downcase} || raise("No tier found with name #{name.inspect}")
+  end
+  module_function :environment_tier
   #
   # Query ouput value of the cloud formation stack
   #
@@ -140,8 +149,11 @@ module EbDeployer
   #   inplace-update strategy will only keep one environment, and update the
   #   version inplace on deploy. this will save resources but will have downtime.
   #
-  # @option opts [Symbol] :solution_stack_name ("64bit Amazon Linux running Tomcat 7")
+  # @option opts [Symbol] :solution_stack_name ("64bit Amazon Linux 2013.09 running Tomcat 7 Java 7")
   #   The elastic beanstalk solution stack you want to deploy on top of.
+  #
+  # @option opts [Symbol] :tier ("WebServer")
+  #   The environment tier. Either "WebServer" or "Worker"
   #
   # @option opts [Symbol] :version_label *required*. Version label give the
   #   package uploaded a unique identifier.  Should use something related to
@@ -182,6 +194,7 @@ module EbDeployer
     bucket = opts[:package_bucket] || app
     skip_resource = opts[:skip_resource_stack_update]
     keep_latest = opts[:keep_latest].to_i || 0
+    app_tier = self.environment_tier(opts[:tier] || 'WebServer')
 
     application = Application.new(app, bs, s3, bucket)
 
@@ -191,9 +204,9 @@ module EbDeployer
       :solution_stack => stack_name,
       :cname_prefix => cname_prefix,
       :smoke_test => smoke_test,
-      :phoenix_mode => phoenix_mode
+      :phoenix_mode => phoenix_mode,
+      :tier => app_tier
     }
-    creation_opts[:tier] = opts[:tier] if opts[:tier]
 
     strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs, creation_opts)
 

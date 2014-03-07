@@ -5,7 +5,10 @@ application: eb-deployer-simple-java
 # Common settings for all environments
 common:
   # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
-  # solution_stack_name: 64bit Amazon Linux running Tomcat 7
+  # solution_stack_name: 64bit Amazon Linux 2013.09 running Tomcat 7 Java 7
+
+  # Tier name for environments. Current supported values are WebServer and Worker
+  # tier: WebServer
 
   # AWS region to deploy. Default to us-east-1
   # region: us-west-1
