@@ -168,7 +168,7 @@ module EbDeployer
     bs = opts[:bs_driver] || Beanstalk.new
     s3 = opts[:s3_driver] || S3Driver.new
     cf = opts[:cf_driver] || CloudFormationDriver.new
-    stack_name = opts[:solution_stack_name] || "64bit Amazon Linux running Tomcat 7"
+    stack_name = opts[:solution_stack_name] || "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7"
     app = opts[:application]
     env_name = opts[:environment]
     version_prefix = opts[:version_prefix].to_s.strip
@@ -187,11 +187,15 @@ module EbDeployer
 
     cf = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
 
-    strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs,
-                                         :solution_stack => stack_name,
-                                         :cname_prefix => cname_prefix,
-                                         :smoke_test => smoke_test,
-                                         :phoenix_mode => phoenix_mode)
+    creation_opts = {
+      :solution_stack => stack_name,
+      :cname_prefix => cname_prefix,
+      :smoke_test => smoke_test,
+      :phoenix_mode => phoenix_mode
+    }
+    creation_opts[:tier] = opts[:tier] if opts[:tier]
+
+    strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs, creation_opts)
 
     cleaner = VersionCleaner.new(application, keep_latest)
 

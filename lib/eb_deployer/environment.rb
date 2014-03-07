@@ -52,13 +52,14 @@ module EbDeployer
     private
 
     def create_or_update_env(version_label, settings)
+      tier = @creation_opts[:tier] || "WebServer"
       if @bs.environment_exists?(@app, @name)
         with_polling_events(/Environment update completed successfully/i) do
-          @bs.update_environment(@app, @name, version_label, settings)
+          @bs.update_environment(@app, @name, version_label, tier, settings)
         end
       else
         with_polling_events(/Successfully launched environment/i) do
-          @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, settings)
+          @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, tier, settings)
         end
       end
     end

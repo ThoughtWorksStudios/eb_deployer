@@ -73,7 +73,11 @@ Once this new stack is stable or has run for a while you can choose to delete th
 ### Destroying a stack
 So you are done with this application or environment, you can destroy it easily as well.
 
+    # destroy one environment
     $ eb_deployer -d -e <environment>
+
+    # alternatively, destroy all environments and the application along with it
+    $ eb_deployer -d --all
 
 and you are done!
 

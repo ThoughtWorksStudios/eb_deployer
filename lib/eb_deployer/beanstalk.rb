@@ -1,6 +1,16 @@
 module EbDeployer
   class Beanstalk
+    TIERS = [
+      {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
+      {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
+    ]
+
     attr_reader :client
+
+    def self.environment_tier(name)
+      TIERS.find {|t| t[:name].downcase == name.downcase}
+    end
+
     def initialize(client=AWS::ElasticBeanstalk.new.client)
       @client = client
     end
@@ -17,11 +27,15 @@ module EbDeployer
       @client.describe_applications(:application_names => [app])[:applications].any?
     end
 
-    def update_environment(app_name, env_name, version, settings)
+    def update_environment(app_name, env_name, version, tier, settings)
       env_id = convert_env_name_to_id(app_name, [env_name]).first
-      @client.update_environment(:environment_id => env_id,
-                                 :version_label => version,
-                                 :option_settings => settings)
+      request = {
+        :environment_id => env_id,
+        :version_label => version,
+        :option_settings => settings
+      }
+      request[:tier] = self.class.environment_tier(tier) if tier
+      @client.update_environment(request)
     end
 
     def environment_exists?(app_name, env_name)
@@ -32,13 +46,22 @@ module EbDeployer
       alive_envs(app_name).collect { |env| env[:environment_name] }
     end
 
-    def create_environment(app_name, env_name, stack_name, cname_prefix, version, settings)
-      request = {:application_name => app_name,
+    def create_environment(app_name, env_name, stack_name, cname_prefix, version, tier, settings)
+      request = {
+        :application_name => app_name,
         :environment_name => env_name,
         :solution_stack_name => stack_name,
         :version_label => version,
-        :option_settings => settings }
-      request[:cname_prefix] = cname_prefix if cname_prefix
+        :option_settings => settings
+      }
+
+      if tier
+        request[:tier] = self.class.environment_tier(tier)
+        request[:cname_prefix] = cname_prefix if tier.downcase == "webserver"
+      else
+        request[:cname_prefix] = cname_prefix
+      end
+
       @client.create_environment(request)
     end
 
