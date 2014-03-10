@@ -11,12 +11,19 @@ module EbDeployer
     def create_version(version_label, package)
       create_application_if_not_exists
 
-      source_bundle = if File.extname(package) == '.yml'
-                        YAML.load(File.read(package))
+      source_bundle = if File.exists?(package)
+                        if File.extname(package) == '.yml'
+                          YAML.load(File.read(package))
+                        else
+                          package = Package.new(package, @bucket + ".packages", @s3_driver)
+                          package.upload
+                          package.source_bundle
+                        end
+                      elsif package =~ /:/
+                        bucket, obj_key = package.split(':')
+                        {'s3_bucket' => bucket, 's3_key' => obj_key}
                       else
-                        package = Package.new(package, @bucket + ".packages", @s3_driver)
-                        package.upload
-                        package.source_bundle
+                        raise "Unknown package file/format: #{package.inspect}"
                       end
 
       unless @eb_driver.application_version_labels(@name).include?(version_label)

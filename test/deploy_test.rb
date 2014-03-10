@@ -419,6 +419,18 @@ class DeployTest < MiniTest::Unit::TestCase
     end
   end
 
+  def test_pass_s3_object_name_as_package_file
+    package_name = 'test-bucket:test-mingle.war'
+
+    deploy(:package => package_name,
+           :application => 'simple',
+           :environment => "production",
+           :version_label => 1)
+
+    assert @eb_driver.application_exists?('simple')
+    last_version = @eb_driver.application_versions('simple').last
+    assert_equal({'s3_bucket' => 'test-bucket', 's3_key' => 'test-mingle.war'}, last_version[:source_bundle])
+  end
 
   private
 
