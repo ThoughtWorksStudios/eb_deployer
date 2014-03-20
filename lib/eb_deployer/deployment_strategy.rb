@@ -9,7 +9,7 @@ module EbDeployer
       end
 
       def deploy(version_label, env_settings)
-        Environment.new(@app, @env_name, @eb_driver, @env_creation_opts).
+        EbEnvironment.new(@app, @env_name, @eb_driver, @env_creation_opts).
           deploy(version_label, env_settings)
       end
     end
@@ -47,7 +47,7 @@ module EbDeployer
       end
 
       def env(suffix, cname_prefix=nil)
-        Environment.new(@app, @env_name + '-' + suffix,
+        EbEnvironment.new(@app, @env_name + '-' + suffix,
                         @eb_driver,
                         @env_creation_opts.merge({:cname_prefix => cname_prefix || inactive_cname_prefix}))
       end

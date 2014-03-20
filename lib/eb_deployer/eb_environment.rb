@@ -1,5 +1,5 @@
 module EbDeployer
-  class Environment
+  class EbEnvironment
     attr_reader :app, :name
     attr_writer :event_poller
 

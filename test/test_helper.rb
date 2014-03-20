@@ -15,7 +15,7 @@ class MiniTest::Unit::TestCase
   end
 
   def eb_envname(app_name, env_name)
-    EbDeployer::Environment.unique_ebenv_name(app_name, env_name)
+    EbDeployer::EbEnvironment.unique_ebenv_name(app_name, env_name)
   end
 
 end

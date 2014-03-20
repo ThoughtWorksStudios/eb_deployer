@@ -3,7 +3,7 @@ require "eb_deployer/deployment_strategy"
 require "eb_deployer/beanstalk"
 require "eb_deployer/cloud_formation_provisioner"
 require 'eb_deployer/application'
-require "eb_deployer/environment"
+require "eb_deployer/eb_environment"
 require "eb_deployer/event_poller"
 require "eb_deployer/package"
 require 'eb_deployer/s3_driver'
