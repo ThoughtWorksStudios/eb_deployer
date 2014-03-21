@@ -3,7 +3,9 @@ require "eb_deployer/deployment_strategy"
 require "eb_deployer/beanstalk"
 require "eb_deployer/cloud_formation_provisioner"
 require 'eb_deployer/application'
+require 'eb_deployer/resource_stacks'
 require "eb_deployer/eb_environment"
+require "eb_deployer/environment"
 require "eb_deployer/event_poller"
 require "eb_deployer/package"
 require 'eb_deployer/s3_driver'
@@ -188,7 +190,7 @@ module EbDeployer
     cname = opts[:cname]
     env_settings = opts[:option_settings] || opts[:settings] || []
     strategy_name = opts[:strategy] || :blue_green
-    cname_prefix = opts[:cname_prefix] || [app, env_name].join('-')
+    cname_prefix = opts[:cname_prefix]
     smoke_test = opts[:smoke_test] || Proc.new {}
     phoenix_mode = opts[:phoenix_mode]
     bucket = opts[:package_bucket] || app
@@ -196,30 +198,24 @@ module EbDeployer
     keep_latest = opts[:keep_latest].to_i || 0
     app_tier = self.environment_tier(opts[:tier] || 'WebServer')
 
+    resource_stacks = ResourceStacks.new(opts[:resources], cf, skip_resource)
     application = Application.new(app, bs, s3, bucket)
-
-    cf = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
-
-    creation_opts = {
-      :solution_stack => stack_name,
-      :cname_prefix => cname_prefix,
-      :smoke_test => smoke_test,
-      :phoenix_mode => phoenix_mode,
-      :tier => app_tier
-    }
-
-    strategy = DeploymentStrategy.create(strategy_name, app, env_name, bs, creation_opts)
-
-    cleaner = VersionCleaner.new(application, keep_latest)
-
-    if resources = opts[:resources]
-      cf.provision(resources) unless skip_resource
-      env_settings += cf.transform_outputs(resources)
-    end
+    environment = Environment.new(application,
+                                  env_name,
+                                  resource_stacks,
+                                  env_settings,
+                                  {
+                                    :solution_stack => stack_name,
+                                    :cname_prefix => cname_prefix,
+                                    :smoke_test => smoke_test,
+                                    :phoenix_mode => phoenix_mode,
+                                    :tier => app_tier
+                                  },
+                                  bs)
 
     application.create_version(version_label, opts[:package])
-    strategy.deploy(version_label, env_settings)
-    cleaner.clean(version_prefix)
+    environment.deploy(version_label, strategy_name)
+    application.clean_versions(version_prefix, keep_latest)
   end
 
   def self.destroy(opts)

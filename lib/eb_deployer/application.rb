@@ -1,5 +1,7 @@
 module EbDeployer
   class Application
+    attr_reader :name
+
     def initialize(name, eb_driver, s3_driver, bucket = nil)
       @name = name
       @eb_driver = eb_driver
@@ -73,6 +75,10 @@ module EbDeployer
           log(e.message)
         end
       end
+    end
+
+    def clean_versions(version_prefix, retentions)
+      VersionCleaner.new(self, retentions).clean(version_prefix)
     end
 
     private

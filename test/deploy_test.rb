@@ -432,6 +432,17 @@ class DeployTest < MiniTest::Unit::TestCase
     assert_equal({'s3_bucket' => 'test-bucket', 's3_key' => 'test-mingle.war'}, last_version[:source_bundle])
   end
 
+=begin
+  def test_deploy_with_components
+    deploy(:application => 'simple',
+           :environment => 'production',
+           :components => [{ :name => 'web' }])
+
+    assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+
+  end
+=end
+
   private
 
   def temp_file(content)
