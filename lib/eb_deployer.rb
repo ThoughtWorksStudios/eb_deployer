@@ -1,19 +1,3 @@
-require "eb_deployer/version"
-require "eb_deployer/deployment_strategy"
-require "eb_deployer/beanstalk"
-require "eb_deployer/cloud_formation_provisioner"
-require 'eb_deployer/application'
-require 'eb_deployer/resource_stacks'
-require "eb_deployer/eb_environment"
-require "eb_deployer/environment"
-require "eb_deployer/event_poller"
-require "eb_deployer/package"
-require 'eb_deployer/s3_driver'
-require 'eb_deployer/cloud_formation_driver'
-require 'eb_deployer/config_loader'
-require 'eb_deployer/default_config'
-require 'eb_deployer/smoke_test'
-require 'eb_deployer/version_cleaner'
 require 'digest'
 require 'set'
 require 'time'
@@ -23,6 +7,21 @@ require 'aws-sdk'
 require 'optparse'
 require 'erb'
 require 'fileutils'
+
+require 'eb_deployer/version'
+require 'eb_deployer/aws_driver'
+require 'eb_deployer/deployment_strategy'
+require 'eb_deployer/cloud_formation_provisioner'
+require 'eb_deployer/application'
+require 'eb_deployer/resource_stacks'
+require 'eb_deployer/eb_environment'
+require 'eb_deployer/environment'
+require 'eb_deployer/event_poller'
+require 'eb_deployer/package'
+require 'eb_deployer/config_loader'
+require 'eb_deployer/default_config'
+require 'eb_deployer/smoke_test'
+require 'eb_deployer/version_cleaner'
 
 module EbDeployer
 
@@ -50,7 +49,7 @@ module EbDeployer
     end
     app = opts[:application]
     env_name = opts[:environment]
-    cf = opts[:cf_driver] || CloudFormationDriver.new
+    cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
     provisioner = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
     provisioner.output(key)
   end
@@ -179,9 +178,9 @@ module EbDeployer
       AWS.config(:region => region)
     end
 
-    bs = opts[:bs_driver] || Beanstalk.new
-    s3 = opts[:s3_driver] || S3Driver.new
-    cf = opts[:cf_driver] || CloudFormationDriver.new
+    bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
+    s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
+    cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
     stack_name = opts[:solution_stack_name] || "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7"
     app = opts[:application]
     env_name = opts[:environment]
