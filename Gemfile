@@ -5,4 +5,4 @@ gemspec
 
 gem 'redcarpet'
 gem 'yard'
-
+gem 'rake'
