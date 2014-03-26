@@ -3,12 +3,11 @@ module EbDeployer
     class BlueGreen
       def initialize(env)
         @env = env
-        @major_cname_prefix = @env.cname_prefix
       end
 
       def deploy(version_label, env_settings)
         if !envs.any?(&method(:active_env?))
-          env('a', @major_cname_prefix).
+          env('a', @env.cname_prefix).
             deploy(version_label, env_settings)
           return
         end
@@ -22,7 +21,7 @@ module EbDeployer
 
       private
       def active_env?(env)
-        env.cname_prefix == @major_cname_prefix
+        env.cname_prefix == @env.cname_prefix
       end
 
       def envs
