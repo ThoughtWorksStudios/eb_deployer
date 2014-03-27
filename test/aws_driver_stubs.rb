@@ -79,15 +79,15 @@ class EBStub
   end
 
   def fetch_events(app_name, env_name, options={})
-    [[{:event_date => Time.now.utc,
-        :message => 'Environment update completed successfully'},
-      {:event_date => Time.now.utc,
-        :message => 'terminateEnvironment completed successfully'},
-      {:event_date => Time.now.utc,
-        :message => 'Successfully launched environment'}
-     ],
-     nil]
+    unless @events # unrestricted mode for testing if no explicit events set
+      return generate_event_from_messages(['Environment update completed successfully',
+                                    'terminateEnvironment completed successfully',
+                                    'Successfully launched environment'])
+    end
+
+    @events[env_key(app_name, env_name)]
   end
+
 
   def environment_cname_prefix(app_name, env_name)
     return unless @envs[env_key(app_name, env_name)]
@@ -141,7 +141,19 @@ class EBStub
     @versions_deleted[app_name]
   end
 
+  def set_events(app_name, env_name, messages)
+    @events ||= {}
+    @events[env_key(app_name, env_name)] = generate_event_from_messages(messages)
+  end
+
   private
+
+  def generate_event_from_messages(messages)
+    [messages.reverse.map do |m|
+       {:event_date => Time.now.utc,
+         :message => m}
+     end, nil]
+  end
 
   def env_key(app, name)
     [app, name].join("-")
