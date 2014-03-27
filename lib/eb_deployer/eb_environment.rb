@@ -38,7 +38,7 @@ module EbDeployer
 
     def terminate
       if @bs.environment_exists?(@app, @name)
-        with_polling_events(@name, /terminateEnvironment completed successfully/i) do
+        with_polling_events(/terminateEnvironment completed successfully/i) do
           @bs.delete_environment(@app, @name)
         end
       end
@@ -48,11 +48,11 @@ module EbDeployer
 
     def create_or_update_env(version_label, settings)
       if @bs.environment_exists?(@app, @name)
-        with_polling_events(@name, /Environment update completed successfully/i) do
+        with_polling_events(/Environment update completed successfully/i) do
           @bs.update_environment(@app, @name, version_label, @creation_opts[:tier], settings)
         end
       else
-        with_polling_events(@name, /Successfully launched environment/i) do
+        with_polling_events(/Successfully launched environment/i) do
           @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], settings)
         end
       end
@@ -63,10 +63,10 @@ module EbDeployer
       SmokeTest.new(@creation_opts[:smoke_test]).run(host_name, self)
     end
 
-    def with_polling_events(env_name, terminate_pattern, &block)
+    def with_polling_events(terminate_pattern, &block)
       event_start_time = Time.now
       yield
-      event_poller.poll(env_name, event_start_time) do |event|
+      event_poller.poll(event_start_time) do |event|
         if event[:message] =~ /Failed to deploy application/
           raise event[:message]
         end
@@ -95,7 +95,7 @@ module EbDeployer
     end
 
     def event_poller
-      @event_poller || EventPoller.new(@app, @bs)
+      @event_poller || EventPoller.new(@app, @name, @bs)
     end
 
 
