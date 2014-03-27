@@ -85,6 +85,9 @@ common:
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
       value: m1.small
+    - namespace: aws:elasticbeanstalk:environment
+      option_name: EnvironmentType
+      value: SingleInstance
 
   # If resources specified, eb_deployer will use the CloudFormation
   # template you provide to create a default CloudFormation stack with
