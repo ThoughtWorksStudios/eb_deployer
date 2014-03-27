@@ -78,6 +78,61 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
     assert !@eb_driver.environment_exists?('myapp', 'production')
   end
 
+  def test_should_terminate_legacy_env_upon_deployment
+    legacy_env_name = EbDeployer::EbEnvironment.legacy_ebenv_name("myapp", "production")
+    @eb_driver.create_environment("myapp", legacy_env_name, 'solution-stack', 'simple-production', 'foo', 'web' ,{})
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
+    env.deploy("version1")
+    assert !@eb_driver.environment_exists?("myapp", legacy_env_name)
+    assert @eb_driver.environment_exists?("myapp", "production")
+  end
+
+  def test_can_find_cname_if_legacy_env_exists
+    legacy_env_name = EbDeployer::EbEnvironment.legacy_ebenv_name("myapp", "production")
+    @eb_driver.create_environment("myapp", legacy_env_name, 'solution-stack', 'myapp-production', 'foo', 'web' ,{})
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
+    assert_equal 'myapp-production', env.cname_prefix
+  end
+
+  def test_terminate_legacy_env
+    legacy_env_name = create_legacy_env("myapp", "production", "myapp-production")
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
+    env.terminate
+    assert !@eb_driver.environment_exists?("myapp", legacy_env_name)
+  end
+
+  def test_swap_legacy_env_with_non_legacy_env
+    create_legacy_env("myapp", "production-a", "myapp-production")
+    env_a = EbDeployer::EbEnvironment.new("myapp", "production-a", @eb_driver)
+    env_b = EbDeployer::EbEnvironment.new("myapp", "production-b", @eb_driver, :cname_prefix => 'myapp-production-inactive')
+    env_b.deploy('version1')
+
+    env_a.swap_cname_with(env_b)
+
+    assert_equal "myapp-production-inactive", env_a.cname_prefix
+    assert_equal "myapp-production", env_b.cname_prefix
+  end
+
+  def test_swap_no_legacy_env_with_legacy_env
+    create_legacy_env("myapp", "production-a", "myapp-production")
+    env_a = EbDeployer::EbEnvironment.new("myapp", "production-a", @eb_driver)
+    env_b = EbDeployer::EbEnvironment.new("myapp", "production-b", @eb_driver, :cname_prefix => 'myapp-production-inactive')
+    env_b.deploy('version1')
+
+    env_b.swap_cname_with(env_a)
+
+    assert_equal "myapp-production-inactive", env_a.cname_prefix
+    assert_equal "myapp-production", env_b.cname_prefix
+  end
+
+
+
+  def create_legacy_env(app_name, env_name, cname_prefix)
+    legacy_env_name = EbDeployer::EbEnvironment.legacy_ebenv_name(app_name, env_name)
+    @eb_driver.create_environment(app_name, legacy_env_name, 'solution-stack', cname_prefix, 'foo', 'web' ,{})
+    legacy_env_name
+  end
+
 
 
 end

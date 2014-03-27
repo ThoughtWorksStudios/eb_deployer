@@ -1,6 +1,6 @@
 module EbDeployer
   class EbEnvironment
-    attr_reader :app, :name
+    attr_reader :app, :name, :legacy_env_name
     attr_writer :event_poller
 
     def self.legacy_ebenv_name(app_name, env_name)
@@ -13,6 +13,7 @@ module EbDeployer
       @name = name
       @bs = eb_driver
       @creation_opts = creation_opts
+      @legacy_env_name = self.class.legacy_ebenv_name(@app, @name)
     end
 
     def deploy(version_label, settings={})
@@ -24,16 +25,12 @@ module EbDeployer
     end
 
     def cname_prefix
-      @bs.environment_cname_prefix(@app, @name)
-    end
-
-    def ==(another)
-      self.app == another.app && self.name == another.name
+      @bs.environment_cname_prefix(@app, defactor_env_name)
     end
 
     def swap_cname_with(another)
       log("Swap CNAME with env #{another.name}")
-      @bs.environment_swap_cname(self.app, self.name, another.name)
+      @bs.environment_swap_cname(self.app, self.defactor_env_name, another.defactor_env_name)
     end
 
     def log(msg)
@@ -41,23 +38,24 @@ module EbDeployer
     end
 
     def terminate
-      terminate_environment(@name)
+      env_name = defactor_env_name
+      if @bs.environment_exists?(@app, env_name)
+        with_polling_events(/terminateEnvironment completed successfully/i) do
+          @bs.delete_environment(@app, env_name)
+        end
+      end
+    end
+
+    def defactor_env_name
+      @bs.environment_exists?(@app, @legacy_env_name) ? @legacy_env_name : @name
     end
 
     private
 
     def terminate_legacy_env
-      legacy_env_name = self.class.legacy_ebenv_name(@app, @name)
-      if @bs.environment_exists?(@app, legacy_env_name)
-        log("Found legacy environment '#{legacy_env_name}', eb_deployer will terminate it and create new environment following new name pattern.")
-        terminate_environment(legacy_env_name)
-      end
-    end
-
-    def terminate_environment(env_name)
-      if @bs.environment_exists?(@app, env_name)
+      if @bs.environment_exists?(@app, @legacy_env_name)
         with_polling_events(/terminateEnvironment completed successfully/i) do
-          @bs.delete_environment(@app, env_name)
+          @bs.delete_environment(@app, @legacy_env_name)
         end
       end
     end
