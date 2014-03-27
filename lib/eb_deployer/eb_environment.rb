@@ -3,20 +3,20 @@ module EbDeployer
     attr_reader :app, :name
     attr_writer :event_poller
 
-    def self.unique_ebenv_name(app_name, env_name)
-      raise "Environment name #{env_name} is too long, it must be under 15 chars" if env_name.size > 15
+    def self.legacy_ebenv_name(app_name, env_name)
       digest = Digest::SHA1.hexdigest(app_name + '-' + env_name)[0..6]
       "#{env_name}-#{digest}"
     end
 
-    def initialize(app, env_name, eb_driver, creation_opts={})
+    def initialize(app, name, eb_driver, creation_opts={})
       @app = app
-      @name = self.class.unique_ebenv_name(app, env_name)
+      @name = name
       @bs = eb_driver
       @creation_opts = creation_opts
     end
 
     def deploy(version_label, settings={})
+      terminate_legacy_env
       terminate if @creation_opts[:phoenix_mode]
       create_or_update_env(version_label, settings)
       smoke_test
@@ -41,15 +41,26 @@ module EbDeployer
     end
 
     def terminate
-      if @bs.environment_exists?(@app, @name)
-        with_polling_events(/terminateEnvironment completed successfully/i) do
-          @bs.delete_environment(@app, @name)
-        end
+      terminate_environment(@name)
+    end
+
+    private
+
+    def terminate_legacy_env
+      legacy_env_name = self.class.legacy_ebenv_name(@app, @name)
+      if @bs.environment_exists?(@app, legacy_env_name)
+        log("Found legacy environment '#{legacy_env_name}', eb_deployer will terminate it and create new environment following new name pattern.")
+        terminate_environment(legacy_env_name)
       end
     end
 
-
-    private
+    def terminate_environment(env_name)
+      if @bs.environment_exists?(@app, env_name)
+        with_polling_events(/terminateEnvironment completed successfully/i) do
+          @bs.delete_environment(@app, env_name)
+        end
+      end
+    end
 
     def create_or_update_env(version_label, settings)
       if @bs.environment_exists?(@app, @name)

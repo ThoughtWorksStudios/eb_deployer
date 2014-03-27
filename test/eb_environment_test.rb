@@ -27,21 +27,21 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
   def test_deploy_should_create_corresponding_eb_env
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
-    assert @eb_driver.environment_exists?('myapp', eb_envname('myapp', 'production'))
+    assert @eb_driver.environment_exists?('myapp', 'production')
   end
 
   def test_deploy_again_should_update_environment
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
     env.deploy("version2")
-    assert @eb_driver.environment_exists?('myapp', eb_envname('myapp', 'production'))
-    assert_equal 'version2', @eb_driver.environment_verion_label('myapp', eb_envname('myapp', 'production'))
+    assert @eb_driver.environment_exists?('myapp', 'production')
+    assert_equal 'version2', @eb_driver.environment_verion_label('myapp', 'production')
   end
 
   def test_option_setttings_get_set_on_eb_env
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1", {s1: 'v1'})
-    assert_equal({s1: 'v1' },  @eb_driver.environment_settings('myapp', eb_envname('myapp', 'production')))
+    assert_equal({s1: 'v1' },  @eb_driver.environment_settings('myapp', 'production'))
   end
 
   def test_should_run_smoke_test_after_deploy
@@ -75,7 +75,7 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
     env.terminate
-    assert !@eb_driver.environment_exists?('myapp', eb_envname('myapp', 'production'))
+    assert !@eb_driver.environment_exists?('myapp', 'production')
   end
 
 

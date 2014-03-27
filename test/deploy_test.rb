@@ -36,7 +36,7 @@ class DeployTest < MiniTest::Unit::TestCase
     deploy(:application => 'simple', :environment => "production",
            :option_settings => [redudant])
 
-    assert_equal [redudant], @eb_driver.environment_settings('simple', eb_envname('simple', 'production'))
+    assert_equal [redudant], @eb_driver.environment_settings('simple', 'production')
 
   end
 
@@ -44,35 +44,35 @@ class DeployTest < MiniTest::Unit::TestCase
     deploy(:application => 'simple', :environment => "production")
     destroy(:application => 'simple')
     assert !@eb_driver.application_exists?('simple')
-    assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+    assert !@eb_driver.environment_exists?('simple', 'production')
   end
 
   def test_first_deployment_create_environment
-    assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+    assert !@eb_driver.environment_exists?('simple', 'production')
     deploy(:application => 'simple', :environment => "production")
-    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+    assert @eb_driver.environment_exists?('simple', 'production')
   end
 
   def test_support_very_very_long_app_name
     deploy(:application => 'ver-very-simple-application', :environment => "production")
-    assert @eb_driver.environment_exists?('ver-very-simple-application', eb_envname('ver-very-simple-application', 'production'))
+    assert @eb_driver.environment_exists?('ver-very-simple-application', 'production')
   end
 
   def test_should_raise_error_when_env_name_is_too_long
-    assert_raises(RuntimeError) { deploy(:application => 'simple', :environment => "p" * 16) }
+    assert_raises(RuntimeError) { deploy(:application => 'simple', :environment => "p" * 24) }
   end
 
   def test_update_environment_with_new_version_should_change_version_that_deployed
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 1)
-    assert_equal '1', @eb_driver.environment_verion_label('simple', eb_envname('simple', 'production'))
+    assert_equal '1', @eb_driver.environment_verion_label('simple', 'production')
 
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 2)
 
-    assert_equal '2', @eb_driver.environment_verion_label('simple', eb_envname('simple', 'production'))
+    assert_equal '2', @eb_driver.environment_verion_label('simple', 'production')
   end
 
   def test_version_prefix_should_be_prepended_to_version_label
@@ -80,7 +80,7 @@ class DeployTest < MiniTest::Unit::TestCase
            :environment => "production",
            :version_label => 1,
            :version_prefix => "prod-")
-    assert_equal 'prod-1', @eb_driver.environment_verion_label('simple', eb_envname('simple', 'production'))
+    assert_equal 'prod-1', @eb_driver.environment_verion_label('simple', 'production')
   end
 
   def test_should_keep_only_number_of_versions_specified
@@ -128,7 +128,7 @@ class DeployTest < MiniTest::Unit::TestCase
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 42)
-    assert_equal "simple-production", @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production'))
+    assert_equal "simple-production", @eb_driver.environment_cname_prefix('simple', 'production')
   end
 
   def test_cname_prefix_can_be_override
@@ -136,7 +136,7 @@ class DeployTest < MiniTest::Unit::TestCase
            :environment => "production",
            :cname_prefix => 'sports123',
            :version_label => 42)
-    assert_equal "sports123", @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production'))
+    assert_equal "sports123", @eb_driver.environment_cname_prefix('simple', 'production')
   end
 
   def test_smoke_test_should_be_run_after_env_created_or_update
@@ -164,8 +164,8 @@ class DeployTest < MiniTest::Unit::TestCase
            :strategy => 'blue-green',
            :version_label => 42)
 
-    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production-a'))
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-a'))
+    assert @eb_driver.environment_exists?('simple', 'production-a')
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-a')
   end
 
 
@@ -180,8 +180,8 @@ class DeployTest < MiniTest::Unit::TestCase
            :strategy => 'blue-green',
            :version_label => 43)
 
-    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production-a'))
-    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production-b'))
+    assert @eb_driver.environment_exists?('simple', 'production-a')
+    assert @eb_driver.environment_exists?('simple', 'production-b')
   end
 
 
@@ -196,9 +196,9 @@ class DeployTest < MiniTest::Unit::TestCase
            :strategy => 'blue-green',
            :version_label => 43)
 
-    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-a')))
+    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'production-a'))
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-b'))
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-b')
 
 
     deploy(:application => 'simple',
@@ -206,9 +206,9 @@ class DeployTest < MiniTest::Unit::TestCase
            :strategy => 'blue-green',
            :version_label => 44)
 
-    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-b')))
+    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'production-b'))
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', eb_envname('simple', 'production-a'))
+    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-a')
   end
 
 
@@ -300,7 +300,7 @@ class DeployTest < MiniTest::Unit::TestCase
              }
            })
 
-    assert @eb_driver.environment_settings('simple', eb_envname('simple', 'production')).
+    assert @eb_driver.environment_settings('simple', 'production').
       include?({:namespace => 'aws.foo', :option_name => 'o2', :value => 'transformed value of O2'})
   end
 
@@ -325,7 +325,7 @@ class DeployTest < MiniTest::Unit::TestCase
                'O1' => lambda { |v| {:namespace => 'aws.foo', :option_name => 'o1', :value => v} }
              }
            })
-    assert @eb_driver.environment_settings('simple', eb_envname('simple', 'production')).
+    assert @eb_driver.environment_settings('simple', 'production').
       include?({:namespace => 'aws.foo', :option_name => 'o1', :value => 'value of O1'})
   end
 
@@ -356,10 +356,10 @@ class DeployTest < MiniTest::Unit::TestCase
 
   def test_should_terminate_old_environment_if_phoenix_mode_is_enabled
     deploy(:application => 'simple', :environment => "production", :phoenix_mode => true)
-    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+    assert @eb_driver.environment_exists?('simple', 'production')
     deploy(:application => 'simple', :environment => "production", :phoenix_mode => true)
-    assert @eb_driver.environments_been_deleted('simple').include?(eb_envname('simple', 'production'))
-    assert @eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
+    assert @eb_driver.environments_been_deleted('simple').include?('production')
+    assert @eb_driver.environment_exists?('simple', 'production')
   end
 
   def test_blue_green_deployment_should_delete_and_recreate_inactive_env_if_phoenix_mode_is_enabled
@@ -377,7 +377,7 @@ class DeployTest < MiniTest::Unit::TestCase
 
     assert_equal [],  @eb_driver.environments_been_deleted('simple')
 
-    inactive_env = eb_envname('simple', 'production-a')
+    inactive_env = 'production-a'
     assert_match(/inactive/,  @eb_driver.environment_cname_prefix('simple', inactive_env))
 
 
@@ -405,12 +405,12 @@ class DeployTest < MiniTest::Unit::TestCase
 
   def test_sets_default_tier_as_webserver
     deploy(:application => 'simple', :environment => "production")
-    assert_equal EbDeployer.environment_tier('WebServer'), @eb_driver.environment_tier('simple', eb_envname('simple', 'production'))
+    assert_equal EbDeployer.environment_tier('WebServer'), @eb_driver.environment_tier('simple', 'production')
   end
 
   def test_can_change_tier
     deploy(:application => 'simple', :environment => "production", :tier => 'Worker')
-    assert_equal EbDeployer.environment_tier('Worker'), @eb_driver.environment_tier('simple', eb_envname('simple', 'production'))
+    assert_equal EbDeployer.environment_tier('Worker'), @eb_driver.environment_tier('simple', 'production')
   end
 
   def test_should_raise_error_when_tier_setting_is_not_recognized
@@ -432,16 +432,24 @@ class DeployTest < MiniTest::Unit::TestCase
     assert_equal({'s3_bucket' => 'test-bucket', 's3_key' => 'test-mingle.war'}, last_version[:source_bundle])
   end
 
-=begin
-  def test_deploy_with_components
+  # def test_deploy_with_components
+  #   deploy(:application => 'simple',
+  #          :environment => 'production',
+  #          :components => [{ :name => 'web' }])
+
+  #   assert @eb_driver.environment_exists?('simple', 'production-web')
+  # end
+
+  def test_should_clean_up_legacy_environment_on_deploy
+    legacy_env_name = EbDeployer::EbEnvironment.legacy_ebenv_name("simple", "production")
+    @eb_driver.create_application("simple")
+    @eb_driver.create_environment("simple", legacy_env_name, 'solution-stack', 'simple-production', 'foo', 'web' ,{})
     deploy(:application => 'simple',
            :environment => 'production',
-           :components => [{ :name => 'web' }])
-
-    assert !@eb_driver.environment_exists?('simple', eb_envname('simple', 'production'))
-
+           :version_label => 1)
+    assert @eb_driver.environment_exists?("simple", "production")
+    assert !@eb_driver.environment_exists?("simple", legacy_env_name)
   end
-=end
 
   private
 
