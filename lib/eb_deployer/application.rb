@@ -36,7 +36,6 @@ module EbDeployer
 
     def delete(env_name=nil)
       if @eb_driver.application_exists?(@name)
-        env_name = EbEnvironment.unique_ebenv_name(@name, env_name) unless env_name.nil?
         available_envs = @eb_driver.environment_names_for_application(@name)
 
         unless env_name.nil? || available_envs.include?(env_name)
