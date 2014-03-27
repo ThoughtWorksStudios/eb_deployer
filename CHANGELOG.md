@@ -1,3 +1,7 @@
+0.4.0
+====
+* revert back all changes from 0.3.8 to 0.3.9. Elasticbeanstalk haven't relex the real unique constain. The actually contrain is you can not have environment name cross different application
+
 0.3.9
 ====
 * Fix hang problem introduced in 0.3.8 when migrating old ElasticBeanstalk environment.
