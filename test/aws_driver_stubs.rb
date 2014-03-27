@@ -1,4 +1,5 @@
 class EBStub
+  attr_reader :envs
   def initialize
     @apps = []
     @envs = {}

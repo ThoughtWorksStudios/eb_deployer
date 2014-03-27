@@ -6,29 +6,29 @@ module EbDeployer
       end
 
       def deploy(version_label, env_settings)
-        if !envs.any?(&method(:active_env?))
-          env('a', @env.cname_prefix).
+        if !ebenvs.any?(&method(:active_ebenv?))
+          ebenv('a', @env.cname_prefix).
             deploy(version_label, env_settings)
           return
         end
 
-        active_env = envs.detect(&method(:active_env?))
-        inactive_env = envs.reject(&method(:active_env?)).first
+        active_ebenv = ebenvs.detect(&method(:active_ebenv?))
+        inactive_ebenv = ebenvs.reject(&method(:active_ebenv?)).first
 
-        inactive_env.deploy(version_label, env_settings)
-        active_env.swap_cname_with(inactive_env)
+        inactive_ebenv.deploy(version_label, env_settings)
+        active_ebenv.swap_cname_with(inactive_ebenv)
       end
 
       private
-      def active_env?(env)
-        env.cname_prefix == @env.cname_prefix
+      def active_ebenv?(ebenv)
+        ebenv.cname_prefix == @env.cname_prefix
       end
 
-      def envs
-        [env('a'), env('b')]
+      def ebenvs
+        [ebenv('a'), ebenv('b')]
       end
 
-      def env(suffix, cname_prefix=nil)
+      def ebenv(suffix, cname_prefix=nil)
         @env.new_eb_env(suffix, cname_prefix || inactive_cname_prefix)
       end
 
