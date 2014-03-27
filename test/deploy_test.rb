@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DeployTest < MiniTest::Unit::TestCase
   def setup
-    @eb_driver = EBStub.new
+    @eb = EBStub.new
     @s3_driver = S3Stub.new
     @cf_driver = CFStub.new
     @sample_package = sample_file('app-package.war')
@@ -17,7 +17,7 @@ class DeployTest < MiniTest::Unit::TestCase
   end
 
   def query_resource_output(key, opts)
-    EbDeployer.query_resource_output(key, {:bs_driver => @eb_driver,
+    EbDeployer.query_resource_output(key, {:bs_driver => @eb,
                                        :s3_driver => @s3_driver,
                                        :cf_driver => @cf_driver}.merge(opts))
   end
@@ -33,7 +33,7 @@ class DeployTest < MiniTest::Unit::TestCase
   end
 
   def stubs
-    { :bs_driver => @eb_driver,
+    { :bs_driver => @eb,
       :s3_driver => @s3_driver,
       :cf_driver => @cf_driver
     }

@@ -10,8 +10,8 @@ class VersionsDeployTest < DeployTest
 
     deploy(:application => 'simple', :environment => "production",
            :package => 'mingle_package.yml', :version_label => 1)
-    assert @eb_driver.application_exists?('simple')
-    last_version = @eb_driver.application_versions('simple').last
+    assert @eb.application_exists?('simple')
+    last_version = @eb.application_versions('simple').last
     assert_equal({'s3_bucket' => 'test-bucket', 's3_key' => 'test-mingle.war'}, last_version[:source_bundle])
   ensure
     FileUtils.rm_rf('mingle_package.yml')
@@ -24,7 +24,7 @@ class VersionsDeployTest < DeployTest
            :environment => "production",
            :version_label => 1,
            :version_prefix => "prod-")
-    assert_equal 'prod-1', @eb_driver.environment_verion_label('simple', 'production')
+    assert_equal 'prod-1', @eb.environment_verion_label('simple', t('production', 'simple'))
   end
 
   def test_should_keep_only_number_of_versions_specified
@@ -41,7 +41,7 @@ class VersionsDeployTest < DeployTest
            :version_label => 3,
            :keep_latest => 2)
 
-    assert_equal '1', @eb_driver.versions_deleted('simple').first
+    assert_equal '1', @eb.versions_deleted('simple').first
   end
 
   def test_should_only_remove_versions_with_matching_prefix
@@ -61,10 +61,10 @@ class VersionsDeployTest < DeployTest
            :version_prefix => "prod2-",
            :keep_latest => 1)
 
-    assert_equal 'prod1-1', @eb_driver.versions_deleted('simple').first
-    assert_equal 1, @eb_driver.versions_deleted('simple').count
+    assert_equal 'prod1-1', @eb.versions_deleted('simple').first
+    assert_equal 1, @eb.versions_deleted('simple').count
 
-    app_versions = @eb_driver.application_versions('simple').map { |apv| apv[:version_label] }
+    app_versions = @eb.application_versions('simple').map { |apv| apv[:version_label] }
     assert_equal ["prod1-2", "prod2-1"], app_versions
   end
 
@@ -72,7 +72,7 @@ class VersionsDeployTest < DeployTest
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 42)
-    assert_equal "simple-production", @eb_driver.environment_cname_prefix('simple', 'production')
+    assert_equal "simple-production", @eb.environment_cname_prefix('simple', t('production', 'simple'))
   end
 
   def test_cname_prefix_can_be_override
@@ -80,7 +80,7 @@ class VersionsDeployTest < DeployTest
            :environment => "production",
            :cname_prefix => 'sports123',
            :version_label => 42)
-    assert_equal "sports123", @eb_driver.environment_cname_prefix('simple', 'production')
+    assert_equal "sports123", @eb.environment_cname_prefix('simple', t('production', 'simple'))
   end
 
   def test_pass_s3_object_name_as_package_file
@@ -91,8 +91,8 @@ class VersionsDeployTest < DeployTest
            :environment => "production",
            :version_label => 1)
 
-    assert @eb_driver.application_exists?('simple')
-    last_version = @eb_driver.application_versions('simple').last
+    assert @eb.application_exists?('simple')
+    last_version = @eb.application_versions('simple').last
     assert_equal({'s3_bucket' => 'test-bucket', 's3_key' => 'test-mingle.war'}, last_version[:source_bundle])
   end
 

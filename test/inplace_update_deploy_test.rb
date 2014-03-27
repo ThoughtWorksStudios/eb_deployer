@@ -2,9 +2,9 @@ require 'deploy_test'
 
 class InplaceUpdateDeployTest < DeployTest
   def test_first_deployment_create_eb_application
-    assert !@eb_driver.application_exists?('simple')
+    assert !@eb.application_exists?('simple')
     deploy(:application => 'simple', :environment => "production")
-    assert @eb_driver.application_exists?('simple')
+    assert @eb.application_exists?('simple')
   end
 
   def test_set_option_settings_on_deployment
@@ -14,26 +14,26 @@ class InplaceUpdateDeployTest < DeployTest
     deploy(:application => 'simple', :environment => "production",
            :option_settings => [redudant])
 
-    assert_equal [redudant], @eb_driver.environment_settings('simple', 'production')
+    assert_equal [redudant], @eb.environment_settings('simple', t('production', 'simple'))
 
   end
 
   def test_destroy_should_clean_up_eb_application_and_env
     deploy(:application => 'simple', :environment => "production")
     destroy(:application => 'simple')
-    assert !@eb_driver.application_exists?('simple')
-    assert !@eb_driver.environment_exists?('simple', 'production')
+    assert !@eb.application_exists?('simple')
+    assert !@eb.environment_exists?('simple', t('production', 'simple'))
   end
 
   def test_first_deployment_create_environment
-    assert !@eb_driver.environment_exists?('simple', 'production')
+    assert !@eb.environment_exists?('simple', t('production', 'simple'))
     deploy(:application => 'simple', :environment => "production")
-    assert @eb_driver.environment_exists?('simple', 'production')
+    assert @eb.environment_exists?('simple', t('production', 'simple'))
   end
 
   def test_support_very_very_long_app_name
     deploy(:application => 'ver-very-simple-application', :environment => "production")
-    assert @eb_driver.environment_exists?('ver-very-simple-application', 'production')
+    assert @eb.environment_exists?('ver-very-simple-application', t('production', 'ver-very-simple-application'))
   end
 
   def test_should_raise_error_when_env_name_is_too_long
@@ -44,13 +44,13 @@ class InplaceUpdateDeployTest < DeployTest
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 1)
-    assert_equal '1', @eb_driver.environment_verion_label('simple', 'production')
+    assert_equal '1', @eb.environment_verion_label('simple', t('production', 'simple'))
 
     deploy(:application => 'simple',
            :environment => "production",
            :version_label => 2)
 
-    assert_equal '2', @eb_driver.environment_verion_label('simple', 'production')
+    assert_equal '2', @eb.environment_verion_label('simple', t('production', 'simple'))
   end
 
   def test_smoke_test_should_be_run_after_env_created_or_update
@@ -74,12 +74,9 @@ class InplaceUpdateDeployTest < DeployTest
 
   def test_should_terminate_old_environment_if_phoenix_mode_is_enabled
     deploy(:application => 'simple', :environment => "production", :phoenix_mode => true)
-    assert @eb_driver.environment_exists?('simple', 'production')
+    assert @eb.environment_exists?('simple', t('production', 'simple'))
     deploy(:application => 'simple', :environment => "production", :phoenix_mode => true)
-    assert @eb_driver.environments_been_deleted('simple').include?('production')
-    assert @eb_driver.environment_exists?('simple', 'production')
+    assert @eb.environments_been_deleted('simple').include?(t('production', 'simple'))
+    assert @eb.environment_exists?('simple', t('production', 'simple'))
   end
-
-
-
 end

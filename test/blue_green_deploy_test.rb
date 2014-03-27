@@ -7,8 +7,8 @@ class BlueGreenDeployTest < DeployTest
            :strategy => 'blue-green',
            :version_label => 42)
 
-    assert @eb_driver.environment_exists?('simple', 'production-a')
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-a')
+    assert @eb.environment_exists?('simple', t('production-a', 'simple'))
+    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', t('production-a', 'simple'))
   end
 
 
@@ -23,8 +23,8 @@ class BlueGreenDeployTest < DeployTest
            :strategy => 'blue-green',
            :version_label => 43)
 
-    assert @eb_driver.environment_exists?('simple', 'production-a')
-    assert @eb_driver.environment_exists?('simple', 'production-b')
+    assert @eb.environment_exists?('simple', t('production-a', 'simple'))
+    assert @eb.environment_exists?('simple', t('production-b', 'simple'))
   end
 
 
@@ -39,9 +39,9 @@ class BlueGreenDeployTest < DeployTest
            :strategy => 'blue-green',
            :version_label => 43)
 
-    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'production-a'))
+    assert_match(/simple-production-inactive/,  @eb.environment_cname_prefix('simple', t('production-a', 'simple')))
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-b')
+    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', t('production-b', 'simple'))
 
 
     deploy(:application => 'simple',
@@ -49,9 +49,9 @@ class BlueGreenDeployTest < DeployTest
            :strategy => 'blue-green',
            :version_label => 44)
 
-    assert_match(/simple-production-inactive/,  @eb_driver.environment_cname_prefix('simple', 'production-b'))
+    assert_match(/simple-production-inactive/,  @eb.environment_cname_prefix('simple', t('production-b', 'simple')))
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', 'production-a')
+    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', t('production-a', 'simple'))
   end
 
 
@@ -85,10 +85,10 @@ class BlueGreenDeployTest < DeployTest
            :version_label => 43,
            :phoenix_mode => true)
 
-    assert_equal [],  @eb_driver.environments_been_deleted('simple')
+    assert_equal [],  @eb.environments_been_deleted('simple')
 
-    inactive_env = 'production-a'
-    assert_match(/inactive/,  @eb_driver.environment_cname_prefix('simple', inactive_env))
+    inactive_env = t('production-a', 'simple')
+    assert_match(/inactive/,  @eb.environment_cname_prefix('simple', inactive_env))
 
 
     deploy(:application => 'simple',
@@ -97,9 +97,9 @@ class BlueGreenDeployTest < DeployTest
            :version_label => 44,
            :phoenix_mode => true)
 
-    assert_equal [inactive_env], @eb_driver.environments_been_deleted('simple')
+    assert_equal [inactive_env], @eb.environments_been_deleted('simple')
 
-    assert_equal 'simple-production',  @eb_driver.environment_cname_prefix('simple', inactive_env)
+    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', inactive_env)
   end
 
 

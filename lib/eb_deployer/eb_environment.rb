@@ -1,23 +1,22 @@
 module EbDeployer
   class EbEnvironment
-    attr_reader :app, :name, :legacy_env_name
+    attr_reader :app, :name
     attr_writer :event_poller
 
-    def self.legacy_ebenv_name(app_name, env_name)
+    def self.unique_ebenv_name(env_name, app_name)
+      raise "Environment name #{env_name} is too long, it must be under 15 chars" if env_name.size > 15
       digest = Digest::SHA1.hexdigest(app_name + '-' + env_name)[0..6]
       "#{env_name}-#{digest}"
     end
 
     def initialize(app, name, eb_driver, creation_opts={})
       @app = app
-      @name = name
+      @name = self.class.unique_ebenv_name(name, app)
       @bs = eb_driver
       @creation_opts = creation_opts
-      @legacy_env_name = self.class.legacy_ebenv_name(@app, @name)
     end
 
     def deploy(version_label, settings={})
-      terminate_legacy_env
       terminate if @creation_opts[:phoenix_mode]
       create_or_update_env(version_label, settings)
       smoke_test
@@ -25,12 +24,12 @@ module EbDeployer
     end
 
     def cname_prefix
-      @bs.environment_cname_prefix(@app, defactor_env_name)
+      @bs.environment_cname_prefix(@app, @name)
     end
 
     def swap_cname_with(another)
       log("Swap CNAME with env #{another.name}")
-      @bs.environment_swap_cname(self.app, self.defactor_env_name, another.defactor_env_name)
+      @bs.environment_swap_cname(self.app, self.name, another.name)
     end
 
     def log(msg)
@@ -38,29 +37,14 @@ module EbDeployer
     end
 
     def terminate
-      env_name = defactor_env_name
-      if @bs.environment_exists?(@app, env_name)
-        with_polling_events(env_name, /terminateEnvironment completed successfully/i) do
-          @bs.delete_environment(@app, env_name)
+      if @bs.environment_exists?(@app, @name)
+        with_polling_events(@name, /terminateEnvironment completed successfully/i) do
+          @bs.delete_environment(@app, @name)
         end
       end
-    end
-
-    def defactor_env_name
-      @bs.environment_exists?(@app, @legacy_env_name) ? @legacy_env_name : @name
     end
 
     private
-
-    def terminate_legacy_env
-      if @bs.environment_exists?(@app, @legacy_env_name)
-        log("Found legacy environment '#{@legacy_env_name}', eb_deployer will terminate it and create new environment following new name pattern as '#{@name}'.")
-
-        with_polling_events(@legacy_env_name, /terminateEnvironment completed successfully/i) do
-          @bs.delete_environment(@app, @legacy_env_name)
-        end
-      end
-    end
 
     def create_or_update_env(version_label, settings)
       if @bs.environment_exists?(@app, @name)

@@ -1,24 +1,6 @@
 require 'test_helper'
 
 class EbEnvironmentTest < MiniTest::Unit::TestCase
-  class PollerStub
-    class Deadloop < StandardError; end
-
-    def initialize(messages)
-      start_time = Time.now.utc
-      @events = messages.map do |message|
-        start_time += 1
-        {:event_date => start_time, :message => message}
-      end
-    end
-
-
-    def poll(start_time = Time.now, &block)
-      @events.each(&block)
-      raise Deadloop.new('poll will never terminate if you do not set a break in the block')
-    end
-  end
-
   def setup
     @eb_driver = EBStub.new
     @eb_driver.create_application("myapp")
@@ -27,21 +9,21 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
   def test_deploy_should_create_corresponding_eb_env
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
-    assert @eb_driver.environment_exists?('myapp', 'production')
+    assert @eb_driver.environment_exists?('myapp', t('production', 'myapp'))
   end
 
   def test_deploy_again_should_update_environment
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
     env.deploy("version2")
-    assert @eb_driver.environment_exists?('myapp', 'production')
-    assert_equal 'version2', @eb_driver.environment_verion_label('myapp', 'production')
+    assert @eb_driver.environment_exists?('myapp', t('production', 'myapp'))
+    assert_equal 'version2', @eb_driver.environment_verion_label('myapp', t('production', 'myapp'))
   end
 
   def test_option_setttings_get_set_on_eb_env
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1", {s1: 'v1'})
-    assert_equal({s1: 'v1' },  @eb_driver.environment_settings('myapp', 'production'))
+    assert_equal({s1: 'v1' },  @eb_driver.environment_settings('myapp', t('production', 'myapp')))
   end
 
   def test_should_run_smoke_test_after_deploy
@@ -55,13 +37,13 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
 
   def test_should_raise_runtime_error_when_deploy_failed
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    @eb_driver.set_events("myapp", "production", ["start deploying", "Failed to deploy application"])
+    @eb_driver.set_events("myapp", t("production", 'myapp'), ["start deploying", "Failed to deploy application"])
     assert_raises(RuntimeError) { env.deploy("version 1") }
   end
 
   def test_should_raise_runtime_error_when_eb_extension_execution_failed
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    @eb_driver.set_events("myapp", "production", ["start deploying",
+    @eb_driver.set_events("myapp", t("production", 'myapp'), ["start deploying",
                                                   "create environment",
                                                   "Command failed on instance. Return code: 1 Output: Error occurred during build: Command hooks failed",
                                                   "Successfully launched environment"])
@@ -74,65 +56,6 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
     env.terminate
-    assert !@eb_driver.environment_exists?('myapp', 'production')
+    assert !@eb_driver.environment_exists?('myapp', t('production', 'myapp'))
   end
-
-  def test_should_terminate_legacy_env_upon_deployment
-    legacy_env_name = create_legacy_env("myapp", "production", "myapp-production")
-    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    @eb_driver.set_events("myapp", legacy_env_name, ["terminateEnvironment completed successfully"])
-    @eb_driver.set_events("myapp", "production", ["Successfully launched environment"])
-    env.deploy("version1")
-    assert !@eb_driver.environment_exists?("myapp", legacy_env_name)
-    assert @eb_driver.environment_exists?("myapp", "production")
-  end
-
-  def test_can_find_cname_if_legacy_env_exists
-    legacy_env_name = EbDeployer::EbEnvironment.legacy_ebenv_name("myapp", "production")
-    @eb_driver.create_environment("myapp", legacy_env_name, 'solution-stack', 'myapp-production', 'foo', 'web' ,{})
-    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    assert_equal 'myapp-production', env.cname_prefix
-  end
-
-  def test_terminate_legacy_env
-    legacy_env_name = create_legacy_env("myapp", "production", "myapp-production")
-    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    env.terminate
-    assert !@eb_driver.environment_exists?("myapp", legacy_env_name)
-  end
-
-  def test_swap_legacy_env_with_non_legacy_env
-    create_legacy_env("myapp", "production-a", "myapp-production")
-    env_a = EbDeployer::EbEnvironment.new("myapp", "production-a", @eb_driver)
-    env_b = EbDeployer::EbEnvironment.new("myapp", "production-b", @eb_driver, :cname_prefix => 'myapp-production-inactive')
-    env_b.deploy('version1')
-
-    env_a.swap_cname_with(env_b)
-
-    assert_equal "myapp-production-inactive", env_a.cname_prefix
-    assert_equal "myapp-production", env_b.cname_prefix
-  end
-
-  def test_swap_no_legacy_env_with_legacy_env
-    create_legacy_env("myapp", "production-a", "myapp-production")
-    env_a = EbDeployer::EbEnvironment.new("myapp", "production-a", @eb_driver)
-    env_b = EbDeployer::EbEnvironment.new("myapp", "production-b", @eb_driver, :cname_prefix => 'myapp-production-inactive')
-    env_b.deploy('version1')
-
-    env_b.swap_cname_with(env_a)
-
-    assert_equal "myapp-production-inactive", env_a.cname_prefix
-    assert_equal "myapp-production", env_b.cname_prefix
-  end
-
-  private
-
-  def create_legacy_env(app_name, env_name, cname_prefix)
-    legacy_env_name = EbDeployer::EbEnvironment.legacy_ebenv_name(app_name, env_name)
-    @eb_driver.create_environment(app_name, legacy_env_name, 'solution-stack', cname_prefix, 'foo', 'web' ,{})
-    legacy_env_name
-  end
-
-
-
 end

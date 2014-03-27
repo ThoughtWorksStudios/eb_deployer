@@ -74,7 +74,7 @@ class ResourcesDeployTest < DeployTest
              }
            })
 
-    assert @eb_driver.environment_settings('simple', 'production').
+    assert @eb.environment_settings('simple', t('production', 'simple')).
       include?({:namespace => 'aws.foo', :option_name => 'o2', :value => 'transformed value of O2'})
   end
 
@@ -91,7 +91,7 @@ class ResourcesDeployTest < DeployTest
                'O1' => lambda { |v| {:namespace => 'aws.foo', :option_name => 'o1', :value => v} }
              }
            })
-    assert @eb_driver.environment_settings('simple', 'production').
+    assert @eb.environment_settings('simple', t('production', 'simple')).
       include?({:namespace => 'aws.foo', :option_name => 'o1', :value => 'value of O1'})
   end
 
