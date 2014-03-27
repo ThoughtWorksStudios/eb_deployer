@@ -308,6 +308,7 @@ module EbDeployer
         puts "YAML package file format:"
         puts "s3_bucket: <bucket_name>"
         puts "s3_key: <object_path>"
+        exit(0)
       end
     end
   end

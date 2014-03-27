@@ -25,6 +25,19 @@ YAML
     assert_equal(nil, config[:common])
   end
 
+  def test_use_package_as_version_label_when_using_s3_obj_as_package
+    config = @loader.load(generate_input(<<-YAML, :package => 'bucket:obj'))
+application: myapp
+common:
+  strategy: inplace-update
+environments:
+  dev:
+YAML
+    assert_equal('myapp', config[:application])
+    assert_equal('bucket:obj', config[:package])
+    assert_equal('bucket:obj', config[:version_label])
+  end
+
   def test_common_settings_get_merge_into_the_config
     config = @loader.load(generate_input(<<-YAML))
 application: myapp
