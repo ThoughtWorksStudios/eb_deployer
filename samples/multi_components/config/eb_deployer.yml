@@ -1,0 +1,136 @@
+# Applicaiton name,  can only contain any combination of uppercase letters, lowercase
+# letters, numbers, dashes (-)
+application: eb-deployer-java-multi-components
+
+# Common settings for all environments
+common:
+  # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
+  # solution_stack_name: 64bit Amazon Linux 2013.09 running Tomcat 7 Java 7
+
+  # Tier name for environments. Current supported values are WebServer and Worker
+  # tier: WebServer
+
+  # AWS region to deploy. Default to us-east-1
+  # region: us-west-1
+
+  # There are two deployment strategies supported: blue-green and inplace-update.
+  # Blue green keep two elastic beanstalk environments and always deploy to
+  # inactive one, to achive zero downtime. inplace-update strategy
+  # will only keep one environment, and update the version inplace on
+  # deploy. inplace-update will save resources but will have downtime. Default
+  # strategy is blue-green. PS. All old environments need be destroyed when you
+  # switching between strategies, otherwise you will have DNS conflict.
+  # strategy: blue-green
+
+  # If phoenix mode is turn on, it will terminate the old elastic
+  # beanstalk environment and recreate on deploy. For blue-green
+  # deployment it terminate the inactive environment first then
+  # recreate it. This is useful to avoiding configuration drift and
+  # accumulating state on the ec2 instances. Also it has the benifit of
+  # keeping your EC2 instance system package upto date, because everytime EC2
+  # instance boot up from AMI it does a system update. Default is off but we suggest
+  # overriden it to on for production environment.
+  # phoenix_mode: false
+
+
+  # Specifies the maximum number of versions to keep. Older versions are removed
+  # and deleted from the S3 source bucket as well. If specified as zero or not
+  # specified, all versions will be kept.  If a version_prefix is given, only removes
+  # version starting with the prefix.
+  # keep_latest: 200
+
+
+  # Specifies a prefix to prepend to the version label.
+  # This can be useful if you want to use different binaries for different
+  # environments.
+  # version_prefix:
+
+
+  # Generating a version label for package being deployed. A readable version label
+  # will provide better traceablity of your deployment process.
+  # By default setting is:
+  # version_label: <%= package_digest %>
+  # which means using MD5 digest of the package file. If you deploy using build
+  # pipeline tool such as GO, switching to pipline counter is highly suggested to
+  # increase the readability. Following example read pipeline counter from environment
+  # variable with a fall back to digest for local deployment:
+  # version_label: <%= ENV['GO_PIPELINE_COUNTER'] || package_digest %>
+
+
+  # Smoke test value should be a piece of ruby code with access to single variable
+  # named "host_name" -- environment DNS name. Smoke test snippet will be evaluated at
+  # the end of the deployment for inplace-update deployment. For blue-green
+  # deployment it will run after inactive environment deploy finish and before
+  # switching inactive and active environments.
+  # Defining a smoke test is high recommended for serious usage. The
+  # simplest one could just be checking server landing page using curl, e.g.
+  smoke_test: >
+    Timeout.timeout(600) do
+      until `curl http://#{host_name}`.include?('Hello, World')
+        sleep 5
+      end
+    end
+
+
+  # Elastic Beanstalk settings that will apply to the environments you
+  # deploying.
+  # For all available options take a look at
+  # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
+  option_settings:
+    # Following is an option_settings example which changes EC2 instance type
+    # from t1.micro (default) to m1.small. Intances with t1.micro type sometime
+    # are not very responsible, so m1.small is suggested for saving time.
+    # But if you care about the marginal cost difference you can comment this out to
+    # go back to t1.micro.
+    - namespace: aws:autoscaling:launchconfiguration
+      option_name: InstanceType
+      value: m1.small
+    - namespace: aws:elasticbeanstalk:environment
+      option_name: EnvironmentType
+      value: SingleInstance
+
+  # If resources specified, eb_deployer will use the CloudFormation
+  # template you provide to create a default CloudFormation stack with
+  # name <application_name>-<env-name> for the environment current
+  # deploying. And Outputs of the CloudFormation can be mapped to Elastic Beanstalk
+  # options settings.
+  # keys:
+  #    template => CloudFormation template file with JSON format
+  #    inputs => A Hash, input values for the CloudFormation template
+  #    outputs => A Hash with key map to your CloudFormation
+  # template outputs and value as elastic beanstalk settings namespace and option_name.
+  #    :capabilities => An array. You need set it to ['CAPABILITY_IAM'] if the
+  # template include IAM Instance Profile.
+  resources:
+    # For example creating a RDS instance for blue green deployment:
+    # template: config/my_rds.json
+    # inputs:
+    #   DBPassword: <%= random_hash %>
+    # outputs:
+    #   RDSPassSecurityGroup:
+    #     namespace: aws:autoscaling:launchconfiguration
+    #     option_name: SecurityGroups
+    #   RDSDatabaseConfig:
+    #     namespace: aws:elasticbeanstalk:application:environment
+    #     option_name: databaseConfig
+  components:
+    - name: web
+    - name: api
+      option_settings:
+        - namespace: aws:elasticbeanstalk:application:environment
+          option_name: APP_MODE
+          value: api
+
+
+# You can define environment here. Each environment can overriden any common settings
+environments:
+  dev:
+    # example for overriding common settings
+    # strategy: inplace-update
+  prod:
+    option_settings:
+      # example for overriding common option_settings: providing least redanduncy
+      # in production environment.
+      # - namespace: aws:autoscaling:asg
+      #   option_name: MinSize
+      #    value: "2"
