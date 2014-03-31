@@ -29,6 +29,7 @@ module EbDeployer
     def components=(components_attrs)
       return unless components_attrs
       @components = components_attrs.map do |attrs|
+        attrs = symbolize_keys(attrs)
         name = attrs.delete(:name)
         eb_settings = attrs.delete(:option_settings) || []
         Component.new(name, self, @creation_opts.merge(attrs), eb_settings, @eb_driver)
@@ -36,6 +37,10 @@ module EbDeployer
     end
 
     private
+    def symbolize_keys(hash)
+      hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    end
+
     def resource_stack_name
       "#{app_name}-#{@name}"
     end

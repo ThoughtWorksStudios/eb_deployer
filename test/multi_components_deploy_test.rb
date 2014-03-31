@@ -36,13 +36,13 @@ class MultiComponentsDeployTest < DeployTest
   end
 
   def test_components_inheritate_creation_options_from_environment
-    do_deploy(:components => [:name => 'web'])
+    do_deploy
     assert_equal 'WebServer', @eb.environment_tier('simple', t('prod-web', 'simple'))
   end
 
   def test_components_can_override_creation_opts
     do_deploy(:tier => 'WebServer',
-              :components => [{:name => 'web'}, {:name => 'bg', :tier => "Worker"}])
+              :components => [{'name' => 'web'}, {'name' => 'bg', 'tier' => "Worker"}])
     assert_equal 'WebServer', @eb.environment_tier('simple', t('prod-web', 'simple'))
     assert_equal 'Worker', @eb.environment_tier('simple', t('prod-bg', 'simple'))
   end
@@ -56,9 +56,9 @@ class MultiComponentsDeployTest < DeployTest
       :value => '2' }
 
     do_deploy(:option_settings => [minsize_3],
-              :components => [{:name => 'web'},
-                              {:name => 'api',
-                                :option_settings => [minsize_2]}])
+              :components => [{'name' => 'web'},
+                              {'name' => 'api',
+                                'option_settings' => [minsize_2]}])
     assert_equal [minsize_3], @eb.environment_settings('simple', t('prod-web', 'simple'))
     assert_equal [minsize_3, minsize_2], @eb.environment_settings('simple', t('prod-api', 'simple'))
 
@@ -69,11 +69,10 @@ class MultiComponentsDeployTest < DeployTest
   def do_deploy(options={})
     deploy({:application => 'simple',
              :environment => 'prod',
-             :components => [{ :name => 'web' },
-                             { :name => 'bg' },
-                             { :name => 'api' }]
+             :components => [{ 'name' => 'web' },
+                             { 'name' => 'bg' },
+                             { 'name' => 'api' }]
            }.merge(options))
-
   end
 
   def do_bg_deploy
