@@ -1,6 +1,6 @@
 require 'deploy_test'
 
-class ComponentsDeployTest < DeployTest
+class MultiComponentsDeployTest < DeployTest
   def test_deploy_with_components
     deploy(:application => 'simple',
            :environment => 'production',
