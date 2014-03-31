@@ -18,13 +18,6 @@ class InplaceUpdateDeployTest < DeployTest
 
   end
 
-  def test_destroy_should_clean_up_eb_application_and_env
-    deploy(:application => 'simple', :environment => "production")
-    destroy(:application => 'simple')
-    assert !@eb.application_exists?('simple')
-    assert !@eb.environment_exists?('simple', t('production', 'simple'))
-  end
-
   def test_first_deployment_create_environment
     assert !@eb.environment_exists?('simple', t('production', 'simple'))
     deploy(:application => 'simple', :environment => "production")
@@ -79,4 +72,11 @@ class InplaceUpdateDeployTest < DeployTest
     assert @eb.environments_been_deleted('simple').include?(t('production', 'simple'))
     assert @eb.environment_exists?('simple', t('production', 'simple'))
   end
+
+  def test_destroy_should_clean_up_env
+    deploy(:application => 'simple', :environment => "production")
+    destroy(:application => 'simple', :environment => 'production')
+    assert !@eb.environment_exists?('simple', t('production', 'simple'))
+  end
+
 end

@@ -24,24 +24,21 @@ module EbDeployer
       config_file = options.delete(:config_file)
       config_settings = load_config_settings(config_file, package_digest)
 
-      common_settings = symbolize_keys(config_settings.delete(:common))
+      app_name = config_settings[:application]
+
+      common_settings = symbolize_keys(config_settings[:common])
       common_settings[:version_label] ||= package_digest
 
-      envs = config_settings.delete(:environments)
-      ret = options.merge(config_settings).merge(common_settings)
-      unless ret.delete(:all_envs)
-        env = ret[:environment]
-        raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
-        env_settings = symbolize_keys(envs[env] || {})
-        env_option_settings = env_settings.delete(:option_settings) || []
+      envs = config_settings[:environments]
+      env = options[:environment]
+      raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
+      env_settings = symbolize_keys(envs[env] || {})
+      env_option_settings = env_settings.delete(:option_settings) || []
 
-        ret.merge!(env_settings)
-
-        ret[:option_settings] ||= []
-        ret[:option_settings] += env_option_settings
-      else
-        ret.delete(:environment)
-      end
+      ret = options.merge(common_settings).merge(env_settings)
+      ret[:application] = app_name
+      ret[:option_settings] ||= []
+      ret[:option_settings] += env_option_settings
       ret
     end
 

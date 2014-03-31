@@ -236,8 +236,6 @@ module EbDeployer
     parser.parse!
     action = options.delete(:action)
 
-    raise "--all is only valid with --destroy" if (options[:all_envs] && action != :destroy)
-
     if File.exists?(options[:config_file])
       puts "Found configuration at #{options[:config_file]}."
     else
@@ -273,19 +271,15 @@ module EbDeployer
         options[:config_file] = v
       end
 
-      opts.on("-d", "--destroy", "Destroy specified environment") do |v|
+      opts.on("-d", "--destroy", "Destroy all Elasticbeanstalk environments under the application which have specified environment as name prefix") do |v|
         options[:action] = :destroy
       end
 
-      opts.on("--all", "Operate on all environments, only valid with --destroy") do |v|
-        options[:all_envs] = true
-      end
-
-      opts.on("--skip-resource-stack-update", "skip cloud-formation stack update. (only for extreme situation like hitting a cloudformation bug)") do |v|
+      opts.on("--skip-resource-stack-update", "Skip cloud-formation stack update. (only for extreme situation like hitting a cloudformation bug)") do |v|
         options[:skip_resource_stack_update] = true
       end
 
-      opts.on("--component [COMPONENT]", "specify which component to deploy") do |v|
+      opts.on("--component [COMPONENT]", "Specify which component to deploy") do |v|
         options[:component] = v
       end
 

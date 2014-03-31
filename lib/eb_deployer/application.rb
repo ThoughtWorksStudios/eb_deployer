@@ -34,23 +34,20 @@ module EbDeployer
       end
     end
 
-    def delete(env_name=nil)
+    def delete(env_name_prefix)
       if @eb_driver.application_exists?(@name)
-        available_envs = @eb_driver.environment_names_for_application(@name)
+        available_envs = @eb_driver.environment_names_for_application(@name).select do |name|
+          name =~ /^#{env_name_prefix}-/
+        end
 
-        unless env_name.nil? || available_envs.include?(env_name)
-          log("Environment #{env_name.inspect} does not exist in application #{@name.inspect}. Skipping delete.")
+        if available_envs.empty?
+          log("Environment #{env_name_prefix.inspect} does not exist in application #{@name.inspect}. Skipping delete.")
           return
         end
 
-        available_envs.select { |e| env_name.nil? || e == env_name }.each do |env|
+        available_envs.each do |env|
           log("Terminating environment #{env}")
           @eb_driver.delete_environment(@name, env)
-        end
-
-        if env_name.nil?
-          log("Deleting application")
-          @eb_driver.delete_application(@name)
         end
       end
     end

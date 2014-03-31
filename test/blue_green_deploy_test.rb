@@ -102,5 +102,20 @@ class BlueGreenDeployTest < DeployTest
     assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', inactive_env)
   end
 
+  def test_destroy_should_clean_up_env
+    2.times do
+      deploy(:application => 'simple',
+             :environment => "production",
+             :strategy => 'blue-green',
+             :version_label => 44,
+             :phoenix_mode => true)
+    end
+
+    destroy(:application => 'simple', :environment => 'production')
+    assert !@eb.environment_exists?('simple', t('production-a', 'simple'))
+    assert !@eb.environment_exists?('simple', t('production-b', 'simple'))
+  end
+
+
 
 end
