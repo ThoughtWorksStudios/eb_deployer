@@ -1,3 +1,8 @@
+0.4.1
+=====
+* Remove options for delete all environments ("-d --all"), because it is too destructive and not recoverable.
+* Experimental support for multiple components deployment.
+
 0.4.0
 ====
 * revert back all changes from 0.3.8 to 0.3.9. Elasticbeanstalk haven't relex the real unique constain. The actually contrain is you can not have environment name cross different application
