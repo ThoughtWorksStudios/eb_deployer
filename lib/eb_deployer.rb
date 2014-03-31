@@ -16,6 +16,8 @@ require 'eb_deployer/application'
 require 'eb_deployer/resource_stacks'
 require 'eb_deployer/eb_environment'
 require 'eb_deployer/environment'
+require 'eb_deployer/default_component'
+require 'eb_deployer/component'
 require 'eb_deployer/event_poller'
 require 'eb_deployer/package'
 require 'eb_deployer/config_loader'
@@ -83,7 +85,7 @@ module EbDeployer
   #        :option_name => 'InstanceType',
   #        :value => 'm1.small' }]
   #
-  #   When there are many, Using an external yaml file to hold those
+  #   When there are many, using an external yaml file to hold those
   #   configuration is recommended. Such as:
   #
   #     YAML.load(File.read("my_settings_file.yml"))
@@ -187,7 +189,7 @@ module EbDeployer
     version_prefix = opts[:version_prefix].to_s.strip
     version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
     cname = opts[:cname]
-    env_settings = opts[:option_settings] || opts[:settings] || []
+    eb_settings = opts[:option_settings] || opts[:settings] || []
     strategy_name = opts[:strategy] || :blue_green
     cname_prefix = opts[:cname_prefix]
     smoke_test = opts[:smoke_test] || Proc.new {}
@@ -199,18 +201,19 @@ module EbDeployer
 
     resource_stacks = ResourceStacks.new(opts[:resources], cf, skip_resource)
     application = Application.new(app, bs, s3, bucket)
-    environment = Environment.new(application,
-                                  env_name,
-                                  resource_stacks,
-                                  env_settings,
-                                  {
-                                    :solution_stack => stack_name,
-                                    :cname_prefix => cname_prefix,
-                                    :smoke_test => smoke_test,
-                                    :phoenix_mode => phoenix_mode,
-                                    :tier => app_tier
-                                  },
-                                  bs)
+    environment = Environment.new(application, env_name, bs) do |env|
+      env.resource_stacks = resource_stacks
+      env.settings = eb_settings
+      env.creation_opts = {
+        :solution_stack => stack_name,
+        :cname_prefix => cname_prefix,
+        :smoke_test => smoke_test,
+        :phoenix_mode => phoenix_mode,
+        :tier => app_tier
+      }
+
+      env.components = opts[:components]
+    end
 
     application.create_version(version_label, opts[:package])
     environment.deploy(version_label, strategy_name)

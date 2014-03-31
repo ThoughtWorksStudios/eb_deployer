@@ -1,45 +1,43 @@
 module EbDeployer
   class Environment
+    attr_writer :resource_stacks, :settings, :creation_opts, :components
+    attr_reader :name
 
-    def initialize(app, name, resource_stacks, settings, creation_opts, bs_driver)
+    def initialize(app, name, eb_driver, &block)
       @app = app
       @name = name
-      @resource_stacks = resource_stacks
-      @settings = settings
-      @creation_opts = creation_opts
-      @bs_driver = bs_driver
+      @eb_driver = eb_driver
+      @creation_opts = {}
+      @settings = []
+      yield(self) if block_given?
+      unless @components
+        @components = [DefaultComponent.new(self, @creation_opts, @eb_driver)]
+      end
     end
 
-    def cname_prefix
-      @creation_opts[:cname_prefix] || default_cname_prefix
+    def app_name
+      @app.name
     end
 
     def deploy(version_label, strategy_name)
-      strategy = create_strategy(strategy_name)
-      strategy.deploy(version_label,
-                       @settings + @resource_stacks.provision(resource_stack_name))
+      resource_settings = @resource_stacks.provision(resource_stack_name)
+      @components.each do |component|
+        component.deploy(version_label, strategy_name, @settings + resource_settings)
+      end
     end
 
-    def new_eb_env(suffix=nil, cname_prefix_overriding=nil)
-      EbEnvironment.new(@app.name,
-                        [@name, suffix].compact.join('-'),
-                        @bs_driver,
-                        @creation_opts.merge(:cname_prefix => cname_prefix_overriding || cname_prefix))
+    def components=(components_attrs)
+      return unless components_attrs
+      @components = components_attrs.map do |attrs|
+        name = attrs.delete(:name)
+        Component.new(name, self, @creation_opts.merge(attrs), @eb_driver)
+      end
     end
 
     private
-
-    def default_cname_prefix
-      [@app.name, @name].join('-')
-    end
-
-
-    def create_strategy(strategy_name)
-      DeploymentStrategy.create(self, strategy_name)
-    end
-
     def resource_stack_name
-      "#{@app.name}-#{@name}"
+      "#{app_name}-#{@name}"
     end
+
   end
 end
