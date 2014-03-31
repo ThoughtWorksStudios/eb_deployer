@@ -46,7 +46,7 @@ module EbDeployer
           :solution_stack_name => stack_name,
           :version_label => version,
           :option_settings => settings,
-          :tier => tier,
+          :tier => environment_tier(tier),
           :cname_prefix => cname_prefix
         }
 
@@ -111,6 +111,15 @@ module EbDeployer
       end
 
       private
+
+      TIERS = [
+               {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
+               {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
+              ]
+
+      def environment_tier(name)
+        TIERS.find {|t| t[:name].downcase == name.downcase} || raise("No tier found with name #{name.inspect}")
+      end
 
       def convert_env_name_to_id(app_name, env_names)
         envs = alive_envs(app_name, env_names)

@@ -27,15 +27,6 @@ require 'eb_deployer/version_cleaner'
 
 module EbDeployer
 
-  TIERS = [
-    {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
-    {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
-  ]
-
-  def environment_tier(name)
-    TIERS.find {|t| t[:name].downcase == name.downcase} || raise("No tier found with name #{name.inspect}")
-  end
-  module_function :environment_tier
   #
   # Query ouput value of the cloud formation stack
   #
@@ -197,7 +188,7 @@ module EbDeployer
     bucket = opts[:package_bucket] || app
     skip_resource = opts[:skip_resource_stack_update]
     keep_latest = opts[:keep_latest].to_i || 0
-    app_tier = self.environment_tier(opts[:tier] || 'WebServer')
+    app_tier = opts[:tier] || 'WebServer'
 
     resource_stacks = ResourceStacks.new(opts[:resources], cf, skip_resource)
     application = Application.new(app, bs, s3, bucket)

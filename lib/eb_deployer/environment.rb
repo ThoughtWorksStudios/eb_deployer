@@ -30,7 +30,8 @@ module EbDeployer
       return unless components_attrs
       @components = components_attrs.map do |attrs|
         name = attrs.delete(:name)
-        Component.new(name, self, @creation_opts.merge(attrs), @eb_driver)
+        eb_settings = attrs.delete(:option_settings) || []
+        Component.new(name, self, @creation_opts.merge(attrs), eb_settings, @eb_driver)
       end
     end
 

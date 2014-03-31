@@ -1,10 +1,11 @@
 module EbDeployer
   class Component
-    def initialize(name, env, creation_opts, eb_driver)
+    def initialize(name, env, creation_opts, eb_settings, eb_driver)
       @name = name
       @env = env
       @eb_driver = eb_driver
       @creation_opts = creation_opts
+      @eb_settings = eb_settings
     end
 
     def cname_prefix
@@ -14,7 +15,7 @@ module EbDeployer
 
     def deploy(version_label, strategy_name, eb_settings)
       strategy = create_strategy(strategy_name)
-      strategy.deploy(version_label, eb_settings)
+      strategy.deploy(version_label, eb_settings + @eb_settings)
     end
 
     def new_eb_env(suffix=nil, cname_prefix_overriding=nil)
