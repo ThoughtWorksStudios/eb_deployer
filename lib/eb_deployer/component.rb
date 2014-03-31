@@ -1,5 +1,7 @@
 module EbDeployer
   class Component
+    attr_reader :name
+
     def initialize(name, env, creation_opts, eb_settings, eb_driver)
       @name = name
       @env = env
@@ -11,7 +13,6 @@ module EbDeployer
     def cname_prefix
       @creation_opts[:cname_prefix] || default_cname_prefix
     end
-
 
     def deploy(version_label, strategy_name, eb_settings)
       strategy = create_strategy(strategy_name)

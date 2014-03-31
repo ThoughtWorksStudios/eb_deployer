@@ -61,9 +61,20 @@ class MultiComponentsDeployTest < DeployTest
                                 'option_settings' => [minsize_2]}])
     assert_equal [minsize_3], @eb.environment_settings('simple', t('prod-web', 'simple'))
     assert_equal [minsize_3, minsize_2], @eb.environment_settings('simple', t('prod-api', 'simple'))
-
   end
 
+  def test_can_deploy_single_component
+    do_deploy(:component => "bg")
+    assert !@eb.environment_exists?('simple', t('prod-web', 'simple'))
+    assert !@eb.environment_exists?('simple', t('prod-api', 'simple'))
+    assert @eb.environment_exists?('simple', t('prod-bg', 'simple'))
+  end
+
+  def test_should_raise_exception_when_try_to_deploy_a_none_exists_component
+    assert_raises(RuntimeError) do
+      do_deploy(:component => "foo")
+    end
+  end
 
   private
   def do_deploy(options={})

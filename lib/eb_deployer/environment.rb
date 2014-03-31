@@ -1,6 +1,6 @@
 module EbDeployer
   class Environment
-    attr_writer :resource_stacks, :settings, :creation_opts, :components
+    attr_writer :resource_stacks, :settings, :creation_opts, :components, :component_under_deploy
     attr_reader :name
 
     def initialize(app, name, eb_driver, &block)
@@ -21,7 +21,7 @@ module EbDeployer
 
     def deploy(version_label, strategy_name)
       resource_settings = @resource_stacks.provision(resource_stack_name)
-      @components.each do |component|
+      components_to_deploy.each do |component|
         component.deploy(version_label, strategy_name, @settings + resource_settings)
       end
     end
@@ -37,6 +37,20 @@ module EbDeployer
     end
 
     private
+    def components_to_deploy
+      if @component_under_deploy
+        component = component_named(@component_under_deploy)
+        raise "'#{@component_under_deploy}' is not in the configuration. Available components are #{@components.map(&:name) }" unless component
+        [component]
+      else
+        @components
+      end
+    end
+
+    def component_named(name)
+      @components.detect { |c| c.name == name }
+    end
+
     def symbolize_keys(hash)
       hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
@@ -44,6 +58,5 @@ module EbDeployer
     def resource_stack_name
       "#{app_name}-#{@name}"
     end
-
   end
 end

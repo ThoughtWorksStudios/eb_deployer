@@ -204,6 +204,7 @@ module EbDeployer
       }
 
       env.components = opts[:components]
+      env.component_under_deploy = opts[:component]
     end
 
     application.create_version(version_label, opts[:package])
@@ -282,6 +283,10 @@ module EbDeployer
 
       opts.on("--skip-resource-stack-update", "skip cloud-formation stack update. (only for extreme situation like hitting a cloudformation bug)") do |v|
         options[:skip_resource_stack_update] = true
+      end
+
+      opts.on("--component [COMPONENT]", "specify which component to deploy") do |v|
+        options[:component] = v
       end
 
       opts.on("-v", "--version", "Print current version") do |v|
