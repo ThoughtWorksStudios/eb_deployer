@@ -25,7 +25,7 @@ module EbDeployer
           :environment_id => env_id,
           :version_label => version,
           :option_settings => settings,
-          :tier => tier
+          :tier => environment_tier(tier)
         }
 
         @client.update_environment(request)
