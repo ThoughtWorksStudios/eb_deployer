@@ -2,21 +2,21 @@ module EbDeployer
   class Component
     attr_reader :name
 
-    def initialize(name, env, creation_opts, eb_settings, eb_driver)
+    def initialize(name, env, creation_opts, eb_settings, strategy_name, eb_driver)
       @name = name
       @env = env
       @eb_driver = eb_driver
       @creation_opts = creation_opts
       @eb_settings = eb_settings
+      @strategy = DeploymentStrategy.create(self, strategy_name)
     end
 
     def cname_prefix
       @creation_opts[:cname_prefix] || default_cname_prefix
     end
 
-    def deploy(version_label, strategy_name, eb_settings)
-      strategy = create_strategy(strategy_name)
-      strategy.deploy(version_label, eb_settings + @eb_settings)
+    def deploy(version_label, eb_settings)
+      @strategy.deploy(version_label, eb_settings + @eb_settings)
     end
 
     def new_eb_env(suffix=nil, cname_prefix_overriding=nil)
@@ -31,10 +31,5 @@ module EbDeployer
     def default_cname_prefix
       [@env.app_name, @env.name, @name].join('-')
     end
-
-    def create_strategy(strategy_name)
-      DeploymentStrategy.create(self, strategy_name)
-    end
-
   end
 end

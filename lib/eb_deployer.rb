@@ -181,7 +181,6 @@ module EbDeployer
     version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
     cname = opts[:cname]
     eb_settings = opts[:option_settings] || opts[:settings] || []
-    strategy_name = opts[:strategy] || :blue_green
     cname_prefix = opts[:cname_prefix]
     smoke_test = opts[:smoke_test] || Proc.new {}
     phoenix_mode = opts[:phoenix_mode]
@@ -202,13 +201,13 @@ module EbDeployer
         :phoenix_mode => phoenix_mode,
         :tier => app_tier
       }
-
+      env.strategy_name = opts[:strategy] || :blue_green
       env.components = opts[:components]
       env.component_under_deploy = opts[:component]
     end
 
     application.create_version(version_label, opts[:package])
-    environment.deploy(version_label, strategy_name)
+    environment.deploy(version_label)
     application.clean_versions(version_prefix, keep_latest)
   end
 

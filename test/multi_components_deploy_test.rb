@@ -63,6 +63,16 @@ class MultiComponentsDeployTest < DeployTest
     assert_equal [minsize_3, minsize_2], @eb.environment_settings('simple', t('prod-api', 'simple'))
   end
 
+  def test_override_deployment_strategy
+    do_deploy(:components => [{'name' => 'web',
+                                'strategy' => 'blue-green' },
+                              {'name' => 'bg',
+                                'strategy' => 'inplace-update'}])
+
+    assert @eb.environment_exists?('simple', t('prod-web-a', 'simple'))
+    assert @eb.environment_exists?('simple', t('prod-bg', 'simple'))
+  end
+
   def test_can_deploy_single_component
     do_deploy(:component => "bg")
     assert !@eb.environment_exists?('simple', t('prod-web', 'simple'))

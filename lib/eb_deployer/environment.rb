@@ -1,6 +1,6 @@
 module EbDeployer
   class Environment
-    attr_writer :resource_stacks, :settings, :creation_opts, :components, :component_under_deploy
+    attr_writer :resource_stacks, :settings, :creation_opts, :components, :component_under_deploy, :strategy_name
     attr_reader :name
 
     def initialize(app, name, eb_driver, &block)
@@ -9,9 +9,10 @@ module EbDeployer
       @eb_driver = eb_driver
       @creation_opts = {}
       @settings = []
+      @strategy_name = :blue_green
       yield(self) if block_given?
       unless @components
-        @components = [DefaultComponent.new(self, @creation_opts, @eb_driver)]
+        @components = [DefaultComponent.new(self, @creation_opts, @strategy_name, @eb_driver)]
       end
     end
 
@@ -19,10 +20,10 @@ module EbDeployer
       @app.name
     end
 
-    def deploy(version_label, strategy_name)
+    def deploy(version_label)
       resource_settings = @resource_stacks.provision(resource_stack_name)
       components_to_deploy.each do |component|
-        component.deploy(version_label, strategy_name, @settings + resource_settings)
+        component.deploy(version_label, @settings + resource_settings)
       end
     end
 
@@ -32,7 +33,8 @@ module EbDeployer
         attrs = symbolize_keys(attrs)
         name = attrs.delete(:name)
         eb_settings = attrs.delete(:option_settings) || []
-        Component.new(name, self, @creation_opts.merge(attrs), eb_settings, @eb_driver)
+        strategy_name = attrs[:strategy] || @strategy_name
+        Component.new(name, self, @creation_opts.merge(attrs), eb_settings, strategy_name, @eb_driver)
       end
     end
 
