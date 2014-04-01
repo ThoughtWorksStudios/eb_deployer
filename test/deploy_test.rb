@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DeployTest < MiniTest::Unit::TestCase
   def setup
-    @eb = EBStub.new
+    @eb = ErrorRaisingWrapper.new(EBStub.new)
     @s3_driver = S3Stub.new
     @cf_driver = CFStub.new
     @sample_package = sample_file('app-package.war')

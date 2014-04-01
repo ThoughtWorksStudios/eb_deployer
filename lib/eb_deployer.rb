@@ -9,6 +9,7 @@ require 'erb'
 require 'fileutils'
 
 require 'eb_deployer/version'
+require 'eb_deployer/utils'
 require 'eb_deployer/aws_driver'
 require 'eb_deployer/deployment_strategy'
 require 'eb_deployer/cloud_formation_provisioner'

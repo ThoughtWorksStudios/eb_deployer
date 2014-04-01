@@ -3,6 +3,7 @@ require 'digest'
 
 module EbDeployer
   class ConfigLoader
+    include Utils
 
     class EvalBinding
       def initialize(package_digest)
@@ -43,10 +44,6 @@ module EbDeployer
     end
 
     private
-
-    def symbolize_keys(hash)
-      hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
-    end
 
     def load_config_settings(config_file, package_digest)
       yaml = ERB.new(File.read(config_file)).result(eval_binding(package_digest))

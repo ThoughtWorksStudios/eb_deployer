@@ -79,4 +79,22 @@ class InplaceUpdateDeployTest < DeployTest
     assert !@eb.environment_exists?('simple', t('production', 'simple'))
   end
 
+  def test_deploy_should_raise_error_when_constantly_hitting_throttling_error
+    throttling_error = AWS::ElasticBeanstalk::Errors::Throttling.new("bang!")
+    @eb.set_error(:fetch_events, throttling_error)
+    assert_raises(AWS::ElasticBeanstalk::Errors::Throttling) do
+      deploy(:application => 'simple', :environment => "production")
+    end
+  end
+
+  def test_deploy_should_retry_on_temporary_throttling_error
+    throttling_error = AWS::ElasticBeanstalk::Errors::Throttling.new("bang!")
+    error_seq = [throttling_error] * 5
+    @eb.set_error_generator(:fetch_events) do
+      error_seq.pop
+    end
+    deploy(:application => 'simple', :environment => "production")
+    assert @eb.environment_exists?('simple', t('production', 'simple'))
+  end
+
 end

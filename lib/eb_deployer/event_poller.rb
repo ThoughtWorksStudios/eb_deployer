@@ -1,7 +1,9 @@
 module EbDeployer
   class EventPoller
-    def initialize(app, env, beanstalk)
-      @app, @env, @beanstalk = app, env, beanstalk
+    include Utils
+
+    def initialize(app, env, eb_driver)
+      @app, @env, @eb_driver = app, env, eb_driver
     end
 
     def poll(start_time = Time.now, &block)
@@ -16,7 +18,6 @@ module EbDeployer
       end
     end
 
-
     private
 
     def digest(event)
@@ -28,15 +29,21 @@ module EbDeployer
     end
 
     def fetch_events(start_time, &block)
-      events, next_token = @beanstalk.fetch_events(@app, @env, :start_time => start_time.iso8601)
+      events, next_token = fetch_events_from_eb(:start_time => start_time.iso8601)
       yield(events)
       fetch_next(next_token, &block) if next_token
     end
 
     def fetch_next(next_token, &block)
-      events, next_token = @beanstalk.fetch_events(@app, @env, :next_token => next_token)
+      events, next_token = fetch_events_from_eb(:next_token => next_token)
       yield(events)
       fetch_next(next_token, &block) if next_token
+    end
+
+    def fetch_events_from_eb(options)
+      backoff(AWS::ElasticBeanstalk::Errors::Throttling) do
+        @eb_driver.fetch_events(@app, @env, options)
+      end
     end
   end
 end

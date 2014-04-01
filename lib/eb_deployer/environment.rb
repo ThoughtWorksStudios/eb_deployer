@@ -1,5 +1,7 @@
 module EbDeployer
   class Environment
+    include Utils
+
     attr_writer :resource_stacks, :settings, :creation_opts, :components, :component_under_deploy, :strategy_name
     attr_reader :name
 
@@ -51,10 +53,6 @@ module EbDeployer
 
     def component_named(name)
       @components.detect { |c| c.name == name }
-    end
-
-    def symbolize_keys(hash)
-      hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
     def resource_stack_name
