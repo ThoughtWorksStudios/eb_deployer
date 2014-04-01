@@ -1,3 +1,7 @@
+0.4.2
+=====
+* Allow provding different deploy strategy for different components.
+
 0.4.1
 =====
 * Remove options for delete all environments ("-d --all"), because it is too destructive and not recoverable.
