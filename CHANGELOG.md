@@ -1,3 +1,7 @@
+0.4.3
+=====
+* Backoff and retry when AWS::ElasticBeanstalk::Errors::Throttling happens during polling events
+
 0.4.2
 =====
 * Allow provding different deploy strategy for different components.
