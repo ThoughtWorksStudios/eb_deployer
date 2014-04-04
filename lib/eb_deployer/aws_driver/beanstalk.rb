@@ -121,7 +121,7 @@ module EbDeployer
 
       def get_environment_attribute(app_name, env_name, attribute)
         env = alive_envs(app_name, [env_name]).first
-        env && env[:attribute]
+        env && env[attribute]
       end
 
       def environment_tier(name)
