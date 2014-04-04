@@ -5,7 +5,7 @@ module EbDeployer
         @env = env
       end
 
-      def deploy(version_label, env_settings)
+      def deploy(version_label, env_settings, inactive_settings)
         @env.new_eb_env.deploy(version_label, env_settings)
       end
     end

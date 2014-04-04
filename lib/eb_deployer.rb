@@ -175,32 +175,25 @@ module EbDeployer
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
-    stack_name = opts[:solution_stack_name] || "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7"
-    app = opts[:application]
-    env_name = opts[:environment]
+    app_name = opts[:application]
     version_prefix = opts[:version_prefix].to_s.strip
     version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
-    cname = opts[:cname]
-    eb_settings = opts[:option_settings] || opts[:settings] || []
-    cname_prefix = opts[:cname_prefix]
-    smoke_test = opts[:smoke_test] || Proc.new {}
-    phoenix_mode = opts[:phoenix_mode]
-    bucket = opts[:package_bucket] || app
-    skip_resource = opts[:skip_resource_stack_update]
-    keep_latest = opts[:keep_latest].to_i || 0
-    app_tier = opts[:tier] || 'WebServer'
 
-    resource_stacks = ResourceStacks.new(opts[:resources], cf, skip_resource)
-    application = Application.new(app, bs, s3, bucket)
-    environment = Environment.new(application, env_name, bs) do |env|
+    application = Application.new(app_name, bs, s3, opts[:package_bucket])
+    resource_stacks = ResourceStacks.new(opts[:resources],
+                                         cf,
+                                         opts[:skip_resource_stack_update])
+
+    environment = Environment.new(application, opts[:environment], bs) do |env|
       env.resource_stacks = resource_stacks
-      env.settings = eb_settings
+      env.settings = opts[:option_settings] || opts[:settings] || []
+      env.inactive_settings = opts[:inactve_settings] || []
       env.creation_opts = {
-        :solution_stack => stack_name,
-        :cname_prefix => cname_prefix,
-        :smoke_test => smoke_test,
-        :phoenix_mode => phoenix_mode,
-        :tier => app_tier
+        :solution_stack => opts[:solution_stack_name] || "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7",
+        :cname_prefix =>  opts[:cname_prefix],
+        :smoke_test => opts[:smoke_test] || Proc.new {},
+        :phoenix_mode => opts[:phoenix_mode],
+        :tier => opts[:tier] || 'WebServer'
       }
       env.strategy_name = opts[:strategy] || :blue_green
       env.components = opts[:components]
@@ -209,7 +202,7 @@ module EbDeployer
 
     application.create_version(version_label, opts[:package])
     environment.deploy(version_label)
-    application.clean_versions(version_prefix, keep_latest)
+    application.clean_versions(version_prefix, opts[:keep_latest].to_i || 0)
   end
 
   def self.destroy(opts)

@@ -18,9 +18,20 @@ module EbDeployer
 
     def deploy(version_label, settings={})
       terminate if @creation_opts[:phoenix_mode]
-      create_or_update_env(version_label, settings)
+
+      if @bs.environment_exists?(@app, @name)
+        update_eb_env(settings, version_label)
+      else
+        create_eb_env(settings, version_label)
+      end
+
       smoke_test
       wait_for_env_become_healthy
+    end
+
+    def apply_settings(settings)
+      raise "Env #{self.name} not exists for applying settings" unless @bs.environment_exists?(@app, @name)
+      update_eb_env(settings)
     end
 
     def cname_prefix
@@ -46,15 +57,15 @@ module EbDeployer
 
     private
 
-    def create_or_update_env(version_label, settings)
-      if @bs.environment_exists?(@app, @name)
-        with_polling_events(/Environment update completed successfully/i) do
-          @bs.update_environment(@app, @name, version_label, @creation_opts[:tier], settings)
-        end
-      else
-        with_polling_events(/Successfully launched environment/i) do
-          @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], settings)
-        end
+    def create_eb_env(settings, version_label)
+      with_polling_events(/Successfully launched environment/i) do
+        @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], settings)
+      end
+    end
+
+    def update_eb_env(settings, version_label=nil)
+      with_polling_events(/Environment update completed successfully/i) do
+        @bs.update_environment(@app, @name, version_label, @creation_opts[:tier], settings)
       end
     end
 

@@ -86,6 +86,60 @@ class MultiComponentsDeployTest < DeployTest
     end
   end
 
+
+  def test_can_have_inactive_settings_which_will_be_applied_to_inactive_env
+    settings = {:inactve_settings =>
+      [{:namespace => 'aws:autoscaling:launchconfiguration',
+         :option_name => 'MinSize',
+         :value => 1}],
+      :components =>
+      [{:name => 'web',
+         :option_settings =>
+         [{:namespace => 'aws:autoscaling:launchconfiguration',
+            :option_name => 'MinSize',
+            :value => 10}]}]}
+
+    do_bg_deploy(settings)
+    assert_equal 10, @eb.environment_settings('simple', t('prod-web-a', 'simple')).last[:value]
+
+    do_bg_deploy(settings)
+    assert_equal 1, @eb.environment_settings('simple', t('prod-web-a', 'simple')).last[:value]
+    assert_equal 10, @eb.environment_settings('simple', t('prod-web-b', 'simple')).last[:value]
+
+    do_bg_deploy(settings)
+    assert_equal 10, @eb.environment_settings('simple', t('prod-web-a', 'simple')).last[:value]
+    assert_equal 1, @eb.environment_settings('simple', t('prod-web-b', 'simple')).last[:value]
+  end
+
+  def test_can_provide_inactive_settings_at_component_level
+    settings = {:option_settings =>
+      [{:namespace => 'aws:autoscaling:launchconfiguration',
+         :option_name => 'MinSize',
+         :value => 10}],
+      :components =>
+      [{:name => 'web',
+         :inactive_settings =>
+         [{:namespace => 'aws:autoscaling:launchconfiguration',
+            :option_name => 'MinSize',
+            :value => 2}]},
+       {:name => 'api',
+         :inactive_settings =>
+         [{:namespace => 'aws:autoscaling:launchconfiguration',
+            :option_name => 'MinSize',
+            :value => 1}]}]}
+
+    do_bg_deploy(settings)
+    assert_equal 10, @eb.environment_settings('simple', t('prod-web-a', 'simple')).last[:value]
+    assert_equal 10, @eb.environment_settings('simple', t('prod-api-a', 'simple')).last[:value]
+
+    do_bg_deploy(settings)
+    assert_equal 2, @eb.environment_settings('simple', t('prod-web-a', 'simple')).last[:value]
+    assert_equal 1, @eb.environment_settings('simple', t('prod-api-a', 'simple')).last[:value]
+
+
+  end
+
+
   private
   def do_deploy(options={})
     deploy({:application => 'simple',
@@ -96,8 +150,8 @@ class MultiComponentsDeployTest < DeployTest
            }.merge(options))
   end
 
-  def do_bg_deploy
-    do_deploy(:strategy => 'blue-green')
+  def do_bg_deploy(options={})
+    do_deploy(options.merge(:strategy => 'blue-green'))
   end
 
 end

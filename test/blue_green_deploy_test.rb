@@ -64,6 +64,27 @@ class BlueGreenDeployTest < DeployTest
     assert !@eb.environment_exists?('simple', t('production-b', 'simple'))
   end
 
+  def test_can_have_inactive_settings_which_will_be_applied_to_inactive_env
+    settings = {:option_settings =>
+      [{:namespace => 'aws:autoscaling:launchconfiguration',
+         :option_name => 'MinSize',
+         :value => 10}],
+      :inactve_settings =>
+      [{:namespace => 'aws:autoscaling:launchconfiguration',
+         :option_name => 'MinSize',
+         :value => 1}]}
+
+    do_deploy(42, settings)
+    assert_equal 10, @eb.environment_settings('simple', t('production-a', 'simple')).last[:value]
+
+    do_deploy(43, settings)
+    assert_equal 1, @eb.environment_settings('simple', t('production-a', 'simple')).last[:value]
+    assert_equal 10, @eb.environment_settings('simple', t('production-b', 'simple')).last[:value]
+
+    do_deploy(44, settings)
+    assert_equal 10, @eb.environment_settings('simple', t('production-a', 'simple')).last[:value]
+    assert_equal 1, @eb.environment_settings('simple', t('production-b', 'simple')).last[:value]
+  end
 
   private
 

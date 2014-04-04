@@ -5,7 +5,7 @@ module EbDeployer
         @env = env
       end
 
-      def deploy(version_label, env_settings)
+      def deploy(version_label, env_settings, inactive_settings=[])
         if !ebenvs.any?(&method(:active_ebenv?))
           ebenv('a', @env.cname_prefix).
             deploy(version_label, env_settings)
@@ -17,6 +17,7 @@ module EbDeployer
 
         inactive_ebenv.deploy(version_label, env_settings)
         active_ebenv.swap_cname_with(inactive_ebenv)
+        active_ebenv.apply_settings(inactive_settings) unless inactive_settings.empty?
       end
 
       private

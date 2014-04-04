@@ -1,8 +1,10 @@
 module EbDeployer
   class Environment
     include Utils
+    attr_accessor :creation_opts, :strategy_name
 
-    attr_writer :resource_stacks, :settings, :creation_opts, :components, :component_under_deploy, :strategy_name
+    attr_writer :resource_stacks, :settings, :inactive_settings, :components, :component_under_deploy
+
     attr_reader :name
 
     def initialize(app, name, eb_driver, &block)
@@ -11,6 +13,7 @@ module EbDeployer
       @eb_driver = eb_driver
       @creation_opts = {}
       @settings = []
+      @inactive_settings = []
       @strategy_name = :blue_green
       yield(self) if block_given?
       unless @components
@@ -25,7 +28,7 @@ module EbDeployer
     def deploy(version_label)
       resource_settings = @resource_stacks.provision(resource_stack_name)
       components_to_deploy.each do |component|
-        component.deploy(version_label, @settings + resource_settings)
+        component.deploy(version_label, @settings + resource_settings, @inactive_settings)
       end
     end
 
@@ -33,10 +36,7 @@ module EbDeployer
       return unless components_attrs
       @components = components_attrs.map do |attrs|
         attrs = symbolize_keys(attrs)
-        name = attrs.delete(:name)
-        eb_settings = attrs.delete(:option_settings) || []
-        strategy_name = attrs[:strategy] || @strategy_name
-        Component.new(name, self, @creation_opts.merge(attrs), eb_settings, strategy_name, @eb_driver)
+        Component.new(attrs.delete(:name), self, attrs, @eb_driver)
       end
     end
 

@@ -12,8 +12,8 @@ module EbDeployer
     end
 
 
-    def deploy(version_label, eb_settings)
-      @strategy.deploy(version_label, eb_settings)
+    def deploy(version_label, eb_settings, inactive_settings=[])
+      @strategy.deploy(version_label, eb_settings, inactive_settings)
     end
 
     def new_eb_env(suffix=nil, cname_prefix_overriding=nil)

@@ -6,7 +6,7 @@ module EbDeployer
       @name = name
       @eb_driver = eb_driver
       @s3_driver = s3_driver
-      @bucket = bucket
+      @bucket = bucket || @name
       raise "application name can only contain any combination of uppercase letters, lowercase letters, numbers, dashes (-)" unless @name =~ /^[a-zA-Z0-9.-]+$/
     end
 
