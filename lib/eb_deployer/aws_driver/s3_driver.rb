@@ -15,7 +15,7 @@ module EbDeployer
 
       def upload_file(bucket_name, obj_name, file)
         o = obj(bucket_name, obj_name)
-        File.open(file) { |f| o.write(f) }
+        File.open(file, 'rb') { |f| o.write(f) }
       end
 
       private
