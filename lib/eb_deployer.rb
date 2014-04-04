@@ -187,7 +187,7 @@ module EbDeployer
     environment = Environment.new(application, opts[:environment], bs) do |env|
       env.resource_stacks = resource_stacks
       env.settings = opts[:option_settings] || opts[:settings] || []
-      env.inactive_settings = opts[:inactve_settings] || []
+      env.inactive_settings = opts[:inactive_settings] || []
       env.creation_opts = {
         :solution_stack => opts[:solution_stack_name] || "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7",
         :cname_prefix =>  opts[:cname_prefix],

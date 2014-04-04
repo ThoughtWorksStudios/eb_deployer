@@ -135,6 +135,45 @@ YAML
     assert_match(/non_existant/, error.message)
   end
 
+  def test_set_inactive_settings_at_common_level
+    config = @loader.load(generate_input(<<-YAML, :environment => 'production'))
+application: myapp
+common:
+  inactive_settings:
+    - namespace: aws:autoscaling:asg
+      option_name: MinSize
+      value: "1"
+environments:
+  dev:
+  production:
+YAML
+    assert_equal([{'namespace' => 'aws:autoscaling:asg',
+                    'option_name' => 'MinSize',
+                    'value' => '1'}], config[:inactive_settings])
+  end
+
+  def test_set_inactive_settings_at_env_level
+    config = @loader.load(generate_input(<<-YAML, :environment => 'dev'))
+application: myapp
+common:
+  inactive_settings:
+    - namespace: aws:autoscaling:asg
+      option_name: MinSize
+      value: "1"
+environments:
+  dev:
+    inactive_settings:
+      - namespace: aws:autoscaling:asg
+        option_name: MinSize
+        value: "0"
+  production:
+YAML
+    assert_equal([{'namespace' => 'aws:autoscaling:asg',
+                    'option_name' => 'MinSize',
+                    'value' => '0'}], config[:inactive_settings])
+  end
+
+
   private
 
   def md5_digest(file)

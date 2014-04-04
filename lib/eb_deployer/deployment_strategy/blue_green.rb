@@ -17,7 +17,10 @@ module EbDeployer
 
         inactive_ebenv.deploy(version_label, env_settings)
         active_ebenv.swap_cname_with(inactive_ebenv)
-        active_ebenv.apply_settings(inactive_settings) unless inactive_settings.empty?
+        unless inactive_settings.empty?
+          active_ebenv.log("applying inactive settings...")
+          active_ebenv.apply_settings(inactive_settings)
+        end
       end
 
       private

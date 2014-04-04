@@ -88,7 +88,7 @@ class MultiComponentsDeployTest < DeployTest
 
 
   def test_can_have_inactive_settings_which_will_be_applied_to_inactive_env
-    settings = {:inactve_settings =>
+    settings = {:inactive_settings =>
       [{:namespace => 'aws:autoscaling:launchconfiguration',
          :option_name => 'MinSize',
          :value => 1}],

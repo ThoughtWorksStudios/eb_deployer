@@ -69,7 +69,7 @@ class BlueGreenDeployTest < DeployTest
       [{:namespace => 'aws:autoscaling:launchconfiguration',
          :option_name => 'MinSize',
          :value => 10}],
-      :inactve_settings =>
+      :inactive_settings =>
       [{:namespace => 'aws:autoscaling:launchconfiguration',
          :option_name => 'MinSize',
          :value => 1}]}
