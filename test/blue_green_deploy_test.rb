@@ -76,14 +76,23 @@ class BlueGreenDeployTest < DeployTest
 
     do_deploy(42, settings)
     assert_equal 10, @eb.environment_settings('simple', t('production-a', 'simple')).last[:value]
+    assert_equal '42', @eb.environment_verion_label('simple', t('production-a', 'simple'))
 
     do_deploy(43, settings)
     assert_equal 1, @eb.environment_settings('simple', t('production-a', 'simple')).last[:value]
+    assert_equal '42', @eb.environment_verion_label('simple', t('production-a', 'simple'))
+
     assert_equal 10, @eb.environment_settings('simple', t('production-b', 'simple')).last[:value]
+    assert_equal '43', @eb.environment_verion_label('simple', t('production-b', 'simple'))
+
 
     do_deploy(44, settings)
     assert_equal 10, @eb.environment_settings('simple', t('production-a', 'simple')).last[:value]
+    assert_equal '44', @eb.environment_verion_label('simple', t('production-a', 'simple'))
+
     assert_equal 1, @eb.environment_settings('simple', t('production-b', 'simple')).last[:value]
+    assert_equal '43', @eb.environment_verion_label('simple', t('production-b', 'simple'))
+
   end
 
   private

@@ -95,13 +95,15 @@ module EbDeployer
       end
 
       def environment_cname(app_name, env_name)
-        env = alive_envs(app_name, [env_name]).first
-        env && env[:cname]
+        get_environment_attribute(app_name, env_name, :cname)
       end
 
       def environment_health_state(app_name, env_name)
-        env = alive_envs(app_name, [env_name]).first
-        env && env[:health]
+        get_environment_attribute(app_name, env_name, :health)
+      end
+
+      def environment_verion_label(app_name, env_name)
+        get_environment_attribute(app_name, env_name, :version_label)
       end
 
       def environment_swap_cname(app_name, env1, env2)
@@ -116,6 +118,11 @@ module EbDeployer
                {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
                {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
               ]
+
+      def get_environment_attribute(app_name, env_name, attribute)
+        env = alive_envs(app_name, [env_name]).first
+        env && env[:attribute]
+      end
 
       def environment_tier(name)
         TIERS.find {|t| t[:name].downcase == name.downcase} || raise("No tier found with name #{name.inspect}")

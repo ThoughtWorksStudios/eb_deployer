@@ -111,10 +111,11 @@ class EBStub
     'Green'
   end
 
-  #test only
   def environment_verion_label(app_name, env_name)
     @envs[env_key(app_name, env_name)][:version]
   end
+
+  #test only
 
   def environment_tier(app_name, env_name)
     @envs[env_key(app_name, env_name)][:tier]

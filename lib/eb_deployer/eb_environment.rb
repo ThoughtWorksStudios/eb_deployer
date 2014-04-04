@@ -31,7 +31,8 @@ module EbDeployer
 
     def apply_settings(settings)
       raise "Env #{self.name} not exists for applying settings" unless @bs.environment_exists?(@app, @name)
-      update_eb_env(settings)
+      version_label = @bs.environment_verion_label(@app, @name)
+      update_eb_env(settings, version_label)
     end
 
     def cname_prefix
@@ -63,7 +64,7 @@ module EbDeployer
       end
     end
 
-    def update_eb_env(settings, version_label=nil)
+    def update_eb_env(settings, version_label)
       with_polling_events(/Environment update completed successfully/i) do
         @bs.update_environment(@app, @name, version_label, @creation_opts[:tier], settings)
       end
