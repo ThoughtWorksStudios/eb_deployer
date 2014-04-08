@@ -33,7 +33,8 @@ class EBStub
       :version => version,
       :cname_prefix => cname_prefix,
       :tier => tier,
-      :settings => settings}
+      :settings => settings }
+    set_env_ready(app, env, false)
   end
 
   def delete_environment(app, env)
@@ -43,7 +44,9 @@ class EBStub
   end
 
   def update_environment(app, env, version, tier, settings)
+    raise "not in ready state, consider waiting for previous action finish by pulling envents" unless env_ready?(app, env)
     @envs[env_key(app, env)].merge!(:version => version, :settings => settings, :tier => tier)
+    set_env_ready(app, env, false)
   end
 
   def environment_exists?(app_name, env_name)
@@ -79,13 +82,18 @@ class EBStub
   end
 
   def fetch_events(app_name, env_name, options={})
+    set_env_ready(app_name, env_name, true)
+
     unless @events # unrestricted mode for testing if no explicit events set
       return generate_event_from_messages(['Environment update completed successfully',
-                                    'terminateEnvironment completed successfully',
-                                    'Successfully launched environment'])
+                                           'terminateEnvironment completed successfully',
+                                           'Successfully launched environment',
+                                           'Completed swapping CNAMEs for environments'
+                                          ])
     end
 
     @events[env_key(app_name, env_name)]
+    # assume env become ready after it spit out all the events
   end
 
 
@@ -101,10 +109,14 @@ class EBStub
 
 
   def environment_swap_cname(app_name, env1_name, env2_name)
+    raise "#{env1_name} not in ready state, consider to wait for previous action finsish by pulling events" unless env_ready?(app_name, env1_name)
+
     env1, env2 = @envs[env_key(app_name, env1_name)], @envs[env_key(app_name, env2_name)]
     temp = env1[:cname_prefix]
     env1[:cname_prefix] = env2[:cname_prefix]
     env2[:cname_prefix] = temp
+    set_env_ready(app_name, env1_name, false)
+    set_env_ready(app_name, env2_name, false)
   end
 
   def environment_health_state(app_name, env_name)
@@ -116,6 +128,9 @@ class EBStub
   end
 
   #test only
+  def mark_all_envs_ready
+    @envs.values.each { |env| set_env_ready(env[:application], env[:name], true) }
+  end
 
   def environment_tier(app_name, env_name)
     @envs[env_key(app_name, env_name)][:tier]
@@ -148,6 +163,16 @@ class EBStub
   end
 
   private
+
+  def set_env_ready(app, env, ready)
+    if record = @envs[env_key(app, env)]
+      record[:ready] = ready
+    end
+  end
+
+  def env_ready?(app, env)
+    @envs[env_key(app, env)][:ready]
+  end
 
   def generate_event_from_messages(messages)
     [messages.reverse.map do |m|

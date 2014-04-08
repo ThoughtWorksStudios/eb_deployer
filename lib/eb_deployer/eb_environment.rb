@@ -41,7 +41,9 @@ module EbDeployer
 
     def swap_cname_with(another)
       log("Swap CNAME with env #{another.name}")
-      @bs.environment_swap_cname(self.app, self.name, another.name)
+      with_polling_events(/Completed swapping CNAMEs for environments/i) do
+        @bs.environment_swap_cname(self.app, self.name, another.name)
+      end
     end
 
     def log(msg)

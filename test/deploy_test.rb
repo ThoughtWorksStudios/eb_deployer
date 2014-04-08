@@ -23,6 +23,7 @@ class DeployTest < MiniTest::Unit::TestCase
   end
 
   def deploy(opts)
+    @eb.mark_all_envs_ready
     EbDeployer.deploy({:package => @sample_package,
                         :strategy => :'inplace-update',
                         :version_label => 1}.merge(opts).merge(stubs))
