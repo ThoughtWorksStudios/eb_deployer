@@ -127,9 +127,17 @@ class EBStub
     @envs[env_key(app_name, env_name)][:version]
   end
 
+  def list_solution_stack_names
+    @solution_stacks || ["64bit Amazon Linux 2013.09 running Tomcat 7 Java 7"]
+  end
+
   #test only
   def mark_all_envs_ready
     @envs.values.each { |env| set_env_ready(env[:application], env[:name], true) }
+  end
+
+  def set_solution_stacks(names)
+    @solution_stacks = names
   end
 
   def environment_tier(app_name, env_name)

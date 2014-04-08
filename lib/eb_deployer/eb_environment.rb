@@ -1,5 +1,7 @@
 module EbDeployer
   class EbEnvironment
+    include Utils
+
     attr_reader :app, :name
     attr_writer :event_poller
 
@@ -13,7 +15,7 @@ module EbDeployer
       @app = app
       @name = self.class.unique_ebenv_name(name, app)
       @bs = eb_driver
-      @creation_opts = creation_opts
+      @creation_opts = default_create_options.merge(reject_nil(creation_opts))
     end
 
     def deploy(version_label, settings={})
@@ -61,8 +63,10 @@ module EbDeployer
     private
 
     def create_eb_env(settings, version_label)
+      solution_stack = @creation_opts[:solution_stack]
+      validate_solutions_stack(solution_stack)
       with_polling_events(/Successfully launched environment/i) do
-        @bs.create_environment(@app, @name, @creation_opts[:solution_stack], @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], settings)
+        @bs.create_environment(@app, @name, solution_stack, @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], settings)
       end
     end
 
@@ -70,6 +74,11 @@ module EbDeployer
       with_polling_events(/Environment update completed successfully/i) do
         @bs.update_environment(@app, @name, version_label, @creation_opts[:tier], settings)
       end
+    end
+
+    def validate_solutions_stack(stack_name)
+      names = @bs.list_solution_stack_names
+      raise "'#{stack_name}' is not a valid solution stack name, available solution stack names are: #{names.join(', ')}" unless names.include?(stack_name)
     end
 
     def smoke_test
@@ -112,6 +121,13 @@ module EbDeployer
       @event_poller || EventPoller.new(@app, @name, @bs)
     end
 
+    def default_create_options
+      {
+        :solution_stack => "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7",
+        :smoke_test =>  Proc.new {},
+        :tier => 'WebServer'
+      }
+    end
 
     def log_event(event)
       puts "[#{event[:event_date]}][environment:#{@name}] #{event[:message]}"

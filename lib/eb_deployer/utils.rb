@@ -24,5 +24,10 @@ module EbDeployer
     def symbolize_keys(hash)
       hash.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
+
+
+    def reject_nil(hash)
+      hash.reject{| k, v| v.nil?}
+    end
   end
 end

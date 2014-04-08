@@ -191,11 +191,11 @@ module EbDeployer
       env.settings = opts[:option_settings] || opts[:settings] || []
       env.inactive_settings = opts[:inactive_settings] || []
       env.creation_opts = {
-        :solution_stack => opts[:solution_stack_name] || "64bit Amazon Linux 2013.09 running Tomcat 7 Java 7",
+        :solution_stack => opts[:solution_stack_name],
         :cname_prefix =>  opts[:cname_prefix],
-        :smoke_test => opts[:smoke_test] || Proc.new {},
+        :smoke_test => opts[:smoke_test],
         :phoenix_mode => opts[:phoenix_mode],
-        :tier => opts[:tier] || 'WebServer'
+        :tier => opts[:tier]
       }
       env.strategy_name = opts[:strategy] || :blue_green
       env.components = opts[:components]

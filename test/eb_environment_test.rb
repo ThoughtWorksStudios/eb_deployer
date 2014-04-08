@@ -51,11 +51,20 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
     assert_raises(RuntimeError) { env.deploy("version 1") }
   end
 
-
   def test_terminate_should_delete_environment
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
     env.terminate
     assert !@eb_driver.environment_exists?('myapp', t('production', 'myapp'))
   end
+
+  def test_should_raise_runtime_error_when_solution_stack_is_not_valid
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, {
+                                          :solution_stack => "python"
+                                        })
+    @eb_driver.set_solution_stacks(["java", "ruby"])
+    assert_raises(RuntimeError) { env.deploy("version 1") }
+  end
+
+
 end
