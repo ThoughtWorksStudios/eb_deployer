@@ -15,6 +15,7 @@ require 'eb_deployer/deployment_strategy'
 require 'eb_deployer/cloud_formation_provisioner'
 require 'eb_deployer/application'
 require 'eb_deployer/resource_stacks'
+require 'eb_deployer/throttling_handling'
 require 'eb_deployer/eb_environment'
 require 'eb_deployer/environment'
 require 'eb_deployer/default_component'
@@ -175,6 +176,7 @@ module EbDeployer
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
+
     app_name = opts[:application]
     version_prefix = opts[:version_prefix].to_s.strip
     version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
@@ -183,7 +185,7 @@ module EbDeployer
     resource_stacks = ResourceStacks.new(opts[:resources],
                                          cf,
                                          opts[:skip_resource_stack_update])
-
+    bs = ThrottlingHandling.new(bs, AWS::ElasticBeanstalk::Errors::Throttling)
     environment = Environment.new(application, opts[:environment], bs) do |env|
       env.resource_stacks = resource_stacks
       env.settings = opts[:option_settings] || opts[:settings] || []

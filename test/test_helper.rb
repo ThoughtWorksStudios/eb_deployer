@@ -45,7 +45,7 @@ class ErrorRaisingWrapper < SimpleDelegator
       end
 
       def #{method}(*args, &block)
-        if error_gen = @errors[:fetch_events]
+        if error_gen = @errors[:#{method}]
           error = error_gen.call
           raise error if error
         end

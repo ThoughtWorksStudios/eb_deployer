@@ -41,9 +41,7 @@ module EbDeployer
     end
 
     def fetch_events_from_eb(options)
-      backoff(AWS::ElasticBeanstalk::Errors::Throttling) do
-        @eb_driver.fetch_events(@app, @env, options)
-      end
+      @eb_driver.fetch_events(@app, @env, options)
     end
   end
 end
