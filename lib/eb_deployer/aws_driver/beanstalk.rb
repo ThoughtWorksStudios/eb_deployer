@@ -112,6 +112,10 @@ module EbDeployer
                                          :destination_environment_id => env2_id)
       end
 
+      def list_solution_stack_names
+        @client.list_available_solution_stacks[:solution_stacks]
+      end
+
       private
 
       TIERS = [
