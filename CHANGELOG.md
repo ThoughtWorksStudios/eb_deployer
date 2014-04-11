@@ -1,3 +1,10 @@
+0.4.4
+=====
+* Fix S3 upload on Windows.
+* Experimental support for "inactve_settings" options, which can be used to automatically scale down the inactive environment.
+* Update default solution stack name to latest supported JAVA stack.
+* Validate solution_stack option before creating environment and list available solution_stacks if not valid.
+
 0.4.3
 =====
 * Backoff and retry when AWS::ElasticBeanstalk::Errors::Throttling happens during polling events
