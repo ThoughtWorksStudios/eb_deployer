@@ -43,6 +43,12 @@ class EBStub
     @envs_been_deleted[app] << env
   end
 
+  def update_environment_settings(app, env, settings)
+    raise "not in ready state, consider waiting for previous action finish by pulling envents" unless env_ready?(app, env)
+    @envs[env_key(app, env)].merge!(:settings => settings)
+  end
+
+
   def update_environment(app, env, version, tier, settings)
     raise "not in ready state, consider waiting for previous action finish by pulling envents" unless env_ready?(app, env)
     @envs[env_key(app, env)].merge!(:version => version, :settings => settings, :tier => tier)
