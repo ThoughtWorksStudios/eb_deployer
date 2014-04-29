@@ -19,28 +19,18 @@ module EbDeployer
       end
     end
 
-    def load(options)
-      options = options.dup
-      package_digest = package_digest(options[:package])
-      config_file = options.delete(:config_file)
+    def load(config_file, package, environment)
+      package_digest = package_digest(package)
       config_settings = load_config_settings(config_file, package_digest)
-
       app_name = config_settings[:application]
+      envs = config_settings[:environments] || {}
+      raise "Environment #{environment} is not defined in #{config_file}" unless envs.has_key?(environment)
 
-      common_settings = symbolize_keys(config_settings[:common])
-      common_settings[:version_label] ||= package_digest
-
-      envs = config_settings[:environments]
-      env = options[:environment]
-      raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
-      env_settings = symbolize_keys(envs[env] || {})
-      env_option_settings = env_settings.delete(:option_settings) || []
-
-      ret = options.merge(common_settings).merge(env_settings)
-      ret[:application] = app_name
-      ret[:option_settings] ||= []
-      ret[:option_settings] += env_option_settings
-      ret
+      Configuration.new(app_name, environment,
+                        :package => package,
+                        :version_label => package_digest)
+        .merge(config_settings[:common])
+        .merge(envs[environment])
     end
 
     private
