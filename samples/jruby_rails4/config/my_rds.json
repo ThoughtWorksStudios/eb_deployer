@@ -87,7 +87,6 @@
                 ],
                 "DBInstanceClass": "db.m1.small",
                 "AllocatedStorage": "5",
-                "MultiAZ": false,
                 "EngineVersion": "5.5",
                 "DBName": {
                     "Ref": "DBName"
@@ -95,8 +94,7 @@
                 "MasterUserPassword": {
                     "Ref": "DBPassword"
                 },
-                "Engine": "mysql",
-                "MultiAZ": "true"
+                "Engine": "mysql"
             }
         },
 
