@@ -1,3 +1,7 @@
+0.4.5
+====
+* Rails 3+ support: Rails Generator to install default configurations with Postgres RDS resource and everything need for blue-green deployment
+
 0.4.4
 =====
 * Fix S3 upload on Windows.

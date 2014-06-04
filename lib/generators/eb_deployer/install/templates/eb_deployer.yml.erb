@@ -1,0 +1,148 @@
+# applicaiton name
+application: <%= app_name %>
+
+# common settings for all environments
+common:
+  # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
+  solution_stack_name: <%= solution_stack_name %>
+
+  # Tier name for environments. Current supported values are WebServer and Worker
+  # tier: WebServer
+
+  # AWS region to deploy. Default to us-east-1
+  # region: us-west-1
+
+  # There are two deployment strategies: 'blue-green' or 'inplace-update'.
+  # Blue green deployments keep two elastic beanstalk environments and always deploy to
+  # inactive one, to achieve zero downtime.
+  # Inplace-update strategy will only keep one environment, and update the version inplace on
+  # deploy. Inplace-update will save resources but will suffer from downtime.
+  # (All old environments need be destroyed when you switching between strategies.)
+  # Default strategy is 'blue-green'.
+  # strategy: blue-green
+
+  # Name of s3 bucket where uploaded application packages will be stored.
+  # Note that the string ".packages" will be added as a suffix to your bucket.
+  # So, if "thoughtworks.simple" is passed as the bucket name, the actual s3 bucket
+  # name will be thoughtworks.simple.packages. Default to application name.
+  # package_bucket: my-s3-bucket
+
+  # If phoenix mode is turned 'on', it will terminate the old elastic
+  # beanstalk environment and recreate a new one on deploy. For blue-green
+  # deployment it will terminate the inactive environment first then
+  # recreate it. This is useful to avoid configuration drift and
+  # accumulating state on the ec2 instances. Also it has the benefit of
+  # keeping your ec2 instance system package upto date, because everytime ec2
+  # instance boots up from AMI it does a system update. Default is 'off' but we suggest
+  # you override it to 'on' for production environment.
+  # phoenix_mode: false
+
+  # Specifies the maximum number of versions to keep. Older versions are removed
+  # and deleted from the S3 source bucket as well. If specified as zero or not
+  # specified, all versions will be kept.  If a version_prefix is given, only removes
+  # version starting with the prefix.
+  # keep_latest: 200
+
+  # Specifies a prefix to prepend to the version label.
+  # This can be useful if you want to use different binaries for different
+  # environments.
+  # version_prefix:
+
+  # Generating version label for package to be deployed. A readable version label will
+  # provide better traceablity of your deployment process.
+  # By default setting is:
+  # version_label: <%%= package_digest %>
+  # which means using MD5 digest of the package file. If you deploy using build
+  # pipeline tool such as GO, switching to pipline counter is highly suggested to
+  # increase the readability. Following example will read pipeline counter from environment
+  # variable with a fall back to digest for local deployment:
+  # version_label: <%%= ENV['GO_PIPELINE_COUNTER'] || package_digest %>
+
+
+  # Smoke test value should be a piece of ruby code with access to single variable
+  # "host_name" -- environment DNS name. Smoke test snippet will be evaluated at
+  # the end of the deployment for inplace-update deployment. For blue-green
+  # deployment it will run after inactive environment update is completed and before
+  # switching over.
+  # Defining a smoke test is highly recommended for serious usage. By default we use
+  # The simplest one that just be checking server landing page using curl, e.g.
+  smoke_test: |
+    curl_http_code = "curl -s -o /dev/null -w \"%{http_code}\" http://#{host_name}"
+    Timeout.timeout(600) do
+      until ['200', '301', '302'].include?(`#{curl_http_code}`.strip)
+        sleep 5
+      end
+    end
+
+  # Elastic Beanstalk settings that will apply to the environments you are
+  # deploying.
+  # For all available options take a look at
+  # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
+  option_settings:
+    # Following is an example of set EC2 ssh key name. This allow you ssh into the ec2
+    # instance. See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+    # - namespace: aws:autoscaling:launchconfiguration
+    #   option_name: EC2KeyName
+    #   value: <my-ec2-key-name>
+
+    # Following is an example which changes EC2 instance type
+    # from t1.micro (default) to m1.small. Instances with t1.micro type sometime
+    # are not very responsible, so m1.small is suggested for saving time.
+    # But if you care about the marginal cost difference you can comment this out to
+    # go back to t1.micro.
+    - namespace: aws:autoscaling:launchconfiguration
+      option_name: InstanceType
+      value: m1.small
+
+    - namespace: aws:elasticbeanstalk:application:environment
+      option_name: DATABASE_NAME
+      value: <%= alphanumeric_name %>
+    - namespace: aws:elasticbeanstalk:application:environment
+      option_name: DATABASE_USERNAME
+      value: <%= alphanumeric_name %>
+    - namespace: aws:elasticbeanstalk:application:environment
+      option_name: DATABASE_PASSWORD
+      value: <%= db_password %>
+
+
+  # If resources specified, eb_deployer will use the CloudFormation
+  # template you provide to create a default CloudFormation stack with
+  # name <application_name>-<env-name> for the environment current
+  # deploying. And Outputs of the CloudFormation can be mapped to Elastic Beanstalk
+  # options settings.
+  # keys:
+  #    template => CloudFormation template file with JSON format
+  #    inputs => A Hash, input values for the CloudFormation template
+  #    outputs => A Hash with key map to your CloudFormation template outputs and value as elastic beanstalk settings namespace and option_name.
+  #    capabilities => An array. You need set it to ['CAPABILITY_IAM'] if the
+  # template include IAM Instance Profile.
+  resources:
+    # Creating a RDS instance by CloudFormation, so that database will not hook up with any ElasticBeanstalk environment
+    template: config/rds.json
+    inputs:
+      DBName: <%= alphanumeric_name %>
+      DBUser: <%= alphanumeric_name %>
+      DBPassword: <%= db_password %>
+    outputs:
+      RDSPassSecurityGroup:
+        namespace: aws:autoscaling:launchconfiguration
+        option_name: SecurityGroups
+      RDSHost:
+        namespace: aws:elasticbeanstalk:application:environment
+        option_name: DATABASE_HOST
+      RDSPort:
+        namespace: aws:elasticbeanstalk:application:environment
+        option_name: DATABASE_PORT
+
+# You can define environment here. Each environment can overriden any common settings
+environments:
+  dev:
+    # overriding common settings
+    strategy: inplace-update
+  production:
+    option_settings:
+      # example for overriding common option_settings: providing least redundancy
+      # in production environment.
+      # - namespace: aws:autoscaling:asg
+      #   option_name: MinSize
+      #    value: "2"

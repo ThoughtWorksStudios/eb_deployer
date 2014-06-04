@@ -1,0 +1,88 @@
+{
+    "Outputs": {
+        "RDSHost": {
+            "Description": "Database endpoint address",
+            "Value": { "Fn::GetAtt": ["RDSDatabase", "Endpoint.Address"] }
+        },
+        "RDSPort": {
+            "Description": "Database endpoint port",
+            "Value": { "Fn::GetAtt": ["RDSDatabase", "Endpoint.Port"] }
+        },
+        "RDSPassSecurityGroup": {
+            "Description": "Security group assign to ec2 instance that need access to rds instance",
+            "Value": {
+                "Ref": "RDSPassSecurityGroup"
+            }
+        }
+    },
+
+    "Parameters": {
+        "DBUser": {
+            "NoEcho": "false",
+            "Description": "The name of master user for the client DB Instance.",
+            "Type": "String",
+            "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters"
+        },
+
+        "DBName": {
+            "NoEcho": "false",
+            "Description": "The DB Name of the RDS instance",
+            "Type": "String",
+            "ConstraintDescription": "must contain only alphanumeric characters"
+        },
+
+        "DBPassword": {
+            "NoEcho": "true",
+            "Description": "The master password for the DB instance.",
+            "Type": "String",
+            "ConstraintDescription": "must contain only alphanumeric characters"
+        }
+    },
+
+    "Resources": {
+        "RDSDBSecurityGroup": {
+            "Type": "AWS::RDS::DBSecurityGroup",
+            "Properties": {
+                "GroupDescription": "Enable database access to Beanstalk application",
+                "DBSecurityGroupIngress": {
+                    "EC2SecurityGroupName": {
+                        "Ref": "RDSPassSecurityGroup"
+                    }
+                }
+            }
+        },
+
+        "RDSDatabase": {
+            "Type": "AWS::RDS::DBInstance",
+            "DeletionPolicy": "Delete",
+            "Properties": {
+                "MasterUsername": {
+                    "Ref": "DBUser"
+                },
+                "DBSecurityGroups": [
+                    {
+                        "Ref": "RDSDBSecurityGroup"
+                    }
+                ],
+                "DBInstanceClass": "db.m1.small",
+                "AllocatedStorage": "5",
+                "MultiAZ": "false",
+                "EngineVersion": "9.3.3",
+                "DBName": {
+                    "Ref": "DBName"
+                },
+                "MasterUserPassword": {
+                    "Ref": "DBPassword"
+                },
+                "Engine": "postgres"
+            }
+        },
+
+        "RDSPassSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "SecurityGroup access RDS database."
+            }
+        }
+    }
+}
