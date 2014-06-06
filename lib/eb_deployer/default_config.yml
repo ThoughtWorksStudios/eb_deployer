@@ -37,6 +37,10 @@ common:
   # you override it to 'on' for production environment.
   # phoenix_mode: false
 
+  # The tags you would like to be associated with your resources.
+  # tags:
+  #   my_tag_key: my_tag_value
+
   # Specifies the maximum number of versions to keep. Older versions are removed
   # and deleted from the S3 source bucket as well. If specified as zero or not
   # specified, all versions will be kept.  If a version_prefix is given, only removes

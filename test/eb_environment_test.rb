@@ -26,6 +26,12 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
     assert_equal({s1: 'v1' },  @eb_driver.environment_settings('myapp', t('production', 'myapp')))
   end
 
+  def test_deploy_should_include_tags
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, {:tags => {:my_tag => 'my_value', :tag2 => 'value2'}})
+    env.deploy("version1")
+    assert_equal [{:key => :my_tag, :value => 'my_value'}, {:key => :tag2, :value => 'value2'}], @eb_driver.environment_tags('myapp', t('production', 'myapp'))
+  end
+
   def test_should_run_smoke_test_after_deploy
     smoked_host = nil
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, :smoke_test => Proc.new { |host| smoked_host = host })

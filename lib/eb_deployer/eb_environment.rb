@@ -65,9 +65,10 @@ module EbDeployer
 
     def create_eb_env(settings, version_label)
       solution_stack = @creation_opts[:solution_stack]
+      tags = convert_tags_hash_to_array(@creation_opts.delete(:tags))
       validate_solutions_stack(solution_stack)
       with_polling_events(/Successfully launched environment/i) do
-        @bs.create_environment(@app, @name, solution_stack, @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], settings)
+        @bs.create_environment(@app, @name, solution_stack, @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], tags, settings)
       end
     end
 
@@ -101,6 +102,14 @@ module EbDeployer
 
         log_event(event)
         break if event[:message] =~ terminate_pattern
+      end
+    end
+
+    def convert_tags_hash_to_array tags
+      tags ||= {}
+      tags.inject([]) do |arr, (k, v)|
+        arr << {:key => k, :value => v}
+        arr
       end
     end
 

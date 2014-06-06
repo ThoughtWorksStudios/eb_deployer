@@ -195,6 +195,7 @@ module EbDeployer
         :cname_prefix =>  opts[:cname_prefix],
         :smoke_test => opts[:smoke_test],
         :phoenix_mode => opts[:phoenix_mode],
+        :tags => opts[:tags],
         :tier => opts[:tier]
       }
       env.strategy_name = opts[:strategy] || :blue_green
