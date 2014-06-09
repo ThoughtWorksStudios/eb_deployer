@@ -38,6 +38,10 @@ common:
   # phoenix_mode: false
 
   # The tags you would like to be associated with your resources.
+  # These tags will only be used when you first launch an environment.  If you are using
+  # phoenix_mode set as true each time you deploy you will get a new environment and therefore
+  # any changes to your tags.  If phoenix_mode is false then it will only use your tags on the
+  # initial deploy.
   # tags:
   #   my_tag_key: my_tag_value
 
