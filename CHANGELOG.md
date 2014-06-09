@@ -1,6 +1,9 @@
 0.4.5
 ====
-* Rails 3+ support: Rails Generator to install default configurations with Postgres RDS resource and everything need for blue-green deployment
+* Rails 3+ support: Rails Generator to install default configurations with
+	Postgres RDS resource and everything need for blue-green
+	deployment
+* Add ability to tag beanstalk environment (from @pmcfadden)
 
 0.4.4
 =====
