@@ -37,6 +37,14 @@ common:
   # you override it to 'on' for production environment.
   # phoenix_mode: false
 
+  # The tags you would like to be associated with your resources.
+  # These tags will only be used when you first launch an environment.  If you are using
+  # phoenix_mode set as true each time you deploy you will get a new environment and therefore
+  # any changes to your tags.  If phoenix_mode is false then it will only use your tags on the
+  # initial deploy.
+  # tags:
+  #   my_tag_key: my_tag_value
+
   # Specifies the maximum number of versions to keep. Older versions are removed
   # and deleted from the S3 source bucket as well. If specified as zero or not
   # specified, all versions will be kept.  If a version_prefix is given, only removes

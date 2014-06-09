@@ -22,7 +22,7 @@ class EBStub
     @apps.include?(app)
   end
 
-  def create_environment(app, env, solution_stack, cname_prefix, version, tier, settings)
+  def create_environment(app, env, solution_stack, cname_prefix, version, tier, tags, settings)
     raise 'cname prefix is not avaible' if @envs.values.detect { |env| env[:cname_prefix] == cname_prefix }
     raise "env name #{env} is longer than 23 chars" if env.size > 23
     raise "app not exists" unless application_exists?(app)
@@ -33,6 +33,7 @@ class EBStub
       :version => version,
       :cname_prefix => cname_prefix,
       :tier => tier,
+      :tags => tags,
       :settings => settings }
     set_env_ready(app, env, false)
   end
@@ -150,6 +151,9 @@ class EBStub
     @envs[env_key(app_name, env_name)][:tier]
   end
 
+  def environment_tags(app_name, env_name)
+    @envs[env_key(app_name, env_name)][:tags]
+  end
 
   def environment_settings(app_name, env_name)
     @envs[env_key(app_name, env_name)][:settings]
