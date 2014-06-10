@@ -4,7 +4,7 @@ application: <%= app_name %>
 # common settings for all environments
 common:
   # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
-  # solution_stack_name: 64bit Amazon Linux 2014.02 v1.0.1 running Tomcat 7 Java 7
+  # solution_stack_name: 64bit Amazon Linux 2014.03 v1.0.3 running Tomcat 7 Java 7
 
   # Tier name for environments. Current supported values are WebServer and Worker
   # tier: WebServer
