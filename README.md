@@ -5,6 +5,8 @@ Low friction deployments should be a breeze. Elastic Beanstalk provides a great 
 
 EbDeployer thus allows you to do continuous delivery on AWS.
 
+[Introduction to EbDeployer](http://getmingle.io/scaling/2014/06/13/introduction-to-eb-deployer.html)
+
 ## Installation
 
     $ gem install eb_deployer
@@ -88,71 +90,11 @@ Later tutorials coming soon will cover
 
 Take a look at code if you can not wait for the documentation.
 
-## Rails 3+ support
+## More
 
-EbDeployer ships with a Rails 3+ generator since version 0.4.5.
+[[Rails 3 Support]]
 
-### Install
-
-Add eb_deployer to your Gemfile
-
-		gem 'eb_deployer'
-
-Setup AWS credentials:
-
-    $ export AWS_ACCESS_KEY_ID=xxx
-    $ export AWS_SECRET_ACCESS_KEY=xxx
-
-### Initial configurations and rake tasks
-
-Run Rails generator to generate configurations and rake file:
-
-		rails generate eb_deployer:install
-
-It will setup AWS Elastic Beanstalk blue-green deployment configuration with a Postgres RDS instance as your Rails' backend database.
-The followings are details:
-
-* Add file "lib/tasks/eb_deployer.rake", please run "rake -T eb" for tasks description. These tasks are simple and designed for you to customize.
-* Add file "config/eb_deployer.yml", it includes basic blue-green configurations with a Postgres RDS instance resource.
-* Add file "config/rds.json", it is a CloudFormation template file which provisions the Postgres RDS instance. A separated CloudFormation stack maintains all resources that are shared between different Elastic Beanstalk environments in blue-green deployment. Notice: each eb_deployer environment will create one.
-* Add "gem 'pg'" to your Gemfile, as this initial configuration is hooking up with a Postgres RDS instance, we need postgres driver.
-* Add file ".ebextenstions/01_postgres_packages.config", which installs Postgres dev packages on EC2 instances, so that we can build gem "pg" on your EC2 machine after deployed.
-* Add a new production database configuration into "config/database.yml" file. Your original production configuration will be commented out.
-
-### Deploy
-
-Add all files that need to be deployed into your Git repository, because we will simply use "git ls-files" to find all files need to be packaged.
-
-Deploy a dev environment for testing your application deployment:
-
-		rake eb:deploy
-
-Then, when you're ready to deploy a production environment:
-
-		EB_DEPLOYER_ENV=production rake eb:deploy
-
-## EbDeployer environment
-
-There are so many things called environment:
-
-* Rails environment: development, test, production
-* Elastic Beanstalk environment
-* Development environment
-* Staging environment
-* Production environment
-
-An EbDeployer environment is your application running environment (= your running application + infrastructure), e.g. staging environment, production environment.
-All EbDeployer environments including dev environment are deployed as Rails production environment.
-
-What is different between EbDeployer environment and Elastic Beanstalk environment?
-
-* There are 2 level concepts in Elastic Beanstalk: Application and Environment
-* EbDeployer environment sits between Elastic Beanstalk Application and Elastic Beanstalk Environment:
-	* One Elastic Beanstalk Application has many EbDeployer environments: dev, staging, production, or whatever names you like.
-	* Depending on deployment strategy, one EbDeployer environment has one or more Elastic Beanstalk environments
-		* For 'inplace-update' deployment strategy, it's one Elastic Beanstalk environment.
-		* For 'blue-green' deployment strategy, it's two Elastic Beanstalk environments.
-* You should consider an Elastic Beanstalk environment is designed to be replacable (by another Elastic Beanstalk environment).
+[[EbDeployer environment]]
 
 ## Contributing
 
