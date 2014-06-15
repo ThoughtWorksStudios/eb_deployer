@@ -22,7 +22,7 @@ class RailsGenratorsTest < Rails::Generators::TestCase
 
     assert_file 'config/rds.json'
     assert_file '.ebextensions/01_postgres_packages.config'
-    assert_file 'config/database.yml', /database: <%= ENV\['RDS_DB_NAME'\]/m, /host: <%= ENV\['RDS_HOSTNAME'\]/m
+    assert_file 'config/database.yml', /database: <%= ENV\['DATABASE_NAME'\]/m, /host: <%= ENV\['DATABASE_HOST'\]/m
     assert_file 'Gemfile', /gem "pg"/
   end
 
@@ -52,11 +52,11 @@ test:
 
 production:
   adapter: postgresql
-  database: <%= ENV['RDS_DB_NAME'] || 'tmp_production' %>
-  host: <%= ENV['RDS_HOSTNAME'] || 'localhost' %>
-  port: <%= ENV['RDS_PORT'] || 5432 %>
-  username: <%= ENV['RDS_USERNAME'] || \"xli\" %>
-  password: <%= ENV['RDS_PASSWORD'] %>
+  database: <%= ENV['DATABASE_NAME'] || 'tmp_production' %>
+  host: <%= ENV['DATABASE_HOST'] || 'localhost' %>
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>
+  username: <%= ENV['DATABASE_USERNAME'] || #{ENV['USER'].inspect} %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
   min_messages: ERROR
 YAML
   end

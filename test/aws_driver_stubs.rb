@@ -135,7 +135,7 @@ class EBStub
   end
 
   def list_solution_stack_names
-    @solution_stacks || ["64bit Amazon Linux 2014.02 v1.0.1 running Tomcat 7 Java 7"]
+    @solution_stacks || ["64bit Amazon Linux 2014.03 v1.0.3 running Tomcat 7 Java 7"]
   end
 
   #test only
