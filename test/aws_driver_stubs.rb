@@ -1,11 +1,12 @@
 class EBStub
-  attr_reader :envs
+  attr_reader :envs, :events
   def initialize
     @apps = []
     @envs = {}
     @versions = {}
     @envs_been_deleted = {}
     @versions_deleted = {}
+    @event_fetched_times = 0
   end
 
   def create_application(app)
@@ -88,21 +89,53 @@ class EBStub
     end
   end
 
+  # simulating elasticbeanstalk events api behavior
+  #  use set_events and append_events to set fake events
   def fetch_events(app_name, env_name, options={})
-    set_env_ready(app_name, env_name, true)
+    @event_fetched_times += 1
+    set_env_ready(app_name, env_name, true) # assume env become ready after it spit out all the events
 
     unless @events # unrestricted mode for testing if no explicit events set
-      return generate_event_from_messages(['Environment update completed successfully',
+      return [generate_event_from_messages(['Environment update completed successfully',
                                            'terminateEnvironment completed successfully',
                                            'Successfully launched environment',
                                            'Completed swapping CNAMEs for environments'
-                                          ])
+                                          ], Time.now + @event_fetched_times), nil]
     end
 
-    @events[env_key(app_name, env_name)]
-    # assume env become ready after it spit out all the events
+    events = @events[env_key(app_name, env_name)][@event_fetched_times - 1]
+
+    if options.has_key?(:start_time)
+      start_time = Time.parse(options[:start_time])
+      events = events.select { |e| e[:event_date] >= start_time  }
+    end
+
+    if limit = options[:max_records]
+      events = events[0..limit]
+    end
+
+    [events, nil]
   end
 
+  # add fake events for each times of fetch events call
+  # message passed in should be old to new order
+  # e.g.  given set_events("myapp", "test", ['a'], ['b', 'c'])
+  # then
+  #    fetch_events('myapp', 'test') # => [{message: 'a'}]  for first time
+  #    fetch_events('myapp', 'test') # => [{message: 'c'}, {message: 'b'}, {message: 'a'}] for the second time call
+  def set_events(app_name, env_name, *messages)
+    events_seq = []
+    messages.each do |messages_for_call_seq|
+      if old_events = events_seq.last
+        last_event_date = old_events.first && old_events.first[:event_date]
+        events_seq << (generate_event_from_messages(messages_for_call_seq, last_event_date) + old_events)
+      else
+        events_seq << generate_event_from_messages(messages_for_call_seq)
+      end
+    end
+    @events ||= {}
+    @events[env_key(app_name, env_name)] = events_seq
+  end
 
   def environment_cname_prefix(app_name, env_name)
     return unless @envs[env_key(app_name, env_name)]
@@ -175,11 +208,6 @@ class EBStub
     @versions_deleted[app_name]
   end
 
-  def set_events(app_name, env_name, messages)
-    @events ||= {}
-    @events[env_key(app_name, env_name)] = generate_event_from_messages(messages)
-  end
-
   private
 
   def set_env_ready(app, env, ready)
@@ -192,11 +220,17 @@ class EBStub
     @envs[env_key(app, env)][:ready]
   end
 
-  def generate_event_from_messages(messages)
-    [messages.reverse.map do |m|
-       {:event_date => Time.now.utc,
-         :message => m}
-     end, nil]
+  def generate_event_from_messages(messages, start_time=Time.now)
+    start_time ||= Time.now
+    events = messages.map do |m|
+      { :message => m }
+    end
+
+    events.each_with_index do |e, i|
+      e[:event_date] = start_time + (i + 1)
+    end
+
+    events.reverse
   end
 
   def env_key(app, name)

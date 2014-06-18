@@ -89,9 +89,9 @@ module EbDeployer
     end
 
     def with_polling_events(terminate_pattern, &block)
-      event_start_time = Time.now
+      anchor = event_poller.get_anchor
       yield
-      event_poller.poll(event_start_time) do |event|
+      event_poller.poll(anchor) do |event|
         if event[:message] =~ /Failed to deploy application/
           raise event[:message]
         end

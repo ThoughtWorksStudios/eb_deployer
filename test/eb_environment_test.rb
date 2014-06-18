@@ -43,16 +43,20 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
 
   def test_should_raise_runtime_error_when_deploy_failed
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    @eb_driver.set_events("myapp", t("production", 'myapp'), ["start deploying", "Failed to deploy application"])
+    @eb_driver.set_events("myapp", t("production", 'myapp'),
+                          [],
+                          ["start deploying", "Failed to deploy application"])
     assert_raises(RuntimeError) { env.deploy("version 1") }
   end
 
   def test_should_raise_runtime_error_when_eb_extension_execution_failed
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
-    @eb_driver.set_events("myapp", t("production", 'myapp'), ["start deploying",
-                                                  "create environment",
-                                                  "Command failed on instance. Return code: 1 Output: Error occurred during build: Command hooks failed",
-                                                  "Successfully launched environment"])
+    @eb_driver.set_events("myapp", t("production", 'myapp'),
+                          [],
+                          ["start deploying",
+                           "create environment",
+                           "Command failed on instance. Return code: 1 Output: Error occurred during build: Command hooks failed",
+                           "Successfully launched environment"])
 
     assert_raises(RuntimeError) { env.deploy("version 1") }
   end
