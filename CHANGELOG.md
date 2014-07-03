@@ -1,3 +1,7 @@
+0.4.6
+====
+* Make elasticbeanstalk event polling robust against clock shifting problem.
+
 0.4.5
 ====
 * Rails 3+ support: Rails Generator to install default configurations with
