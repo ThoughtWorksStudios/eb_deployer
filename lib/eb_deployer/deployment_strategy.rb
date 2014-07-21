@@ -8,7 +8,9 @@ module EbDeployer
       when 'inplace_update', 'inplace-update'
         InplaceUpdate.new(env)
       when 'blue_green', 'blue-green'
-        BlueGreen.new(env)
+        BlueGreen.new(env, true)
+      when 'blue_only', 'blue-only'
+        BlueGreen.new(env, false)
       else
         raise 'strategy_name: ' + strategy_name.to_s + ' not supported'
       end

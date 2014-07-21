@@ -1,8 +1,9 @@
 module EbDeployer
   module DeploymentStrategy
     class BlueGreen
-      def initialize(env)
+      def initialize(env, should_swap_cname)
         @env = env
+        @should_swap_cname = should_swap_cname
       end
 
       def deploy(version_label, env_settings, inactive_settings=[])
@@ -16,10 +17,12 @@ module EbDeployer
         inactive_ebenv = ebenvs.reject(&method(:active_ebenv?)).first
 
         inactive_ebenv.deploy(version_label, env_settings)
-        active_ebenv.swap_cname_with(inactive_ebenv)
-        unless inactive_settings.empty?
-          active_ebenv.log("applying inactive settings...")
-          active_ebenv.apply_settings(inactive_settings)
+        if @should_swap_cname
+          active_ebenv.swap_cname_with(inactive_ebenv)
+          unless inactive_settings.empty?
+            active_ebenv.log("applying inactive settings...")
+            active_ebenv.apply_settings(inactive_settings)
+          end
         end
       end
 
