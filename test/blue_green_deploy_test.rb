@@ -27,19 +27,6 @@ class BlueGreenDeployTest < DeployTest
   end
 
 
-  def test_blue_only_deployment_should_not_swap_cname_to_make_active_most_recent_updated_env
-    do_deploy(42, :strategy => 'blue-only')
-    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', t('production-a', 'simple'))
-    assert_nil(@eb.environment_cname_prefix('simple', t('production-b', 'simple')))
-    do_deploy(43, :strategy => 'blue-only')
-    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', t('production-a', 'simple'))
-    assert_match(/simple-production-inactive/,  @eb.environment_cname_prefix('simple', t('production-b', 'simple')))
-    do_deploy(44, :strategy => 'blue-only')
-    assert_equal 'simple-production',  @eb.environment_cname_prefix('simple', t('production-a', 'simple'))
-    assert_match(/simple-production-inactive/,  @eb.environment_cname_prefix('simple', t('production-b', 'simple')))
-  end
-
-
   def test_blue_green_deploy_should_run_smoke_test_before_cname_switch
     smoked_host = []
     smoke_test = lambda { |host| smoked_host << host }

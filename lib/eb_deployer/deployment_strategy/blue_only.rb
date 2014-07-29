@@ -1,6 +1,6 @@
 module EbDeployer
   module DeploymentStrategy
-    class BlueGreen
+    class BlueOnly
       def initialize(env)
         @env = env
       end
@@ -16,11 +16,6 @@ module EbDeployer
         inactive_ebenv = ebenvs.reject(&method(:active_ebenv?)).first
 
         inactive_ebenv.deploy(version_label, env_settings)
-        active_ebenv.swap_cname_with(inactive_ebenv)
-        unless inactive_settings.empty?
-          active_ebenv.log("applying inactive settings...")
-          active_ebenv.apply_settings(inactive_settings)
-        end
       end
 
       private
