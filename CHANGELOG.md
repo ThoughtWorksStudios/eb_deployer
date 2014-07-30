@@ -1,3 +1,7 @@
+0.4.7
+====
+* Added blue-only deployment strategy (a variant of blue-green) that skips the cname swap so that the newly deployed code remains on the inactive "blue" instance.
+
 0.4.6
 ====
 * Make elasticbeanstalk event polling robust against clock shifting problem.

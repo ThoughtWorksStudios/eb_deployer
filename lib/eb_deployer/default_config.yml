@@ -12,9 +12,12 @@ common:
   # AWS region to deploy. Default to us-east-1
   # region: us-west-1
 
-  # There are two deployment strategies: 'blue-green' or 'inplace-update'.
+  # There are three deployment strategies: 'blue-green', 'blue-only', or 'inplace-update'.
   # Blue green deployments keep two elastic beanstalk environments and always deploy to
   # inactive one, to achieve zero downtime.
+  # Blue only deployments do everything that the blue green deployments do except for the final
+  # inactive to active CNAME swap leaving the newly deployed application on the inactive
+  # "blue" instance.
   # Inplace-update strategy will only keep one environment, and update the version inplace on
   # deploy. Inplace-update will save resources but will suffer from downtime.
   # (All old environments need be destroyed when you switching between strategies.)

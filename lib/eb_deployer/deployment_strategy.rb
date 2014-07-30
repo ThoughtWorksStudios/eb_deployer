@@ -1,5 +1,6 @@
 require 'eb_deployer/deployment_strategy/inplace_update'
 require 'eb_deployer/deployment_strategy/blue_green'
+require 'eb_deployer/deployment_strategy/blue_only'
 
 module EbDeployer
   module DeploymentStrategy
@@ -9,6 +10,8 @@ module EbDeployer
         InplaceUpdate.new(env)
       when 'blue_green', 'blue-green'
         BlueGreen.new(env)
+      when 'blue_only', 'blue-only'
+        BlueOnly.new(env)
       else
         raise 'strategy_name: ' + strategy_name.to_s + ' not supported'
       end
