@@ -61,6 +61,17 @@ class EbEnvironmentTest < MiniTest::Unit::TestCase
     assert_raises(RuntimeError) { env.deploy("version 1") }
   end
 
+  def test_should_raise_runtime_error_when_issues_during_launch
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
+    @eb_driver.set_events("myapp", t("production", 'myapp'),
+                          [],
+                          ["start deploying",
+                           "create environment",
+                           "Launched environment: dev-a-1234567. However, there were issues during launch. See event log for details."])
+
+    assert_raises(RuntimeError) { env.deploy("version 1") }
+  end
+
   def test_terminate_should_delete_environment
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver)
     env.deploy("version1")
