@@ -255,7 +255,7 @@ module EbDeployer
   def self.cli_parser(options)
     OptionParser.new do |opts|
       opts.banner = "Usage: eb_deployer [options]"
-      opts.on("-p", "--package [FILE/S3_OBJECT]", "Package to deploy, can be a war file for java application, or yaml specification for package location on S3, or a S3 object with bucket name saperated by colon, e.g. bucket_name:key_name") do |v|
+      opts.on("-p", "--package [FILE/S3_OBJECT]", "Package to deploy, can be a war file for java application, or yaml specification for package location on S3, or a S3 object & bucket name separated by colon, e.g. bucket_name:key_name") do |v|
         options[:package] = v
       end
 
