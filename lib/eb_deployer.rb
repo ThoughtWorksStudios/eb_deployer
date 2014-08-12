@@ -45,7 +45,8 @@ module EbDeployer
     app = opts[:application]
     env_name = opts[:environment]
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
-    provisioner = CloudFormationProvisioner.new("#{app}-#{env_name}", cf)
+    stack_name = opts[:stack_name] || "#{app}-#{env_name}"
+    provisioner = CloudFormationProvisioner.new(stack_name, cf)
     provisioner.output(key)
   end
 
@@ -178,6 +179,7 @@ module EbDeployer
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
 
     app_name = opts[:application]
+    env_name = opts[:environment]
     version_prefix = opts[:version_prefix].to_s.strip
     version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
 
@@ -186,7 +188,10 @@ module EbDeployer
                                          cf,
                                          opts[:skip_resource_stack_update])
     bs = ThrottlingHandling.new(bs, AWS::ElasticBeanstalk::Errors::Throttling)
-    environment = Environment.new(application, opts[:environment], bs) do |env|
+
+    stack_name = opts[:stack_name] || "#{app_name}-#{env_name}"
+
+    environment = Environment.new(application, env_name, stack_name, bs) do |env|
       env.resource_stacks = resource_stacks
       env.settings = opts[:option_settings] || opts[:settings] || []
       env.inactive_settings = opts[:inactive_settings] || []
@@ -269,6 +274,10 @@ module EbDeployer
 
       opts.on("-d", "--destroy", "Destroy all Elasticbeanstalk environments under the application which have specified environment as name prefix") do |v|
         options[:action] = :destroy
+      end
+
+      opts.on("-s", "--stack-name [STACK_NAME]", "CloudFormation stack name to use. If not specified, defaults to {app}-{env_name}") do |v|
+        options[:stack_name] = v
       end
 
       opts.on("--skip-resource-stack-update", "Skip cloud-formation stack update. (only for extreme situation like hitting a cloudformation bug)") do |v|

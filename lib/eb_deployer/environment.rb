@@ -7,9 +7,10 @@ module EbDeployer
 
     attr_reader :name
 
-    def initialize(app, name, eb_driver, &block)
+    def initialize(app, name, stack_name, eb_driver, &block)
       @app = app
       @name = name
+      @stack_name = stack_name
       @eb_driver = eb_driver
       @creation_opts = {}
       @settings = []
@@ -26,7 +27,7 @@ module EbDeployer
     end
 
     def deploy(version_label)
-      resource_settings = @resource_stacks.provision(resource_stack_name)
+      resource_settings = @resource_stacks.provision(@stack_name)
       components_to_deploy.each do |component|
         component.deploy(version_label, @settings + resource_settings, @inactive_settings)
       end
@@ -53,10 +54,6 @@ module EbDeployer
 
     def component_named(name)
       @components.detect { |c| c.name == name }
-    end
-
-    def resource_stack_name
-      "#{app_name}-#{@name}"
     end
   end
 end
