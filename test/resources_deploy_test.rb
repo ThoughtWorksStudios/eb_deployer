@@ -119,4 +119,18 @@ class ResourcesDeployTest < DeployTest
                             :environment => "production")
     end
   end
+
+  def test_custom_stack_name
+    cf_template = temp_file(JSON.dump({
+                                        'Resources' => {'R1' => {}},
+                                        'Outputs' => {'O1' => {}, 'O2' => {}}
+                                      }))
+    deploy(:application => 'simple',
+           :environment => "production",
+           :resources => { :template => cf_template },
+           :stack_name => 'my-lovely-stack')
+
+    assert !@cf_driver.stack_exists?('simple-production')
+    assert @cf_driver.stack_exists?('my-lovely-stack')
+  end
 end
