@@ -18,7 +18,7 @@ module EbDeployer
       @strategy_name = :blue_green
       yield(self) if block_given?
       unless @components
-        @components = [DefaultComponent.new(self, @creation_opts, @strategy_name, @eb_driver)]
+        @components = [DefaultComponent.new(self, @creation_opts, @strategy_name, @stack_name, @eb_driver)]
       end
     end
 
@@ -37,7 +37,7 @@ module EbDeployer
       return unless components_attrs
       @components = components_attrs.map do |attrs|
         attrs = symbolize_keys(attrs)
-        Component.new(attrs.delete(:name), self, attrs, @eb_driver)
+        Component.new(attrs.delete(:name), self, attrs, @stack_name, @eb_driver)
       end
     end
 

@@ -4,13 +4,13 @@ module EbDeployer
       @test_body = test_body
     end
 
-    def run(host_name, logger=nil)
+    def run(host_name, stack_name, logger=nil)
       return unless @test_body
-      logger.log("running smoke test for #{host_name}...") if logger
+      logger.log("running smoke test for #{host_name}/#{stack_name}...") if logger
 
       case @test_body
       when Proc
-        @test_body.call(host_name)
+        @test_body.call(host_name, stack_name)
       when String
         eval(@test_body, binding)
       else

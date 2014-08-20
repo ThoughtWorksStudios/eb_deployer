@@ -1,7 +1,8 @@
 module EbDeployer
   class DefaultComponent
-    def initialize(env, creation_opts, strategy_name, eb_driver)
+    def initialize(env, creation_opts, strategy_name, stack_name, eb_driver)
       @env = env
+      @stack_name = stack_name
       @eb_driver = eb_driver
       @creation_opts = creation_opts
       @strategy = DeploymentStrategy.create(self, strategy_name)
@@ -19,6 +20,7 @@ module EbDeployer
     def new_eb_env(suffix=nil, cname_prefix_overriding=nil)
       EbEnvironment.new(@env.app_name,
                         [@env.name, suffix].compact.join('-'),
+                        @stack_name,
                         @eb_driver,
                         @creation_opts.merge(:cname_prefix => cname_prefix_overriding || cname_prefix))
     end

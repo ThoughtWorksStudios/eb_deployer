@@ -11,8 +11,9 @@ module EbDeployer
       "#{env_name}-#{digest}"
     end
 
-    def initialize(app, name, eb_driver, creation_opts={})
+    def initialize(app, name, stack_name, eb_driver, creation_opts={})
       @app = app
+      @stack_name = stack_name
       @name = self.class.unique_ebenv_name(name, app)
       @bs = eb_driver
       @creation_opts = default_create_options.merge(reject_nil(creation_opts))
@@ -85,7 +86,7 @@ module EbDeployer
 
     def smoke_test
       host_name = @bs.environment_cname(@app, @name)
-      SmokeTest.new(@creation_opts[:smoke_test]).run(host_name, self)
+      SmokeTest.new(@creation_opts[:smoke_test]).run(host_name, @stack_name, self)
     end
 
     def with_polling_events(terminate_pattern, &block)
