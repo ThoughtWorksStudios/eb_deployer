@@ -175,6 +175,7 @@ module EbDeployer
     end
 
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
+    bs = ThrottlingHandling.new(bs, AWS::ElasticBeanstalk::Errors::Throttling)
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
 
@@ -187,7 +188,6 @@ module EbDeployer
     resource_stacks = ResourceStacks.new(opts[:resources],
                                          cf,
                                          opts[:skip_resource_stack_update])
-    bs = ThrottlingHandling.new(bs, AWS::ElasticBeanstalk::Errors::Throttling)
 
     stack_name = opts[:stack_name] || "#{app_name}-#{env_name}"
 
