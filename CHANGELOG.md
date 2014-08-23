@@ -1,6 +1,16 @@
+0.4.8
+====
+* Raise an error if the environment launched with problems (contributed by kmanning)
+* Add --stack-name option that let's use choose the name of the cloud
+  formation stack to operate on (contributed by NET-A-PORTER)
+* Document typo/grammar fix (contributed by stig)
+* Retry on AWS API throttling error when operating on versions
+
 0.4.7
 ====
-* Added blue-only deployment strategy (a variant of blue-green) that skips the cname swap so that the newly deployed code remains on the inactive "blue" instance.
+* Added blue-only deployment strategy (a variant of blue-green) that
+  skips the cname swap so that the newly deployed code remains on the
+  inactive "blue" instance. (contributed by jlabrecque)
 
 0.4.6
 ====
