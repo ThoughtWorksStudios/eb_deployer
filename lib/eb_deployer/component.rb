@@ -2,9 +2,10 @@ module EbDeployer
   class Component
     attr_reader :name
 
-    def initialize(name, env, options, eb_driver)
+    def initialize(name, env, options, stack_name, eb_driver)
       @name = name
       @env = env
+      @stack_name = stack_name
       @eb_driver = eb_driver
       @options = options.dup
       @component_eb_settings = @options.delete(:option_settings) || []
@@ -19,7 +20,7 @@ module EbDeployer
 
     def deploy(version_label, eb_settings, inactive_settings=[])
       @strategy.deploy(version_label,
-                       eb_settings + @component_eb_settings,
+                       eb_settings + @component_eb_settings,                       
                        inactive_settings + @component_inactive_settings)
     end
 
@@ -29,6 +30,7 @@ module EbDeployer
       creation_opts = creation_opts.merge(:cname_prefix => cname_prefix_overriding || cname_prefix)
       EbEnvironment.new(@env.app_name,
                         env_name,
+                        @stack_name,
                         @eb_driver,
                         creation_opts)
 

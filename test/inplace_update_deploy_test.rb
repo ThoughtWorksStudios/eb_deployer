@@ -48,21 +48,25 @@ class InplaceUpdateDeployTest < DeployTest
 
   def test_smoke_test_should_be_run_after_env_created_or_update
     host_for_smoke_test = nil
+    stack_for_smoke_test = nil
     deploy(:application => 'simple',
            :environment => "production",
            :cname_prefix => 'foobar',
-           :smoke_test => lambda { |host| host_for_smoke_test = host },
+           :smoke_test => lambda { |host, stack| host_for_smoke_test = host; stack_for_smoke_test = stack },
            :version_label => 42)
     assert_equal 'foobar.elasticbeanstalk.com', host_for_smoke_test
+    assert_equal 'simple-production', stack_for_smoke_test
 
     host_for_smoke_test = nil
+    stack_for_smoke_test = nil
     deploy(:application => 'simple',
            :environment => "production",
            :cname_prefix => 'foobar',
-           :smoke_test => lambda { |host| host_for_smoke_test = host },
+           :smoke_test => lambda { |host, stack| host_for_smoke_test = host; stack_for_smoke_test = stack },
            :version_label => 43)
 
     assert_equal 'foobar.elasticbeanstalk.com', host_for_smoke_test
+    assert_equal 'simple-production', stack_for_smoke_test
   end
 
   def test_should_terminate_old_environment_if_phoenix_mode_is_enabled

@@ -31,14 +31,14 @@ class BlueOnlyDeployTest < DeployTest
 
   def test_blue_only_deploy_should_run_smoke_test_before_cname_switch
     smoked_host = []
-    smoke_test = lambda { |host| smoked_host << host }
+    smoke_test = lambda { |host,stack| smoked_host << host + "+" + stack}
     [42, 43, 44].each do |version_label|
       do_deploy(version_label, :smoke_test => smoke_test)
     end
 
-    assert_equal ['simple-production.elasticbeanstalk.com',
-                  'simple-production-inactive.elasticbeanstalk.com',
-                  'simple-production-inactive.elasticbeanstalk.com'], smoked_host
+    assert_equal ['simple-production.elasticbeanstalk.com+simple-production',
+                  'simple-production-inactive.elasticbeanstalk.com+simple-production',
+                  'simple-production-inactive.elasticbeanstalk.com+simple-production'], smoked_host
   end
 
 
