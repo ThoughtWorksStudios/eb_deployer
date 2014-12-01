@@ -1,5 +1,6 @@
 # EbDeployer [![Build Status](https://travis-ci.org/ThoughtWorksStudios/eb_deployer.png?branch=master)](https://travis-ci.org/ThoughtWorksStudios/eb_deployer)
-[From Thoughtworks Mingle Team](http://getmingle.io)
+
+[Built with :yellow_heart: and :coffee: in San Francisco](http://getmingle.io)
 
 Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing link to automate the whole flow out of box.
 
