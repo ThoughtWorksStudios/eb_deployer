@@ -1,3 +1,8 @@
+0.4.9
+====
+
+* Ignore AWS::ElasticBeanstalk::Errors::OperationInProgressFailure error when delete application version
+
 0.4.8
 ====
 * Raise an error if the environment launched with problems (contributed by kmanning)
