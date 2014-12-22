@@ -45,7 +45,7 @@ run deploy
 Then open aws console for Elastic Beanstalk to see the result of this deployment.
 
 
-### Conifgure Smoke Testing your stack
+### Configure Smoke Testing your stack
 
 EB_Deployer allows you to automate your deployment and then some. You can also add smoke tests to your deployment - thus ensuring that the app you deployed is also working correctly.
 Adding a smoke test suite is also simple. Check "smoke_test" section in your eb_deployer.yml. We show a simple curl based smoke test that helps you test if your app is up and responding to http.
