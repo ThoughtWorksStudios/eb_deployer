@@ -1,3 +1,4 @@
+require 'yaml'
 module EbDeployer
   class Application
     attr_reader :name

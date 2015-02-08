@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'digest'
+require 'yaml'
 
 module EbDeployer
   class ConfigLoader
