@@ -93,7 +93,6 @@ common:
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
       value: m1.small
-
     - namespace: aws:elasticbeanstalk:application:environment
       option_name: DATABASE_NAME
       value: <%= alphanumeric_name %>
@@ -146,3 +145,8 @@ environments:
       # - namespace: aws:autoscaling:asg
       #   option_name: MinSize
       #    value: "2"
+
+      # For Rails4: config/secrets.yml
+      - namespace: aws:elasticbeanstalk:application:environment
+        option_name: SECRET_KEY_BASE
+        value: <%= secure_random(128) %>

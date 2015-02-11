@@ -1,11 +1,12 @@
 require 'rails/generators'
 require 'eb_deployer/default_config'
 require 'aws/elastic_beanstalk'
+require 'securerandom'
 
 module EbDeployer
   module Generators
     class InstallGenerator < Rails::Generators::Base
-      DEFAULT_STACK_NAME = '64bit Amazon Linux 2014.03 v1.0.3 running Ruby 2.0 (Puma)'
+      DEFAULT_STACK_NAME = '64bit Amazon Linux 2014.09 v1.1.0 running Ruby 2.1 (Passenger Standalone)'
       source_root File.expand_path("../templates", __FILE__)
 
       def do_install
@@ -59,14 +60,18 @@ YAML
 
       def solution_stack_name
         AWS::ElasticBeanstalk.new.client.list_available_solution_stacks[:solution_stacks].find do |s|
-          s =~ /Amazon Linux/ && s =~ /running Ruby 2.0 \(Puma\)/
+          s =~ /Amazon Linux/ && s =~ /running Ruby 2.1 \(Passenger Standalone\)/
         end
       rescue
-        '64bit Amazon Linux 2014.03 v1.0.4 running Ruby 2.0 (Puma)'
+        DEFAULT_STACK_NAME
       end
 
       def alphanumeric_name
         app_name.gsub(/-/, '')
+      end
+
+      def secure_random(length)
+        SecureRandom.hex(length)
       end
 
       def app_name
