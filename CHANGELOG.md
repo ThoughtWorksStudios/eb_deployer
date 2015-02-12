@@ -1,3 +1,19 @@
+0.4.12
+======
+
+* Update default solution stacks.
+* Rails generator generates SECRET_KEY_BASE for rails 4 app.
+
+0.4.11
+======
+
+* Make gem depend on aws-sdk-v1 until we put in support for both v1 and v2
+
+0.4.10
+======
+
+* Fix #33
+
 0.4.9
 ====
 
