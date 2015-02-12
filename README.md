@@ -93,7 +93,7 @@ Take a look at code if you can not wait for the documentation.
 
 ## More
 
-[Rails 3 Support](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/Rails-3-Support)
+[Rails 3/4 Support](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/Rails-3-Support)
 
 [EbDeployer environment](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/EbDeployer-environment)
 
