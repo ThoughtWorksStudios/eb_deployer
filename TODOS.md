@@ -8,3 +8,4 @@
 * Support smoke_test_script option
 * Document for how to use components
 * Document for how to use inactive-settings
+* Support bucket folders for different environments (e.g. tworker/dev,tworker/ci)
