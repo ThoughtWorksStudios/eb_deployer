@@ -48,9 +48,10 @@ module EbDeployer
           :version_label => version,
           :option_settings => settings,
           :tier => environment_tier(tier),
-          :tags => tags,
-          :cname_prefix => cname_prefix
+          :tags => tags
         }
+
+        request[:cname_prefix] = cname_prefix if tier.downcase == 'webserver'
 
         @client.create_environment(request)
       end
