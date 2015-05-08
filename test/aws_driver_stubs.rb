@@ -139,12 +139,14 @@ class EBStub
 
   def environment_cname_prefix(app_name, env_name)
     return unless @envs[env_key(app_name, env_name)]
-    @envs[env_key(app_name, env_name)][:cname_prefix] || app_name + "-" + SecureRandom.hex
+    @envs[env_key(app_name, env_name)][:cname_prefix]
   end
 
   def environment_cname(app_name, env_name)
     return unless @envs[env_key(app_name, env_name)]
-    environment_cname_prefix(app_name, env_name) + ".elasticbeanstalk.com"
+    if cname_prefix = environment_cname_prefix(app_name, env_name)
+      cname_prefix + ".elasticbeanstalk.com"
+    end
   end
 
 

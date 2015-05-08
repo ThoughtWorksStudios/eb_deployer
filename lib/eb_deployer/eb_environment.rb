@@ -63,18 +63,41 @@ module EbDeployer
 
     private
 
+    def configured_tier
+      @creation_opts[:tier]
+    end
+
+    def has_cname?
+      !configured_tier || configured_tier.downcase == 'webserver'
+    end
+
+    def configured_cname_prefix
+      @creation_opts[:cname_prefix]
+    end
+
     def create_eb_env(settings, version_label)
       solution_stack = @creation_opts[:solution_stack]
       tags = convert_tags_hash_to_array(@creation_opts.delete(:tags))
       validate_solutions_stack(solution_stack)
       with_polling_events(/Successfully launched environment/i) do
-        @bs.create_environment(@app, @name, solution_stack, @creation_opts[:cname_prefix], version_label, @creation_opts[:tier], tags, settings)
+        @bs.create_environment(@app,
+                               @name,
+                               solution_stack,
+                               has_cname? ? configured_cname_prefix : nil,
+                               version_label,
+                               configured_tier,
+                               tags,
+                               settings)
       end
     end
 
     def update_eb_env(settings, version_label)
       with_polling_events(/Environment update completed successfully/i) do
-        @bs.update_environment(@app, @name, version_label, @creation_opts[:tier], settings)
+        @bs.update_environment(@app,
+                               @name,
+                               version_label,
+                               configured_tier,
+                               settings)
       end
     end
 

@@ -1,6 +1,7 @@
 module EbDeployer
   module AWSDriver
     class Beanstalk
+      include Utils
       attr_reader :client
 
       def initialize(client=AWS::ElasticBeanstalk.new.client)
@@ -41,18 +42,16 @@ module EbDeployer
       end
 
       def create_environment(app_name, env_name, stack_name, cname_prefix, version, tier, tags, settings)
-        request = {
+        request = reject_nil({
           :application_name => app_name,
           :environment_name => env_name,
           :solution_stack_name => stack_name,
           :version_label => version,
           :option_settings => settings,
           :tier => environment_tier(tier),
+          :cname_prefix => cname_prefix,
           :tags => tags
-        }
-
-        request[:cname_prefix] = cname_prefix if tier.downcase == 'webserver'
-
+        })
         @client.create_environment(request)
       end
 
