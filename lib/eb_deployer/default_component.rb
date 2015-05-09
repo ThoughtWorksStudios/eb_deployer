@@ -11,8 +11,8 @@ module EbDeployer
       @creation_opts[:cname_prefix] || default_cname_prefix
     end
 
-
     def deploy(version_label, eb_settings, inactive_settings=[])
+      @strategy.test_compatibility(@creation_opts)
       @strategy.deploy(version_label, eb_settings, inactive_settings)
     end
 

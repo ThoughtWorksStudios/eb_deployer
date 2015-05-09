@@ -18,23 +18,25 @@ module EbDeployer
     end
 
     def deploy(version_label, eb_settings, inactive_settings=[])
+      @strategy.test_compatibility(create_options)
       @strategy.deploy(version_label,
                        eb_settings + @component_eb_settings,
                        inactive_settings + @component_inactive_settings)
     end
 
     def new_eb_env(suffix=nil, cname_prefix_overriding=nil)
-      env_name = [@env.name, @name, suffix].compact.join('-')
-      creation_opts = @env.creation_opts.merge(@options)
-      creation_opts = creation_opts.merge(:cname_prefix => cname_prefix_overriding || cname_prefix)
       EbEnvironment.new(@env.app_name,
-                        env_name,
+                        [@env.name, @name, suffix].compact.join('-'),
                         @eb_driver,
-                        creation_opts)
+                        create_options.merge(:cname_prefix => cname_prefix_overriding || cname_prefix))
 
     end
 
     private
+
+    def create_options
+      @env.creation_opts.merge(@options)
+    end
 
     def default_cname_prefix
       [@env.app_name, @env.name, @name].join('-')

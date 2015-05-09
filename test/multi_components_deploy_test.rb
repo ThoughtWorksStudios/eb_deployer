@@ -135,10 +135,17 @@ class MultiComponentsDeployTest < DeployTest
     do_bg_deploy(settings)
     assert_equal 2, @eb.environment_settings('simple', t('prod-web-a', 'simple')).last[:value]
     assert_equal 1, @eb.environment_settings('simple', t('prod-api-a', 'simple')).last[:value]
-
-
   end
 
+  def test_should_raise_error_when_deploy_work_tier_component_with_blue_green
+    assert_raises(RuntimeError) do
+      deploy(:application => 'simple',
+             :environment => 'prod',
+             :strategy => 'blue-green',
+             :components => [{ 'name' => 'web' },
+                             { 'name' => 'bg', 'tier' => 'worker' }])
+    end
+  end
 
   private
   def do_deploy(options={})

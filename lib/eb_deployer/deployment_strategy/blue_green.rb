@@ -5,6 +5,13 @@ module EbDeployer
         @env = env
       end
 
+      def test_compatibility(env_create_options)
+        tier = env_create_options[:tier]
+        if tier && tier.downcase == 'worker'
+          raise "Blue green deployment is not supported for Worker tier"
+        end
+      end
+
       def deploy(version_label, env_settings, inactive_settings=[])
         if !ebenvs.any?(&method(:active_ebenv?))
           ebenv('a', @env.cname_prefix).
