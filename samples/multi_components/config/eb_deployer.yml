@@ -5,7 +5,7 @@ application: eb-deployer-java-multi-components
 # Common settings for all environments
 common:
   # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
-  # solution_stack_name: 64bit Amazon Linux 2014.02 v1.0.1 running Tomcat 7 Java 7
+  solution_stack_name: 64bit Amazon Linux 2015.03 v1.3.1 running Tomcat 8 Java 8
 
   # Tier name for environments. Current supported values are WebServer and Worker
   # tier: WebServer
@@ -64,12 +64,6 @@ common:
   # switching inactive and active environments.
   # Defining a smoke test is high recommended for serious usage. The
   # simplest one could just be checking server landing page using curl, e.g.
-  smoke_test: >
-    Timeout.timeout(600) do
-      until `curl http://#{host_name}`.include?('Hello, World')
-        sleep 5
-      end
-    end
 
 
   # Elastic Beanstalk settings that will apply to the environments you
@@ -84,10 +78,7 @@ common:
     # go back to t1.micro.
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
-      value: m1.small
-    - namespace: aws:elasticbeanstalk:environment
-      option_name: EnvironmentType
-      value: SingleInstance
+      value: t2.micro
 
   # If resources specified, eb_deployer will use the CloudFormation
   # template you provide to create a default CloudFormation stack with
@@ -102,24 +93,34 @@ common:
   #    :capabilities => An array. You need set it to ['CAPABILITY_IAM'] if the
   # template include IAM Instance Profile.
   resources:
-    # For example creating a RDS instance for blue green deployment:
-    # template: config/my_rds.json
-    # inputs:
-    #   DBPassword: <%= random_hash %>
-    # outputs:
-    #   RDSPassSecurityGroup:
-    #     namespace: aws:autoscaling:launchconfiguration
-    #     option_name: SecurityGroups
-    #   RDSDatabaseConfig:
-    #     namespace: aws:elasticbeanstalk:application:environment
-    #     option_name: databaseConfig
+    # create instance profile so that both web node and background node
+    # can access the queue
+    template: config/aws_resources.json
+    capabilities:
+      - CAPABILITY_IAM
+    outputs:
+      InstanceProfile:
+        namespace: aws:autoscaling:launchconfiguration
+        option_name: IamInstanceProfile
+
+
   components:
     - name: web
-    - name: api
+      smoke_test: >
+        Timeout.timeout(600) do
+          until `curl http://#{host_name}`.include?('Hello, World')
+            sleep 5
+          end
+        end
+    - name: bg
+      tier: Worker
+      strategy: inplace-update
       option_settings:
         - namespace: aws:elasticbeanstalk:application:environment
           option_name: APP_MODE
-          value: api
+          value: background
+      smoke_test: >
+        puts 'TODO: should have a way to verify environment started!!!'
 
 
 # You can define environment here. Each environment can overriden any common settings

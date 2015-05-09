@@ -1,0 +1,58 @@
+{
+  "Outputs": {
+    "InstanceProfile": {
+      "Description": "Instance profile that should be asigned to ec2 instance",
+      "Value": {
+        "Ref": "InstanceProfile"
+      }
+    }
+  },
+
+  "Resources": {
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": ["ec2.amazonaws.com"]
+            },
+            "Action": ["sts:AssumeRole"]
+          }]
+        },
+        "Path": "/",
+        "Policies": [ {
+          "PolicyName": "FullS3Access",
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": ["s3:*"],
+                "Resource": "*"
+              }
+            ]
+          }
+        }, {
+          "PolicyName": "FullSQSAccess",
+          "PolicyDocument": {
+            "Statement": [ {
+              "Effect": "Allow",
+              "Action": ["sqs:*"],
+              "Resource": "*"
+            }]
+          }
+        }]
+      }
+    },
+
+
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [ { "Ref": "Role" } ]
+      }
+    }
+  }
+}
