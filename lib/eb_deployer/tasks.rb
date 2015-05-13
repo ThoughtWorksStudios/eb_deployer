@@ -14,7 +14,7 @@ namespace :eb do
   end
 
   desc "Build package for eb_deployer to deploy to a Ruby environment in tmp directory. It zips all file list by 'git ls-files'"
-  task :package => [:clean, :environment] do
+  task :package => [:clean] do
     sh "git ls-files | zip #{eb_deployer_package} -@"
   end
 
