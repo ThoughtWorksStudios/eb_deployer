@@ -1,3 +1,5 @@
+require 'fileutils'
+
 namespace :eb do
   def eb_deployer_env
     ENV['EB_DEPLOYER_ENV'] || 'dev'
@@ -15,7 +17,9 @@ namespace :eb do
 
   desc "Build package for eb_deployer to deploy to a Ruby environment in tmp directory. It zips all file list by 'git ls-files'"
   task :package => [:clean] do
-    sh "git ls-files | zip #{eb_deployer_package} -@"
+    package = eb_deployer_package
+    FileUtils.mkdir_p(File.dirname(package))
+    sh "git ls-files | zip #{package} -@"
   end
 
   desc "Deploy package we built in tmp directory. default to dev environment, specify environment variable EB_DEPLOYER_ENV to override, for example: EB_DEPLOYER_ENV=production rake eb:deploy."
