@@ -21,21 +21,15 @@ common:
   # switching between strategies.
   # strategy: blue-green
 
-  # If phoenix mode is turn on, it will terminate the old elastic
+  # If phoenix mode is turned on, it will terminate the old elastic
   # beanstalk environment and recreate on deploy. For blue-green
-  # deployment it terminate the inactive environment first then
-  # recreate it. This is useful to avoiding configuration drift and
-  # accumulating state on the ec2 instances. Also it has the benifit of
-  # keeping your ec2 instance system package upto date, because everytime ec2
-  # instance boot up from AMI it does a system update. Default is off but we suggest
-  # overriden it to on for production environment.
+  # deployment it terminates the inactive environment first then
+  # recreate it. This is useful to avoid configuration drift and
+  # accumulating state on the ec2 instances. Also it has the benefit of
+  # keeping your ec2 instance system package up-to-date, because everytime ec2
+  # instance boots up from AMI it does a system update. Default is off but we recommend
+  # it to be turned on for production environment.
   # phoenix_mode: false
-
-  # Specifies the maximum number of versions to keep. Older versions are removed
-  # and deleted from the S3 source bucket as well. If specified as zero or not
-  # specified, all versions will be kept.  If a version_prefix is given, only removes
-  # version starting with the prefix.
-  # keep_latest: 200
 
 
   # Specifies a prefix to prepend to the version label.
