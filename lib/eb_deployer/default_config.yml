@@ -30,15 +30,13 @@ common:
   # name will be thoughtworks.simple.packages. Default to application name.
   # package_bucket: my-s3-bucket
 
-  # If phoenix mode is turned 'on', it will terminate the old elastic
-  # beanstalk environment and recreate a new one on deploy. For blue-green
-  # deployment it will terminate the inactive environment first then
+  # If phoenix mode is turned on, it will terminate the old elastic
+  # beanstalk environment and recreate on deploy. For blue-green
+  # deployment it terminates the inactive environment first then
   # recreate it. This is useful to avoid configuration drift and
-  # accumulating state on the ec2 instances. Also it has the benefit of
-  # keeping your ec2 instance system package upto date, because everytime ec2
-  # instance boots up from AMI it does a system update. Default is 'off' but we suggest
-  # you override it to 'on' for production environment.
-  # phoenix_mode: false
+  # accumulating state on the ec2 instances. Default is off but we recommend
+  # it to be turned on for production environment.
+  # phoenix_mode: off
 
   # The tags you would like to be associated with your resources.
   # These tags will only be used when you first launch an environment.  If you are using

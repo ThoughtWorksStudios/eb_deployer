@@ -25,9 +25,7 @@ common:
   # beanstalk environment and recreate on deploy. For blue-green
   # deployment it terminates the inactive environment first then
   # recreate it. This is useful to avoid configuration drift and
-  # accumulating state on the ec2 instances. Also it has the benefit of
-  # keeping your ec2 instance system package up-to-date, because everytime ec2
-  # instance boots up from AMI it does a system update. Default is off but we recommend
+  # accumulating state on the ec2 instances. Default is off but we recommend
   # it to be turned on for production environment.
   # phoenix_mode: false
 
