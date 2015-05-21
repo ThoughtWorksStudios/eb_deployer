@@ -78,7 +78,7 @@ common:
     # go back to t1.micro.
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
-      value: t2.micro
+      value: t1.micro
 
   # If resources specified, eb_deployer will use the CloudFormation
   # template you provide to create a default CloudFormation stack with
