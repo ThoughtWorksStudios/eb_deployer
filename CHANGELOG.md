@@ -1,3 +1,8 @@
+0.5.2
+=====
+
+* Fix issue: worker tier aws-sqsd using 1.0 version
+* Update multi_components example
 
 0.5.0
 =====
