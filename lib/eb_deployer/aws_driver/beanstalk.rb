@@ -110,7 +110,7 @@ module EbDeployer
 
       def environment_swap_cname(app_name, env1, env2)
         env1_id, env2_id = convert_env_name_to_id(app_name, [env1, env2])
-        @client.swap_environment_cnam_es(:source_environment_id => env1_id,
+        @client.swap_environment_cnames(:source_environment_id => env1_id,
                                          :destination_environment_id => env2_id)
       end
 
