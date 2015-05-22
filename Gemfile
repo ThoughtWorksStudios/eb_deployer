@@ -7,3 +7,4 @@ gem 'redcarpet', :platform => :mri
 gem 'yard'
 gem 'rake'
 gem 'railties'
+gem 'test-unit'
