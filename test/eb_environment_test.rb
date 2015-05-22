@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EbEnvironmentTest < MiniTest::Test
+class EbEnvironmentTest < Test::Unit::TestCase
   def setup
     @eb_driver = EBStub.new
     @eb_driver.create_application("myapp")

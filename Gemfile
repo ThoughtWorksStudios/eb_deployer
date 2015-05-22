@@ -6,4 +6,4 @@ gemspec
 gem 'redcarpet', :platform => :mri
 gem 'yard'
 gem 'rake'
-gem 'railties', "3.2.18"
+gem 'railties'

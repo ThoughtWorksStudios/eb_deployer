@@ -10,7 +10,6 @@ Gem::Specification.new do |gem|
   gem.license       = 'MIT'
 
   gem.add_runtime_dependency 'aws-sdk', '~> 2',  '>= 2.0.0'
-  gem.add_development_dependency 'minitest', '~> 5'
 
   gem.files         = `git ls-files`.split($\).reject {|f| f =~ /^samples\// }
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

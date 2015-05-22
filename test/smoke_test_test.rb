@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SmokeTestTest < MiniTest::Test
+class SmokeTestTest < Test::Unit::TestCase
   def test_call_proc_type_smoke_tests
     host_name_in_proc = nil
     EbDeployer::SmokeTest.new(lambda {|v| host_name_in_proc = v }).run("foo")

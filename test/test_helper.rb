@@ -3,8 +3,7 @@ $:.unshift(File.expand_path("../../lib", __FILE__))
 require 'tempfile'
 require 'eb_deployer'
 require 'aws_driver_stubs'
-require 'minitest/autorun'
-require 'minitest/pride'
+require 'test/unit'
 
 def silence_warnings(&block)
   old_verbose, $VERBOSE = $VERBOSE, nil
@@ -55,7 +54,7 @@ class ErrorRaisingWrapper < SimpleDelegator
   end
 end
 
-class MiniTest::Test
+class Test::Unit::TestCase
   def sample_file(file_name, content='s' * 100)
     path = File.join('/tmp', file_name)
     File.open(path, 'w') { |f| f << content }
