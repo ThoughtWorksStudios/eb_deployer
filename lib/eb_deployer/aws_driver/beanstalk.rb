@@ -121,8 +121,8 @@ module EbDeployer
       private
 
       TIERS = [
-               {:name=>"Worker", :type=>"SQS/HTTP", :version=>"1.0"},
-               {:name=>"WebServer", :type=>"Standard", :version=>"1.0"}
+               {:name=>"Worker", :type=>"SQS/HTTP"},
+               {:name=>"WebServer", :type=>"Standard"}
               ]
 
       def get_environment_attribute(app_name, env_name, attribute)
