@@ -55,7 +55,7 @@ class ErrorRaisingWrapper < SimpleDelegator
   end
 end
 
-class MiniTest::Unit::TestCase
+class MiniTest::Test
   def sample_file(file_name, content='s' * 100)
     path = File.join('/tmp', file_name)
     File.open(path, 'w') { |f| f << content }

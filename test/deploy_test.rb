@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DeployTest < MiniTest::Unit::TestCase
+class DeployTest < MiniTest::Test
   def setup
     @eb = ErrorRaisingWrapper.new(EBStub.new)
     @s3_driver = S3Stub.new
