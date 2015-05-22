@@ -1,6 +1,6 @@
 require 'rails/generators'
 require 'eb_deployer/default_config'
-require 'aws/elastic_beanstalk'
+require 'aws-sdk'
 require 'securerandom'
 
 module EbDeployer
@@ -59,7 +59,7 @@ YAML
       end
 
       def solution_stack_name
-        AWS::ElasticBeanstalk.new.client.list_available_solution_stacks[:solution_stacks].find do |s|
+        AWS::ElasticBeanstalk.Client.new.list_available_solution_stacks[:solution_stacks].find do |s|
           s =~ /Amazon Linux/ && s =~ /running Ruby 2.1 \(Passenger Standalone\)/
         end
       rescue

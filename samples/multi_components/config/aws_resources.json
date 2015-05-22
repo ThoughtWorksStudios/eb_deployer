@@ -42,6 +42,15 @@
               "Resource": "*"
             }]
           }
+        }, {
+          "PolicyName": "FullCloudWatch",
+          "PolicyDocument": {
+            "Statement": [ {
+              "Effect": "Allow",
+              "Action": ["cloudwatch:*"],
+              "Resource": "*"
+            }]
+          }
         }]
       }
     },

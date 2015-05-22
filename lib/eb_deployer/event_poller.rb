@@ -44,6 +44,7 @@ module EbDeployer
 
     def digest(event)
       return nil unless event
+      event = event.to_h if event.respond_to?(:to_h)
       JSON.dump(event)
     end
 

@@ -3,7 +3,7 @@ require 'set'
 require 'time'
 require 'json'
 require 'timeout'
-require 'aws-sdk-v1'
+require 'aws-sdk'
 require 'optparse'
 require 'erb'
 require 'fileutils'
@@ -171,11 +171,11 @@ module EbDeployer
   #   version_prefix is given, only removes version starting with the prefix.
   def self.deploy(opts)
     if region = opts[:region]
-      AWS.config(:region => region)
+      Aws.config.update(:region => region)
     end
 
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
-    bs = ThrottlingHandling.new(bs, AWS::ElasticBeanstalk::Errors::Throttling)
+    bs = ThrottlingHandling.new(bs, Aws::ElasticBeanstalk::Errors::Throttling)
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
 

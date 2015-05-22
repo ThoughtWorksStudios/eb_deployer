@@ -29,7 +29,7 @@ module EbDeployer
 
     def output(key)
       @cf_driver.query_output(@stack_name, key)
-    rescue AWS::CloudFormation::Errors::ValidationError => e
+    rescue Aws::CloudFormation::Errors::ValidationError
       raise ResourceNotInReadyState.new("Resource stack not in ready state yet, perhaps you should provision it first?")
     end
 

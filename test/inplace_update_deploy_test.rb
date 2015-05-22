@@ -80,15 +80,15 @@ class InplaceUpdateDeployTest < DeployTest
   end
 
   def test_deploy_should_raise_error_when_constantly_hitting_throttling_error
-    throttling_error = AWS::ElasticBeanstalk::Errors::Throttling.new("bang!")
+    throttling_error = Aws::ElasticBeanstalk::Errors::Throttling.new(nil, "bang!")
     @eb.set_error(:fetch_events, throttling_error)
-    assert_raises(AWS::ElasticBeanstalk::Errors::Throttling) do
+    assert_raises(Aws::ElasticBeanstalk::Errors::Throttling) do
       deploy(:application => 'simple', :environment => "production")
     end
   end
 
   def test_deploy_should_retry_on_temporary_throttling_error_from_fetch_events
-    throttling_error = AWS::ElasticBeanstalk::Errors::Throttling.new("bang!")
+    throttling_error = Aws::ElasticBeanstalk::Errors::Throttling.new(nil, "bang!")
     error_seq = [throttling_error] * 5
     @eb.set_error_generator(:fetch_events) do
       error_seq.pop
@@ -98,7 +98,7 @@ class InplaceUpdateDeployTest < DeployTest
   end
 
   def test_deploy_should_retry_on_temporary_throttling_error_from_create_env
-    throttling_error = AWS::ElasticBeanstalk::Errors::Throttling.new("bang!")
+    throttling_error = Aws::ElasticBeanstalk::Errors::Throttling.new(nil, "bang!")
     error_seq = [throttling_error] * 5
     @eb.set_error_generator(:create_environment) do
       error_seq.pop

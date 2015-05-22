@@ -2,11 +2,11 @@ module EbDeployer
   module AWSDriver
     class S3Driver
       def create_bucket(bucket_name)
-        buckets.create(bucket_name)
+        s3.create_bucket(:bucket => bucket_name)
       end
 
       def bucket_exists?(bucket_name)
-        buckets[bucket_name].exists?
+        s3.bucket(bucket_name).exists?
       end
 
       def object_length(bucket_name, obj_name)
@@ -15,16 +15,16 @@ module EbDeployer
 
       def upload_file(bucket_name, obj_name, file)
         o = obj(bucket_name, obj_name)
-        File.open(file, 'rb') { |f| o.write(f) }
+        o.upload_file(file)
       end
 
       private
       def s3
-        AWS::S3.new
+        Aws::S3::Resource.new(client: Aws::S3::Client.new)
       end
 
       def obj(bucket_name, obj_name)
-        buckets[bucket_name].objects[obj_name]
+        s3.bucket(bucket_name).object(obj_name)
       end
 
       def buckets

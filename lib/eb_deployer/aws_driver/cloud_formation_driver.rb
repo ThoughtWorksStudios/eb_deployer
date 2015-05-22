@@ -2,18 +2,27 @@ module EbDeployer
   module AWSDriver
     class CloudFormationDriver
 
+      def initialize
+        @client = Aws::CloudFormation::Client.new
+      end
+
       def stack_exists?(name)
-        stack(name).exists?
+        describe_stack(name)
+        true
+      rescue Aws::CloudFormation::Errors::ValidationError
+        false
       end
 
       def create_stack(name, template, opts)
-        cloud_formation.stacks.create(name, template, opts)
+        @client.create_stack(opts.merge(:stack_name => name,
+                                        :template_body => template))
       end
 
       def update_stack(name, template, opts)
         begin
-          stack(name).update(opts.merge(:template => template))
-        rescue AWS::CloudFormation::Errors::ValidationError => e
+          @client.update_stack(opts.merge(:stack_name => name,
+                                          :template_body => template))
+        rescue Aws::CloudFormation::Errors::ValidationError => e
           if e.message =~ /No updates are to be performed/
             log(e.message)
           else
@@ -23,22 +32,18 @@ module EbDeployer
       end
 
       def stack_status(name)
-        stack(name).status.downcase.to_sym
+        describe_stack(name)[:stack_status].downcase.to_sym
       end
 
       def query_output(name, key)
-        output = stack(name).outputs.find { |o| o.key == key }
-        output && output.value
+        output = describe_stack(name)[:outputs].find { |o| o[:output_key] == key }
+        output && output[:output_value]
       end
 
       private
 
-      def cloud_formation
-        AWS::CloudFormation.new
-      end
-
-      def stack(name)
-        cloud_formation.stacks[name]
+      def describe_stack(name)
+        @client.describe_stacks(:stack_name => name)[:stacks].first
       end
 
       def log(msg)

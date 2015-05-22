@@ -1,3 +1,3 @@
 module EbDeployer
-  VERSION = "0.5.1.beta3"
+  VERSION = "0.6.0.beta1"
 end

@@ -290,7 +290,7 @@ class CFStub
   end
 
   def query_output(name, key)
-    raise AWS::CloudFormation::Errors::ValidationError.new unless stack_exists?(name)
+    raise Aws::CloudFormation::Errors::ValidationError.new(nil, nil) unless stack_exists?(name)
     "value of #{key}"
   end
 

@@ -4,7 +4,7 @@ module EbDeployer
       include Utils
       attr_reader :client
 
-      def initialize(client=AWS::ElasticBeanstalk.new.client)
+      def initialize(client=Aws::ElasticBeanstalk::Client.new)
         @client = client
       end
 

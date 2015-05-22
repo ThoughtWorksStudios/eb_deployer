@@ -9,7 +9,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/ThoughtWorksStudios/eb_deployer"
   gem.license       = 'MIT'
 
-  gem.add_runtime_dependency 'aws-sdk-v1', '~> 1', '>= 1.61.0'
+  gem.add_runtime_dependency 'aws-sdk', '~> 2',  '>= 2.0.0'
 
   gem.files         = `git ls-files`.split($\).reject {|f| f =~ /^samples\// }
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
