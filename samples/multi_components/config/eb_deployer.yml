@@ -1,17 +1,17 @@
 # Applicaiton name,  can only contain any combination of uppercase letters, lowercase
 # letters, numbers, dashes (-)
-application: eb-deployer-java-multi-components
+application: eb-deployer-rmc
 
 # Common settings for all environments
 common:
   # Solution stack for elastic beanstalk, default is 64bit tomcat 7 for JAVA app
-  solution_stack_name: 64bit Amazon Linux 2015.03 v1.3.1 running Tomcat 8 Java 8
+  solution_stack_name: 64bit Amazon Linux 2015.03 v1.3.1 running Ruby 2.2 (Passenger Standalone)
 
   # Tier name for environments. Current supported values are WebServer and Worker
   # tier: WebServer
 
   # AWS region to deploy. Default to us-east-1
-  # region: us-west-1
+  region: us-east-1
 
   # There are two deployment strategies supported: blue-green and inplace-update.
   # Blue green keep two elastic beanstalk environments and always deploy to
@@ -79,6 +79,10 @@ common:
     - namespace: aws:autoscaling:launchconfiguration
       option_name: InstanceType
       value: t1.micro
+    - namespace: aws:autoscaling:launchconfiguration
+      option_name: EC2KeyName
+      value: <%= ENV['AWS_EC2_KEY_NAME'] %>
+
 
   # If resources specified, eb_deployer will use the CloudFormation
   # template you provide to create a default CloudFormation stack with
@@ -105,13 +109,6 @@ common:
 
 
   components:
-    - name: web
-      smoke_test: >
-        Timeout.timeout(600) do
-          until `curl http://#{host_name}`.include?('Hello, World')
-            sleep 5
-          end
-        end
     - name: bg
       tier: Worker
       strategy: inplace-update
@@ -121,6 +118,13 @@ common:
           value: background
       smoke_test: >
         puts 'TODO: should have a way to verify environment started!!!'
+    - name: web
+      smoke_test: >
+        Timeout.timeout(600) do
+          until `curl http://#{host_name}`.include?('Sinatra')
+            sleep 5
+          end
+        end
 
 
 # You can define environment here. Each environment can overriden any common settings

@@ -3,6 +3,11 @@
 
 * aws-sdk 2.0
 
+0.5.1
+=====
+
+* Fix issue: worker tier is picking up old version of aws-sqsd
+
 0.5.0
 =====
 

@@ -23,31 +23,58 @@
         },
         "Path": "/",
         "Policies": [ {
-          "PolicyName": "FullS3Access",
+          "PolicyName": "S3Access",
           "PolicyDocument": {
             "Statement": [
               {
                 "Effect": "Allow",
-                "Action": ["s3:*"],
+                "Action": [
+                  "s3:Get*",
+                  "s3:List*",
+                  "s3:PutObject"
+                ],
                 "Resource": "*"
               }
             ]
           }
         }, {
-          "PolicyName": "FullSQSAccess",
+          "PolicyName": "SQSAccess",
           "PolicyDocument": {
             "Statement": [ {
               "Effect": "Allow",
-              "Action": ["sqs:*"],
+              "Action": [
+                "sqs:ChangeMessageVisibility",
+                "sqs:DeleteMessage",
+                "sqs:ReceiveMessage",
+                "sqs:SendMessage"
+              ],
               "Resource": "*"
             }]
           }
         }, {
-          "PolicyName": "FullCloudWatch",
+          "PolicyName": "CloudWatchAccess",
           "PolicyDocument": {
             "Statement": [ {
               "Effect": "Allow",
-              "Action": ["cloudwatch:*"],
+              "Action": ["cloudwatch:PutMetricData"],
+              "Resource": "*"
+            }]
+          }
+        }, {
+          "PolicyName": "DynamoPeriodicTasks",
+          "PolicyDocument": {
+            "Statement": [ {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem"
+              ],
               "Resource": "*"
             }]
           }
