@@ -15,13 +15,15 @@ module EbDeployer
 
       def create_stack(name, template, opts)
         @client.create_stack(opts.merge(:stack_name => name,
-                                        :template_body => template))
+                                        :template_body => template,
+                                        :parameters => convert_parameters(opts[:parameters])))
       end
 
       def update_stack(name, template, opts)
         begin
           @client.update_stack(opts.merge(:stack_name => name,
-                                          :template_body => template))
+                                          :template_body => template,
+                                          :parameters => convert_parameters(opts[:parameters]))
         rescue Aws::CloudFormation::Errors::ValidationError => e
           if e.message =~ /No updates are to be performed/
             log(e.message)
@@ -48,6 +50,10 @@ module EbDeployer
 
       def log(msg)
         puts "[#{Time.now.utc}][cloud_formation_driver] #{msg}"
+      end
+
+      def convert_parameters(params)
+        params.map { |k, v| {:parameter_key => k, :parameter_value => v}}
       end
     end
   end
