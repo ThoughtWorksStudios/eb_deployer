@@ -23,7 +23,7 @@ module EbDeployer
         begin
           @client.update_stack(opts.merge(:stack_name => name,
                                           :template_body => template,
-                                          :parameters => convert_parameters(opts[:parameters]))
+                                          :parameters => convert_parameters(opts[:parameters])))
         rescue Aws::CloudFormation::Errors::ValidationError => e
           if e.message =~ /No updates are to be performed/
             log(e.message)
