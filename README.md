@@ -93,9 +93,15 @@ Take a look at code if you can not wait for the documentation.
 
 ## More
 
+[Automated zero downtime deployment to AWS Elastic Beanstalk for Rails with EbDeployer](http://helabs.com/blog/2015/05/19/automated-zero-downtime-deployment-to-aws-elastic-beanstalk-for-rails-with-eb-deployer/?utm_content=buffer12098&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer)
+
+[Deploy Service by EbDeployer](http://www.thoughtworks.com/mingle/infrastructure/2015/06/01/deploy-service-by-ebdeployer.html)
+
 [Rails 3/4 Support](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/Rails-3-Support)
 
 [EbDeployer environment](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/EbDeployer-environment)
+
+
 
 ## Contributing
 
