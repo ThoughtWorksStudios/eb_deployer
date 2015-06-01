@@ -101,6 +101,7 @@ Take a look at code if you can not wait for the documentation.
 
 [EbDeployer environment](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/EbDeployer-environment)
 
+AWS re:Invent 2013: [slideshare](http://www.slideshare.net/AmazonWebServices/aws-elastic-beanstalk-under-the-hood-dmg301-aws-reinvent-2013-28428616) and [video (starting at 27:46)](http://www.youtube.com/watch?v=U06-QLd4FL4)
 
 
 ## Contributing
