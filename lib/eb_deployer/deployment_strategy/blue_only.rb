@@ -1,8 +1,8 @@
 module EbDeployer
   module DeploymentStrategy
     class BlueOnly
-      def initialize(env)
-        @env = env
+      def initialize(component)
+        @component = component
       end
 
       def test_compatibility(env_create_options)
@@ -14,7 +14,7 @@ module EbDeployer
 
       def deploy(version_label, env_settings, inactive_settings=[])
         if !ebenvs.any?(&method(:active_ebenv?))
-          ebenv('a', @env.cname_prefix).
+          ebenv('a', @component.cname_prefix).
             deploy(version_label, env_settings)
           return
         end
@@ -27,7 +27,7 @@ module EbDeployer
 
       private
       def active_ebenv?(ebenv)
-        ebenv.cname_prefix == @env.cname_prefix
+        ebenv.cname_prefix == @component.cname_prefix
       end
 
       def ebenvs
@@ -35,11 +35,11 @@ module EbDeployer
       end
 
       def ebenv(suffix, cname_prefix=nil)
-        @env.new_eb_env(suffix, cname_prefix || inactive_cname_prefix)
+        @component.new_eb_env(suffix, cname_prefix || inactive_cname_prefix)
       end
 
       def inactive_cname_prefix
-        "#{@env.cname_prefix}-inactive"
+        "#{@component.cname_prefix}-inactive"
       end
     end
   end
