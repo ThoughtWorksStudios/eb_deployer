@@ -1,4 +1,4 @@
-# applicaiton name
+# application name
 application: <%= app_name %>
 
 # common settings for all environments

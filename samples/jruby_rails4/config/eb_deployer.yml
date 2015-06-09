@@ -1,4 +1,4 @@
-# applicaiton name
+# application name
 application: eb-deployer-sample-jruby-rails4
 
 # common settings for all environments

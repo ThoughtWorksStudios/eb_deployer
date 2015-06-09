@@ -1,4 +1,4 @@
-# Applicaiton name,  can only contain any combination of uppercase letters, lowercase
+# Application name, can only contain any combination of uppercase letters, lowercase
 # letters, numbers, dashes (-)
 application: eb-deployer-rmc
 
