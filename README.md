@@ -103,7 +103,8 @@ Take a look at code if you can not wait for the documentation.
 
 AWS re:Invent 2013: [slideshare](http://www.slideshare.net/AmazonWebServices/aws-elastic-beanstalk-under-the-hood-dmg301-aws-reinvent-2013-28428616) and [video (starting at 27:46)](http://www.youtube.com/watch?v=U06-QLd4FL4)
 
-
+[Papertrail Solution for Rails Applications on ElasticBeanstalk
+](http://www.thoughtworks.com/mingle/infrastructure/2015/06/10/simple-solution-for-papertrail-on-elasticbeanstalk.html)
 ## Contributing
 
 1. Fork it
