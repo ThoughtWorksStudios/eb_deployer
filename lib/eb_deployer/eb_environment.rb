@@ -61,6 +61,10 @@ module EbDeployer
       end
     end
 
+    def health_state
+      @bs.environment_health_state(@app, @name)
+    end
+
     private
 
     def configured_tier
