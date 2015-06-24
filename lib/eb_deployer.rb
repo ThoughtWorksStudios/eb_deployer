@@ -40,7 +40,9 @@ module EbDeployer
   #
   def self.query_resource_output(key, opts)
     if region = opts[:region]
-      AWS.config(:region => region)
+      Aws.config.update({
+        region: region
+      })
     end
     app = opts[:application]
     env_name = opts[:environment]
@@ -215,7 +217,7 @@ module EbDeployer
 
   def self.destroy(opts)
     if region = opts[:region]
-      AWS.config(:region => region)
+      Aws.config(:region => region)
     end
 
     app = opts[:application]
@@ -295,9 +297,10 @@ module EbDeployer
 
       opts.on("--debug", "Output AWS debug log") do |d|
         require 'logger'
+        require 'aws-sdk'
         logger = Logger.new($stdout)
         logger.level = Logger::DEBUG
-        AWS.config(:logger => logger)
+        Aws.config[:logger] = logger
       end
 
       opts.on("-h", "--help", "help")  do
