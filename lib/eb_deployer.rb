@@ -217,7 +217,7 @@ module EbDeployer
 
   def self.destroy(opts)
     if region = opts[:region]
-      Aws.config(:region => region)
+      Aws.config.update(:region => region)
     end
 
     app = opts[:application]
