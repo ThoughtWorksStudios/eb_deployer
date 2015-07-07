@@ -6,7 +6,7 @@ Low friction deployments should be a breeze. Elastic Beanstalk provides a great 
 
 EbDeployer thus allows you to do continuous delivery on AWS.
 
-[Introduction to EbDeployer](http://getmingle.io/scaling/2014/06/13/introduction-to-eb-deployer.html)
+[Deploy Service by EbDeployer](http://www.thoughtworks.com/mingle/infrastructure/2015/06/01/deploy-service-by-ebdeployer.html)
 
 ## Installation
 
@@ -100,6 +100,8 @@ Take a look at code if you can not wait for the documentation.
 [Rails 3/4 Support](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/Rails-3-Support)
 
 [EbDeployer environment](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/EbDeployer-environment)
+
+[Introduction to EbDeployer](http://getmingle.io/scaling/2014/06/13/introduction-to-eb-deployer.html)
 
 AWS re:Invent 2013: [slideshare](http://www.slideshare.net/AmazonWebServices/aws-elastic-beanstalk-under-the-hood-dmg301-aws-reinvent-2013-28428616) and [video (starting at 27:46)](http://www.youtube.com/watch?v=U06-QLd4FL4)
 
