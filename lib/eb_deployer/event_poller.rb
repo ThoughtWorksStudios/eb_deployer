@@ -1,6 +1,7 @@
 module EbDeployer
   class EventPoller
     include Utils
+    POLL_INTERVAL = 15
 
     def initialize(event_source)
       @event_source = event_source
@@ -14,7 +15,7 @@ module EbDeployer
       handled = Set.new
       loop do
         @event_source.fetch_events(from_anchor) do |events|
-          # events from api is latest first order
+          # events from event source is latest first order
           to_be_handled = []
           reached_anchor = false
 
@@ -35,7 +36,7 @@ module EbDeployer
 
           !reached_anchor
         end
-        sleep 15
+        sleep POLL_INTERVAL
       end
     end
 

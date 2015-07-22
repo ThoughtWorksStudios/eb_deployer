@@ -13,6 +13,7 @@ ensure
 end
 
 silence_warnings { EbDeployer::Utils::BACKOFF_INITIAL_SLEEP = 0 }
+silence_warnings { EbDeployer::EventPoller::POLL_INTERVAL = 0 }
 
 class ErrorRaisingWrapper < SimpleDelegator
   def initialize(stub)

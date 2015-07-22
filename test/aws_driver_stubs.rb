@@ -271,6 +271,8 @@ end
 class CFStub
   def initialize
     @stacks = {}
+    @events = {}
+    @event_fetch_counter = 0;
   end
 
   def create_stack(name, template, opts)
@@ -296,5 +298,37 @@ class CFStub
 
   def stack_config(name)
     @stacks[name][:opts]
+  end
+
+  def set_events(name, *messages)
+    events_seq = []
+    messages.each do |messages_for_call_seq|
+      if old_events = events_seq.last
+        events_seq << generate_event_from_messages(name, messages_for_call_seq) + old_events
+      else
+        events_seq << generate_event_from_messages(name, messages_for_call_seq)
+      end
+    end
+    @events[name] = events_seq
+  end
+
+  def fetch_events(name, opts={})
+    @event_fetch_counter += 1
+    if es = @events[name]
+      return es[@event_fetch_counter - 1], nil
+    else
+      return generate_event_from_messages(name, ["UPDATE_COMPLETE"]), nil
+    end
+  end
+
+  private
+
+  def generate_event_from_messages(stack, messages)
+    messages.map do |message|
+      event = OpenStruct.new(timestamp: Time.now,
+                             resource_type: 'AWS::CloudFormation::Stack',
+                             logical_resource_id: stack,
+                             resource_status: message)
+    end.reverse
   end
 end

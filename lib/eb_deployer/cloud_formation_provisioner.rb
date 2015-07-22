@@ -3,12 +3,13 @@ module EbDeployer
   end
 
   class CloudFormationProvisioner
-    SUCCESS_STATS = [:create_complete, :update_complete, :update_rollback_complete]
-    FAILED_STATS = [:create_failed, :update_failed]
+    SUCCESS_STATS = ["CREATE_COMPLETE", "UPDATE_COMPLETE"]
+    FAILED_STATS = ["CREATE_FAILED", "UPDATE_FAILED"]
 
     def initialize(stack_name, cf_driver)
       @stack_name = stack_name
       @cf_driver = cf_driver
+      @poller = EventPoller.new(CfEventSource.new(@stack_name, @cf_driver))
     end
 
     def provision(resources)
@@ -16,8 +17,24 @@ module EbDeployer
       template = File.read(resources[:template])
       capabilities = resources[:capabilities] || []
       params = resources[:inputs] || resources[:parameters] || {}
-      stack_exists? ? update_stack(template, params, capabilities) : create_stack(template, params, capabilities)
-      wait_for_stack_op_terminate
+      anchor = nil
+      begin
+        if stack_exists?
+          anchor = @poller.get_anchor
+          update_stack(template, params, capabilities)
+        else
+          create_stack(template, params, capabilities)
+        end
+      rescue Aws::CloudFormation::Errors::ValidationError => e
+        if e.message =~ /No updates are to be performed/
+          log(e.message)
+          return
+        else
+          raise
+        end
+      end
+      wait_for_stack_op_terminate(anchor)
+      log("Resource stack provisioned successfully")
     end
 
     def transform_outputs(resources)
@@ -65,10 +82,6 @@ module EbDeployer
                               :parameters => params)
     end
 
-    def stack_status
-      @cf_driver.stack_status(@stack_name)
-    end
-
     def transform_output_to_settings(transforms)
       (transforms || []).inject([]) do |settings, pair|
         key, transform = pair
@@ -77,15 +90,21 @@ module EbDeployer
       end.flatten
     end
 
-    def wait_for_stack_op_terminate
-      stats = stack_status
-      while !SUCCESS_STATS.include?(stats)
-        sleep 15
-        stats = stack_status
-        raise "Resource stack update failed!" if FAILED_STATS.include?(stats)
-        log "current status: #{stack_status}"
+    def wait_for_stack_op_terminate(anchor)
+      @poller.poll(anchor) do |event|
+        log_event(event)
+        if FAILED_STATS.include?(event.resource_status)
+          raise "Resource stack update failed!"
+        end
+
+        break if event.logical_resource_id == @stack_name && SUCCESS_STATS.include?(event.resource_status)
       end
     end
+
+    def log_event(event)
+      puts "[#{event.timestamp}][cloud_formation_provisioner] #{event.resource_type}(#{event.logical_resource_id}) #{event.resource_status} \"#{event.resource_status_reason}\""
+    end
+
 
     def log(msg)
       puts "[#{Time.now.utc}][cloud_formation_provisioner] #{msg}"

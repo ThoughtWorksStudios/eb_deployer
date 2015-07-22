@@ -20,26 +20,19 @@ module EbDeployer
       end
 
       def update_stack(name, template, opts)
-        begin
-          @client.update_stack(opts.merge(:stack_name => name,
-                                          :template_body => template,
-                                          :parameters => convert_parameters(opts[:parameters])))
-        rescue Aws::CloudFormation::Errors::ValidationError => e
-          if e.message =~ /No updates are to be performed/
-            log(e.message)
-          else
-            raise
-          end
-        end
-      end
-
-      def stack_status(name)
-        describe_stack(name)[:stack_status].downcase.to_sym
+        @client.update_stack(opts.merge(:stack_name => name,
+                                        :template_body => template,
+                                        :parameters => convert_parameters(opts[:parameters])))
       end
 
       def query_output(name, key)
         output = describe_stack(name)[:outputs].find { |o| o[:output_key] == key }
         output && output[:output_value]
+      end
+
+      def fetch_events(name, options={})
+        response = @client.describe_stack_events(options.merge(:stack_name => name))
+        return response.stack_events, response.next_token
       end
 
       private

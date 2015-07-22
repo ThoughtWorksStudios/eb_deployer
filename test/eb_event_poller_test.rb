@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EventPollerTest < Test::Unit::TestCase
+class EbEventPollerTest < Test::Unit::TestCase
   def setup
     @eb = EBStub.new
     @poller = EbDeployer::EventPoller.new(EbDeployer::EbEventSource.new("myapp", "test", @eb))
