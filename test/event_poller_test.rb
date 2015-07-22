@@ -3,7 +3,7 @@ require 'test_helper'
 class EventPollerTest < Test::Unit::TestCase
   def setup
     @eb = EBStub.new
-    @poller = EbDeployer::EventPoller.new("myapp", "test", @eb)
+    @poller = EbDeployer::EventPoller.new(EbDeployer::EbEventSource.new("myapp", "test", @eb))
   end
 
   def test_run_handle_block_through_all_events_when_there_is_no_from_anchor

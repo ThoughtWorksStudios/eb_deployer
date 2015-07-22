@@ -155,7 +155,7 @@ module EbDeployer
     end
 
     def event_poller
-      @event_poller || EventPoller.new(@app, @name, @bs)
+      @event_poller || EventPoller.new(EbEventSource.new(@app, @name, @bs))
     end
 
     def default_create_options
