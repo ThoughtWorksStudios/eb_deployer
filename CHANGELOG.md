@@ -3,6 +3,7 @@
 
 * Use aws-sdk 2.0
 * Ruby 2.2 support
+* Robust error handling on CloudFormation resource stack provisioning
 
 0.5.1
 =====
