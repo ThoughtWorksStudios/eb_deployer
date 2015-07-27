@@ -173,6 +173,19 @@ YAML
                     'value' => '0'}], config[:inactive_settings])
   end
 
+  def test_access_environment_name_in_config_yml_file
+    config = @loader.load(generate_input(<<-YAML, :environment => 'dev'))
+application: myapp
+common:
+  resources:
+    inputs:
+      env: <%= environment %>
+environments:
+  dev:
+  production:
+YAML
+    assert_equal('dev', config[:resources]['inputs']['env'])
+  end
 
   private
 

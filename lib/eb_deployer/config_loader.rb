@@ -7,16 +7,14 @@ module EbDeployer
     include Utils
 
     class EvalBinding
-      def initialize(package_digest)
+      attr_reader :environment, :package_digest
+      def initialize(package_digest, env)
         @package_digest = package_digest
+        @environment = env
       end
 
       def random_hash
         SecureRandom.hex[0..9]
-      end
-
-      def package_digest
-        @package_digest
       end
     end
 
@@ -24,7 +22,9 @@ module EbDeployer
       options = options.dup
       package_digest = package_digest(options[:package])
       config_file = options.delete(:config_file)
-      config_settings = load_config_settings(config_file, package_digest)
+
+      env = options[:environment]
+      config_settings = load_config_settings(config_file, package_digest, env)
 
       app_name = config_settings[:application]
 
@@ -32,7 +32,6 @@ module EbDeployer
       common_settings[:version_label] ||= package_digest
 
       envs = config_settings[:environments]
-      env = options[:environment]
       raise "Environment #{env} is not defined in #{config_file}" unless envs.has_key?(env)
       env_settings = symbolize_keys(envs[env] || {})
       env_option_settings = env_settings.delete(:option_settings) || []
@@ -46,13 +45,14 @@ module EbDeployer
 
     private
 
-    def load_config_settings(config_file, package_digest)
-      yaml = ERB.new(File.read(config_file)).result(eval_binding(package_digest))
+    def load_config_settings(config_file, package_digest, env)
+      yaml = ERB.new(File.read(config_file)).
+             result(eval_binding(package_digest, env))
       symbolize_keys(YAML.load(yaml))
     end
 
-    def eval_binding(package_digest)
-      EvalBinding.new(package_digest).instance_eval { binding }
+    def eval_binding(package_digest, env)
+      EvalBinding.new(package_digest, env).instance_eval { binding }
     end
 
     def package_digest(package)

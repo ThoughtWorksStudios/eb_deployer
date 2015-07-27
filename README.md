@@ -91,6 +91,16 @@ Later tutorials coming soon will cover
 
 Take a look at code if you can not wait for the documentation.
 
+### eb_deploy.yml configuration file
+
+Like Rails database.yml file, EbDeployer will read eb_deploy.yml file as ERB template file. So you can trade it as standard ERB template file, and substitute Ruby script.
+
+By default, EbDeployer provides the following methods:
+
+1. random_hash: it basically is `SecureRandom.hex[0..9]`
+2. package_digest: it is your eb package file digest
+3. environment: environment name you passed in when executing eb_deploy script.
+
 ## More
 
 [Automated zero downtime deployment to AWS Elastic Beanstalk for Rails with EbDeployer](http://helabs.com/blog/2015/05/19/automated-zero-downtime-deployment-to-aws-elastic-beanstalk-for-rails-with-eb-deployer/?utm_content=buffer12098&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer)
@@ -117,4 +127,3 @@ AWS re:Invent 2013: [slideshare](http://www.slideshare.net/AmazonWebServices/aws
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ThoughtWorksStudios/eb_deployer/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
