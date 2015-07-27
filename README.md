@@ -93,13 +93,19 @@ Take a look at code if you can not wait for the documentation.
 
 ### eb_deploy.yml configuration file
 
-Like Rails database.yml file, EbDeployer will read eb_deploy.yml file as ERB template file. So you can trade it as standard ERB template file, and substitute Ruby script.
+Like Rails database.yml file, EbDeployer will read eb_deploy.yml file as ERB template file. So you can trade it as standard ERB template file, and substitute Ruby script. For example, the following eb_deployer.yml file partial configures DBPassword parameter for your CloudFormation template from an environment variable:
 
-By default, EbDeployer provides the following methods:
+    resources:
+      template: config/my_rds.json
+      inputs:
+        DBPassword: <%= ENV['MYDBPASSWORD'] %>
+
+
+EbDeployer also provides the following help methods for convenience:
 
 1. random_hash: it basically is `SecureRandom.hex[0..9]`
 2. package_digest: it is your eb package file digest
-3. environment: environment name you passed in when executing eb_deploy script.
+3. environment: environment name you passed in when executing eb_deploy script using -e option.
 
 ## More
 
