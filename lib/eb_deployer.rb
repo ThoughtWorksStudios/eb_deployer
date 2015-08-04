@@ -95,7 +95,7 @@ module EbDeployer
   #   will terminate the old elastic beanstalk environment and recreate on
   #   deploy. For blue-green deployment it terminate the inactive environment
   #   first then recreate it. This is useful to avoiding configuration drift and
-  #   accumulating state on the EC2 instances. Also it has the benifit of keeping
+  #   accumulating state on the EC2 instances. Also it has the benefit of keeping
   #   your EC2 instance system package upto date, because everytime EC2 instance
   #   boot up from AMI it does a system update.
   #
