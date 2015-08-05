@@ -39,6 +39,13 @@ class BlueGreenDeployTest < DeployTest
                   'simple-production-inactive.elasticbeanstalk.com'], smoked_host
   end
 
+  def test_blue_green_deploy_should_blue_green_terminate_inactive_env_if_blue_green_terminate_inactive_is_enabled
+    do_deploy(42, :blue_green_terminate_inactive => true, :blue_green_terminate_inactive_wait => 1, :blue_green_terminate_inactive_sleep => 1)
+    do_deploy(43, :blue_green_terminate_inactive => true, :blue_green_terminate_inactive_wait => 0, :blue_green_terminate_inactive_sleep => 0)
+
+    inactive_env = t('production-a', 'simple')
+    assert_equal [inactive_env], @eb.environments_been_deleted('simple')
+  end
 
   def test_blue_green_deployment_should_delete_and_recreate_inactive_env_if_phoenix_mode_is_enabled
     do_deploy(42, :phoenix_mode => true)

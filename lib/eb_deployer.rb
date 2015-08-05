@@ -40,7 +40,7 @@ module EbDeployer
   #
   def self.query_resource_output(key, opts)
     if region = opts[:region]
-      AWS.config(:region => region)
+      Aws.config.update({:region => region})
     end
     app = opts[:application]
     env_name = opts[:environment]
@@ -181,6 +181,7 @@ module EbDeployer
 
     app_name = opts[:application]
     env_name = opts[:environment]
+    @opts = {:foo => "bar"}
     version_prefix = opts[:version_prefix].to_s.strip
     version_label = "#{version_prefix}#{opts[:version_label].to_s.strip}"
 
@@ -200,6 +201,9 @@ module EbDeployer
         :cname_prefix =>  opts[:cname_prefix],
         :smoke_test => opts[:smoke_test],
         :phoenix_mode => opts[:phoenix_mode],
+        :blue_green_terminate_inactive => opts[:blue_green_terminate_inactive] || false,
+        :blue_green_terminate_inactive_wait => opts[:blue_green_terminate_inactive_wait] || 600,
+        :blue_green_terminate_inactive_sleep => opts[:blue_green_terminate_inactive_sleep] || 15,
         :tags => opts[:tags],
         :tier => opts[:tier]
       }
@@ -215,7 +219,7 @@ module EbDeployer
 
   def self.destroy(opts)
     if region = opts[:region]
-      AWS.config(:region => region)
+      Aws.config.update({:region => region})
     end
 
     app = opts[:application]
@@ -297,7 +301,7 @@ module EbDeployer
         require 'logger'
         logger = Logger.new($stdout)
         logger.level = Logger::DEBUG
-        AWS.config(:logger => logger)
+        Aws.config.update({:logger => logger})
       end
 
       opts.on("-h", "--help", "help")  do

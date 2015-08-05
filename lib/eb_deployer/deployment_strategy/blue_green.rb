@@ -6,13 +6,16 @@ module EbDeployer
       end
 
       def test_compatibility(env_create_options)
+        @create_opts = env_create_options
         tier = env_create_options[:tier]
+
         if tier && tier.downcase == 'worker'
           raise "Blue green deployment is not supported for Worker tier"
         end
       end
 
       def deploy(version_label, env_settings, inactive_settings=[])
+
         if !ebenvs.any?(&method(:active_ebenv?))
           ebenv('a', @component.cname_prefix).
             deploy(version_label, env_settings)
@@ -24,7 +27,32 @@ module EbDeployer
 
         inactive_ebenv.deploy(version_label, env_settings)
         active_ebenv.swap_cname_with(inactive_ebenv)
-        unless inactive_settings.empty?
+
+        blue_green_terminate_inactive       = @create_opts[:blue_green_terminate_inactive]
+        blue_green_terminate_inactive_wait  = @create_opts[:blue_green_terminate_inactive_wait]
+        blue_green_terminate_inactive_sleep = @create_opts[:blue_green_terminate_inactive_sleep]
+
+        if blue_green_terminate_inactive
+          active_ebenv.log("Waiting #{blue_green_terminate_inactive_wait}s before terminating environment...")
+
+          # Loop until timeout reached or environment becomes Red
+          count = 0
+          loop do
+            break if count >= blue_green_terminate_inactive_wait or inactive_ebenv.health_state != 'Green'
+            sleep blue_green_terminate_inactive_sleep
+            count += blue_green_terminate_inactive_sleep
+          end
+
+          if inactive_ebenv.health_state == 'Green'
+            active_ebenv.log("Active environment healthy, terminating inactive (black) environment")
+            active_ebenv.terminate
+          else
+            active_ebenv.log("Active environment changed state to unhealthy. Existing (black) environment will not be terminated")
+          end
+
+        end
+
+        unless inactive_settings.empty? || blue_green_terminate_inactive
           active_ebenv.log("applying inactive settings...")
           active_ebenv.apply_settings(inactive_settings)
         end
