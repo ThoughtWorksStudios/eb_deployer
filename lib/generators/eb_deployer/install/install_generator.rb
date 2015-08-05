@@ -59,7 +59,7 @@ YAML
       end
 
       def solution_stack_name
-        AWS::ElasticBeanstalk.Client.new.list_available_solution_stacks[:solution_stacks].find do |s|
+        Aws::ElasticBeanstalk.Client.new.list_available_solution_stacks[:solution_stacks].find do |s|
           s =~ /Amazon Linux/ && s =~ /running Ruby 2.1 \(Passenger Standalone\)/
         end
       rescue

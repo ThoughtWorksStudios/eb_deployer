@@ -204,6 +204,9 @@ module EbDeployer
         :cname_prefix =>  opts[:cname_prefix],
         :smoke_test => opts[:smoke_test],
         :phoenix_mode => opts[:phoenix_mode],
+        :blue_green_terminate_inactive => opts[:blue_green_terminate_inactive] || false,
+        :blue_green_terminate_inactive_wait => opts[:blue_green_terminate_inactive_wait] || 600,
+        :blue_green_terminate_inactive_sleep => opts[:blue_green_terminate_inactive_sleep] || 15,
         :tags => opts[:tags],
         :tier => opts[:tier]
       }
@@ -302,7 +305,7 @@ module EbDeployer
         require 'aws-sdk'
         logger = Logger.new($stdout)
         logger.level = Logger::DEBUG
-        Aws.config[:logger] = logger
+        Aws.config.update(:logger => logger)
       end
 
       opts.on("-h", "--help", "help")  do

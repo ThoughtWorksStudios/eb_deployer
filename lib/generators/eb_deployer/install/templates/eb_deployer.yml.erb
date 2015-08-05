@@ -37,6 +37,21 @@ common:
   # you override it to 'on' for production environment.
   # phoenix_mode: false
 
+  # Terminates the inactive stack upon successful blue-green deployment.
+  # This is useful if you require HA deployment but don't want the cost of running
+  # a stack that is not in use. See https://github.com/ThoughtWorksStudios/eb_deployer/pull/44/
+  # for other strategies that can be employed.
+  # Note: As EB Deployer uses DNS to switch between stacks, this should be used only if you
+  #       both put in a sufficient wait period and accept the risk that traffic may still be
+  #       going to the inactive stack when it is terminated, due to client DNS caching, for example.
+  #blue_green_terminate_inactive: false
+
+  # How long to wait before terminating the inactive stack if 'blue_green_terminate_inactive' is set to true.
+  #blue_green_terminate_inactive_wait: 600
+
+  # How often to check for changes to the inactive stack during the 'blue_green_terminate_inactive_wait' period.
+  #blue_green_terminate_inactive_sleep: 15
+
   # Specifies the maximum number of versions to keep. Older versions are removed
   # and deleted from the S3 source bucket as well. If specified as zero or not
   # specified, all versions will be kept.  If a version_prefix is given, only removes
