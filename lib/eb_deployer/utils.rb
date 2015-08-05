@@ -4,7 +4,7 @@ module EbDeployer
 
     # A util deal with throttling exceptions
     # example:
-    #  backoff(AWS::EC2::Errors::RequestLimitExceeded) do
+    #  backoff(Aws::EC2::Errors::RequestLimitExceeded) do
     #     ...
     #  end
     def backoff(error_class, retry_limit=9, &block)

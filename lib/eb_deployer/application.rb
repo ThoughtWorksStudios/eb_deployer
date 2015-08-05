@@ -68,9 +68,9 @@ module EbDeployer
         begin
           log("Removing #{version}")
           @eb_driver.delete_application_version(@name, version, delete_from_s3)
-        rescue AWS::ElasticBeanstalk::Errors::SourceBundleDeletionFailure => e
+        rescue Aws::ElasticBeanstalk::Errors::SourceBundleDeletionFailure => e
           log(e.message)
-        rescue AWS::ElasticBeanstalk::Errors::OperationInProgressFailure => e
+        rescue Aws::ElasticBeanstalk::Errors::OperationInProgressFailure => e
           log(e.message)
         end
       end
