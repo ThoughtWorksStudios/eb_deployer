@@ -171,7 +171,7 @@ module EbDeployer
   #   version_prefix is given, only removes version starting with the prefix.
   def self.deploy(opts)
     if region = opts[:region]
-      Aws.config.update(:region => region)
+      Aws.config.update({:region => region})
     end
 
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
