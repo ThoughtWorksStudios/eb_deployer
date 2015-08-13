@@ -124,7 +124,7 @@ Co-presented session with Amazon ElasticBeanstalk team at AWS re:Invent 2013: [s
 [Papertrail Solution for Rails Applications on ElasticBeanstalk
 ](http://www.thoughtworks.com/mingle/infrastructure/2015/06/10/simple-solution-for-papertrail-on-elasticbeanstalk.html)
 
-[Elastic Beanstalk Tips and Tricks](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/Elastic-Beanstalk-Tips-and-Tricks)
+[Elastic Beanstalk Tips and Tricks](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/Elastic-Beanstalk-Tips-and-Tricks) (* recommended to read )
 
 ## Contributing
 
