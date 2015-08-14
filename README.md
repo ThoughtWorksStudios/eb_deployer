@@ -4,8 +4,6 @@
 
 Low friction deployments should be a breeze. Elastic Beanstalk provides a great foundation for performing Blue-Green deployments, and EbDeployer add a missing link to automate the whole flow out of box.
 
-EbDeployer thus allows you to do continuous delivery on AWS.
-
 [Deploy Service by EbDeployer](http://www.thoughtworks.com/mingle/infrastructure/2015/06/01/deploy-service-by-ebdeployer.html)
 
 ## Installation
