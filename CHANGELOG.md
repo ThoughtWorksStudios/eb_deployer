@@ -1,3 +1,8 @@
+0.6.3
+=====
+
+* Wait until inactive environment status is ready before applying settings.
+
 0.6.0
 =====
 
