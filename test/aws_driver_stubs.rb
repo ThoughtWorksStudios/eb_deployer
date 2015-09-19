@@ -161,6 +161,10 @@ class EBStub
     set_env_ready(app_name, env2_name, false)
   end
 
+  def environment_status(app_name, env_name)
+    'ready'
+  end
+
   def environment_health_state(app_name, env_name)
     'Green'
   end

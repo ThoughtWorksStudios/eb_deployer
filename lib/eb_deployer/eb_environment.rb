@@ -33,6 +33,7 @@ module EbDeployer
 
     def apply_settings(settings)
       raise "Env #{self.name} not exists for applying settings" unless @bs.environment_exists?(@app, @name)
+      wait_for_env_status_to_be_ready
       with_polling_events(/Environment update completed successfully/i) do
         @bs.update_environment_settings(@app, @name, settings)
       end
@@ -141,6 +142,20 @@ module EbDeployer
       tags.inject([]) do |arr, (k, v)|
         arr << {:key => k, :value => v}
         arr
+      end
+    end
+
+    def wait_for_env_status_to_be_ready
+      Timeout.timeout(600) do
+        current_status = @bs.environment_status(@app, @name)
+
+        while current_status.downcase != 'ready'
+          log("Environment status: #{current_status}")
+          sleep 15
+          current_status = @bs.environment_status(@app, @name)
+        end
+
+        log("Environment status: #{current_status}")
       end
     end
 
