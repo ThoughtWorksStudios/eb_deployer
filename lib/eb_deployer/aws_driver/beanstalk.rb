@@ -104,6 +104,10 @@ module EbDeployer
         get_environment_attribute(app_name, env_name, :health)
       end
 
+      def environment_status(app_name, env_name)
+        get_environment_attribute(app_name, env_name, :status)
+      end
+
       def environment_verion_label(app_name, env_name)
         get_environment_attribute(app_name, env_name, :version_label)
       end
