@@ -91,7 +91,7 @@ module EbDeployer
 
       def environment_cname_prefix(app_name, env_name)
         cname = environment_cname(app_name, env_name)
-        region = Aws.config[:region]
+        region = Aws.config[:region].downcase
         if cname =~ /^(.+?)(\.#{region})?\.elasticbeanstalk\.com/
           $1
         end
