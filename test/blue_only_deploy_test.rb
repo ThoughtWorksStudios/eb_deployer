@@ -36,9 +36,9 @@ class BlueOnlyDeployTest < DeployTest
       do_deploy(version_label, :smoke_test => smoke_test)
     end
 
-    assert_equal ['simple-production.elasticbeanstalk.com',
-                  'simple-production-inactive.elasticbeanstalk.com',
-                  'simple-production-inactive.elasticbeanstalk.com'], smoked_host
+    assert_equal ['simple-production.us-west-1.elasticbeanstalk.com',
+                  'simple-production-inactive.us-west-1.elasticbeanstalk.com',
+                  'simple-production-inactive.us-west-1.elasticbeanstalk.com'], smoked_host
   end
 
 

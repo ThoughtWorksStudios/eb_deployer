@@ -145,7 +145,7 @@ class EBStub
   def environment_cname(app_name, env_name)
     return unless @envs[env_key(app_name, env_name)]
     if cname_prefix = environment_cname_prefix(app_name, env_name)
-      cname_prefix + ".elasticbeanstalk.com"
+      cname_prefix + ".us-west-1.elasticbeanstalk.com"
     end
   end
 

@@ -91,7 +91,7 @@ module EbDeployer
 
       def environment_cname_prefix(app_name, env_name)
         cname = environment_cname(app_name, env_name)
-        if cname =~ /^(.+)\.elasticbeanstalk\.com/
+        if cname =~ /^([^\.]+)(?:\.(?:[a-z0-9\-]+))?\.elasticbeanstalk\.com/i
           $1
         end
       end

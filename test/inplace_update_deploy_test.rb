@@ -53,7 +53,7 @@ class InplaceUpdateDeployTest < DeployTest
            :cname_prefix => 'foobar',
            :smoke_test => lambda { |host| host_for_smoke_test = host },
            :version_label => 42)
-    assert_equal 'foobar.elasticbeanstalk.com', host_for_smoke_test
+    assert_equal 'foobar.us-west-1.elasticbeanstalk.com', host_for_smoke_test
 
     host_for_smoke_test = nil
     deploy(:application => 'simple',
@@ -62,7 +62,7 @@ class InplaceUpdateDeployTest < DeployTest
            :smoke_test => lambda { |host| host_for_smoke_test = host },
            :version_label => 43)
 
-    assert_equal 'foobar.elasticbeanstalk.com', host_for_smoke_test
+    assert_equal 'foobar.us-west-1.elasticbeanstalk.com', host_for_smoke_test
   end
 
   def test_should_terminate_old_environment_if_phoenix_mode_is_enabled
