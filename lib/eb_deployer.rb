@@ -204,6 +204,7 @@ module EbDeployer
         :cname_prefix =>  opts[:cname_prefix],
         :smoke_test => opts[:smoke_test],
         :phoenix_mode => opts[:phoenix_mode],
+        :accepted_healthy_states => opts[:accepted_healthy_states],
         :blue_green_terminate_inactive => opts[:blue_green_terminate_inactive] || false,
         :blue_green_terminate_inactive_wait => opts[:blue_green_terminate_inactive_wait] || 600,
         :blue_green_terminate_inactive_sleep => opts[:blue_green_terminate_inactive_sleep] || 15,

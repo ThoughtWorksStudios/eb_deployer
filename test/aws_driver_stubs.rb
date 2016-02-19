@@ -7,6 +7,7 @@ class EBStub
     @envs_been_deleted = {}
     @versions_deleted = {}
     @event_fetched_times = 0
+    @envs_health_states = {}
   end
 
   def create_application(app)
@@ -166,7 +167,7 @@ class EBStub
   end
 
   def environment_health_state(app_name, env_name)
-    'Green'
+    @envs_health_states.fetch(app_name+env_name, 'Green')
   end
 
   def environment_verion_label(app_name, env_name)
@@ -178,6 +179,11 @@ class EBStub
   end
 
   #test only
+
+  def mark_env_health_state_as(app_name, env_name, state)
+    @envs_health_states[app_name+env_name] = state
+  end
+
   def mark_all_envs_ready
     @envs.values.each { |env| set_env_ready(env[:application], env[:name], true) }
   end
