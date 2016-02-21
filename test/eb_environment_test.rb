@@ -103,6 +103,7 @@ class EbEnvironmentTest < Test::Unit::TestCase
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, :accepted_healthy_states => ["Green", "Yellow"])
     @eb_driver.mark_env_health_state_as("myapp", env.name, "Yellow")
     env.deploy("version1")
+    assert @eb_driver.environment_exists?('myapp', t('production', 'myapp'))
   end
 
 end
