@@ -91,6 +91,11 @@ module EbDeployer
   #   For all available options take a look at
   #   http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
   #
+  # @option opts [Symbol] :accepted_healthy_states (['Green']) If :accepted_healthy_states
+  #   is specified, EBDeployer will accept provided values when checking
+  #   health of an environment instead of default value 'Green'. You can use it
+  #   to specify additional healthy states, for example: ['Green', "Yellow"]
+  #
   # @option opts [Symbol] :phoenix_mode (false) If phoenix mode is turn on, it
   #   will terminate the old elastic beanstalk environment and recreate on
   #   deploy. For blue-green deployment it terminate the inactive environment
