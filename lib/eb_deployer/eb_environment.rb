@@ -16,6 +16,7 @@ module EbDeployer
       @name = self.class.unique_ebenv_name(name, app)
       @bs = eb_driver
       @creation_opts = default_create_options.merge(reject_nil(creation_opts))
+      @accepted_healthy_states = @creation_opts[:accepted_healthy_states]
     end
 
     def deploy(version_label, settings={})
@@ -162,8 +163,7 @@ module EbDeployer
     def wait_for_env_become_healthy
       Timeout.timeout(600) do
         current_health_status = @bs.environment_health_state(@app, @name)
-
-        while current_health_status != 'Green'
+        while !@accepted_healthy_states.include?(current_health_status)
           log("health status: #{current_health_status}")
           sleep 15
           current_health_status = @bs.environment_health_state(@app, @name)
@@ -181,7 +181,8 @@ module EbDeployer
       {
         :solution_stack => "64bit Amazon Linux 2014.09 v1.1.0 running Tomcat 7 Java 7",
         :smoke_test =>  Proc.new {},
-        :tier => 'WebServer'
+        :tier => 'WebServer',
+        :accepted_healthy_states => ['Green']
       }
     end
 
