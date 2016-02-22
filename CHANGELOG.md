@@ -1,3 +1,13 @@
+0.6.5
+=====
+
+* #66: Making it possible to specify other accepted health states when deploying (@dziemid)
+
+0.6.4
+=====
+
+* fixes #65 - aws driver should be able to detect CNAME prefixes from both regionalized and legacy EB domains
+
 0.6.3
 =====
 
