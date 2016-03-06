@@ -1,3 +1,8 @@
+0.6.6
+=====
+
+* Add support for specifying (and overriding) a [stack policy](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html) for the CloudFormation resource stack
+
 0.6.5
 =====
 
