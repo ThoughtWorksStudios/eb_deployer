@@ -178,6 +178,9 @@ module EbDeployer
   #   keep.  Older versions are removed and deleted from the S3 source bucket as well.
   #   If specified as zero or not specified, all versions will be kept.  If a
   #   version_prefix is given, only removes version starting with the prefix.
+  #
+  # @option opts [Symbol] :template_name. Specifies the environement template you wish
+  #   to use to build your environment.
   def self.deploy(opts)
     if region = opts[:region]
       Aws.config.update(:region => region)
@@ -205,6 +208,7 @@ module EbDeployer
       env.settings = opts[:option_settings] || opts[:settings] || []
       env.inactive_settings = opts[:inactive_settings] || []
       env.creation_opts = {
+        :template_name => opts[:template_name],
         :solution_stack => opts[:solution_stack_name],
         :cname_prefix =>  opts[:cname_prefix],
         :smoke_test => opts[:smoke_test],
