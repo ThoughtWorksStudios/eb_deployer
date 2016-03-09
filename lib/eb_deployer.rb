@@ -56,7 +56,7 @@ module EbDeployer
 
 
   #
-  # Deploy a package to specfied environments on elastic beanstalk
+  # Deploy a package to specified environments on elastic beanstalk
   #
   # @param [Hash] opts
   #
@@ -101,7 +101,7 @@ module EbDeployer
   #   deploy. For blue-green deployment it terminate the inactive environment
   #   first then recreate it. This is useful to avoiding configuration drift and
   #   accumulating state on the EC2 instances. Also it has the benefit of keeping
-  #   your EC2 instance system package upto date, because everytime EC2 instance
+  #   your EC2 instance system package upto date, because every time EC2 instance
   #   boot up from AMI it does a system update.
   #
   #
@@ -116,6 +116,10 @@ module EbDeployer
   #   following keys:
   #
   #     :template => CloudFormation template file with JSON format
+  #     :policy => CloudFormation policy file with JSON format
+  #     :override_policy => (false) If override_policy is true and a policy file is provided then the
+  #   policy will temporarily override any existing policy on the resource stack during this update,
+  #   otherwise the provided policy will replace any existing policy on the resource stack
   #     :parameters (or :inputs) => A Hash, input values for the CloudFormation template
   #     :transforms => A Hash with key map to your CloudFormation
   #   template outputs and value as lambda that return a single or array of
@@ -151,7 +155,7 @@ module EbDeployer
   #
   # @option opts [Symbol] :strategy (:blue-green) There are two options:
   #   blue-green or inplace-update. Blue green keep two elastic beanstalk
-  #   environments and always deploy to inactive one, to achive zero downtime.
+  #   environments and always deploy to inactive one, to achieve zero downtime.
   #   inplace-update strategy will only keep one environment, and update the
   #   version inplace on deploy. this will save resources but will have downtime.
   #
@@ -164,8 +168,8 @@ module EbDeployer
   # @option opts [Symbol] :version_label *required*. Version label give the
   #   package uploaded a unique identifier.  Should use something related to
   #   pipeline counter if you have build pipeline setup to build the installer.
-  #   For the convient of dev we recommend use md5 digest of the installer so
-  #   that everytime you upload new installer it forms a new version. e.g.
+  #   For the convenience of dev we recommend use md5 digest of the installer so
+  #   that every time you upload new installer it forms a new version. e.g.
   #
   #      :version_label => ENV['MY_PIPELINE_COUNTER']
   #                       || "dev-" + Digest::MD5.file(my_package).hexdigest

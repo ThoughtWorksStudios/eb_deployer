@@ -11,6 +11,61 @@ class ResourcesDeployTest < DeployTest
     assert @cf_driver.stack_exists?('simple-production')
     assert_equal({},  @cf_driver.stack_config('simple-production')[:parameters])
     assert_equal([],  @cf_driver.stack_config('simple-production')[:capabilities])
+    assert_nil(@cf_driver.stack_config('simple-production')[:stack_policy_body])
+  end
+
+  def test_deploy_with_resources_declared_will_create_a_cf_stack_for_env_with_policy
+    cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}}}))
+    cf_policy = sample_file("sample_policy.json", JSON.dump({'Policy' => {'P1' => {}}}))
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+               :template => cf_template,
+               :policy => cf_policy
+           })
+    assert @cf_driver.stack_exists?('simple-production')
+    assert_equal({},  @cf_driver.stack_config('simple-production')[:parameters])
+    assert_equal([],  @cf_driver.stack_config('simple-production')[:capabilities])
+    assert_equal("{\"Policy\":{\"P1\":{}}}", @cf_driver.stack_config('simple-production')[:stack_policy_body])
+  end
+
+  def test_deploy_with_resources_declared_will_update_a_cf_stack_for_env_with_policy
+    cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}}}))
+    cf_policy = sample_file("sample_policy.json", JSON.dump({'Policy' => {'P1' => {}}}))
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+               :template => cf_template,
+               :policy => cf_policy
+           })
+    assert @cf_driver.stack_exists?('simple-production')
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+               :template => cf_template,
+               :policy => cf_policy,
+               :override_policy => false
+           })
+    assert_equal({},  @cf_driver.stack_config('simple-production')[:parameters])
+    assert_equal([],  @cf_driver.stack_config('simple-production')[:capabilities])
+    assert_equal("{\"Policy\":{\"P1\":{}}}", @cf_driver.stack_config('simple-production')[:stack_policy_body])
+  end
+
+  def test_deploy_with_resources_declared_will_update_a_cf_stack_for_env_with_temp_policy
+    cf_template = temp_file(JSON.dump({'Resources' => {'R1' => {}}}))
+    cf_policy = sample_file("sample_policy.json", JSON.dump({'Policy' => {'P1' => {}}}))
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+               :template => cf_template,
+               :policy => cf_policy
+           })
+    assert @cf_driver.stack_exists?('simple-production')
+    deploy(:application => 'simple', :environment => "production",
+           :resources => {
+               :template => cf_template,
+               :policy => cf_policy,
+               :override_policy => true
+           })
+    assert_equal({},  @cf_driver.stack_config('simple-production')[:parameters])
+    assert_equal([],  @cf_driver.stack_config('simple-production')[:capabilities])
+    assert_equal("{\"Policy\":{\"P1\":{}}}", @cf_driver.stack_config('simple-production')[:stack_policy_during_update_body])
   end
 
   def test_provision_resources_with_capacities
