@@ -2,6 +2,7 @@
 =====
 
 * Add support for specifying (and overriding) a [stack policy](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html) for the CloudFormation resource stack
+* Fix issue where deployment hangs if resource stack update fails and stack is rolled back, deployment will now fail when the resource stack update fails
 
 0.6.5
 =====

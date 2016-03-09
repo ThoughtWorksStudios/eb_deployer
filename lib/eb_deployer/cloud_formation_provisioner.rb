@@ -4,7 +4,7 @@ module EbDeployer
 
   class CloudFormationProvisioner
     SUCCESS_STATS = ["CREATE_COMPLETE", "UPDATE_COMPLETE"]
-    FAILED_STATS = ["CREATE_FAILED", "UPDATE_FAILED"]
+    FAILED_STATS = ["CREATE_FAILED", "UPDATE_FAILED", "UPDATE_ROLLBACK_COMPLETE"]
 
     def initialize(stack_name, cf_driver)
       @stack_name = stack_name
