@@ -73,6 +73,10 @@ module EbDeployer
       @creation_opts[:tier]
     end
 
+    def template_name
+      @creation_opts[:template_name]
+    end
+
     def has_cname?
       !configured_tier || configured_tier.downcase == 'webserver'
     end
@@ -93,7 +97,8 @@ module EbDeployer
                                version_label,
                                configured_tier,
                                tags,
-                               settings)
+                               settings,
+                               template_name)
       end
     end
 
@@ -103,7 +108,8 @@ module EbDeployer
                                @name,
                                version_label,
                                configured_tier,
-                               settings)
+                               settings,
+                               template_name)
       end
     end
 

@@ -25,12 +25,16 @@ module EbDeployer
         @client.update_environment(:environment_id => env_id, :option_settings => settings)
       end
 
-      def update_environment(app_name, env_name, version, tier, settings)
+      def update_environment(app_name, env_name, version, tier, settings, template_name)
         env_id = convert_env_name_to_id(app_name, [env_name]).first
-        @client.update_environment(:environment_id => env_id,
-                                   :version_label => version,
-                                   :option_settings => settings,
-                                   :tier => environment_tier(tier))
+        request = reject_nil({
+          :environment_id => env_id,
+          :version_label => version,
+          :option_settings => settings,
+          :tier => environment_tier(tier),
+          :template_name => template_name
+        })
+        @client.update_environment(request)
       end
 
       def environment_exists?(app_name, env_name)
@@ -41,7 +45,7 @@ module EbDeployer
         alive_envs(app_name).collect { |env| env[:environment_name] }
       end
 
-      def create_environment(app_name, env_name, stack_name, cname_prefix, version, tier, tags, settings)
+      def create_environment(app_name, env_name, stack_name, cname_prefix, version, tier, tags, settings, template_name)
         request = reject_nil({
           :application_name => app_name,
           :environment_name => env_name,
@@ -50,7 +54,8 @@ module EbDeployer
           :option_settings => settings,
           :tier => environment_tier(tier),
           :cname_prefix => cname_prefix,
-          :tags => tags
+          :tags => tags,
+          :template_name => template_name
         })
         @client.create_environment(request)
       end

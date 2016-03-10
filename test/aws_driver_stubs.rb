@@ -24,7 +24,7 @@ class EBStub
     @apps.include?(app)
   end
 
-  def create_environment(app, env, solution_stack, cname_prefix, version, tier, tags, settings)
+  def create_environment(app, env, solution_stack, cname_prefix, version, tier, tags, settings, template_name)
     raise 'cname prefix is not avaible' if @envs.values.detect { |env| env[:cname_prefix] == cname_prefix }
     raise "env name #{env} is longer than 23 chars" if env.size > 23
     raise "app not exists" unless application_exists?(app)
@@ -36,7 +36,8 @@ class EBStub
       :cname_prefix => cname_prefix,
       :tier => tier,
       :tags => tags,
-      :settings => settings }
+      :settings => settings,
+      :template_name => template_name }
     set_env_ready(app, env, false)
   end
 
@@ -52,9 +53,9 @@ class EBStub
   end
 
 
-  def update_environment(app, env, version, tier, settings)
+  def update_environment(app, env, version, tier, settings, template_name)
     raise "not in ready state, consider waiting for previous action finish by pulling envents" unless env_ready?(app, env)
-    @envs[env_key(app, env)].merge!(:version => version, :settings => settings, :tier => tier)
+    @envs[env_key(app, env)].merge!(:version => version, :settings => settings, :tier => tier, :template_name => template_name)
     set_env_ready(app, env, false)
   end
 
@@ -218,6 +219,10 @@ class EBStub
 
   def versions_deleted(app_name)
     @versions_deleted[app_name]
+  end
+
+  def template_name(app_name, env_name)
+    @envs[env_key(app_name, env_name)][:template_name]
   end
 
   private

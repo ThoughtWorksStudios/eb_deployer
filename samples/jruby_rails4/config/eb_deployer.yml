@@ -53,6 +53,8 @@ common:
   # variable with a fall back to digest for local deployment:
   # version_label: <%= ENV['GO_PIPELINE_COUNTER'] || package_digest %>
 
+  # Specify the template to use to create the eb environment
+  # template_name: foo_bar
 
   # Smoke test value should be a piece of ruby code with access to single variable
   # "host_name" -- environment DNS name. Smoke test snippet will be evaluated at
