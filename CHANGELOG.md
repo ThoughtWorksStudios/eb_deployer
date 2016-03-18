@@ -1,8 +1,9 @@
 0.6.6
 =====
 
-* Add support for specifying (and overriding) a [stack policy](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html) for the CloudFormation resource stack
-* Fix issue where deployment hangs if resource stack update fails and stack is rolled back, deployment will now fail when the resource stack update fails
+* Add support for specifying (and overriding) a [stack policy](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html) for the CloudFormation resource stack. (contributed by @jlabrecque)
+* Fix issue where deployment hangs if resource stack update fails and stack is rolled back, deployment will now fail when the resource stack update fails. (contributed by @jlabrecque)
+* Add support for creating environment base on a elasticbeanstalk template. (contributed by @djpate)
 
 0.6.5
 =====
