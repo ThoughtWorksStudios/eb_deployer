@@ -17,6 +17,7 @@ module EbDeployer
       @bs = eb_driver
       @creation_opts = default_create_options.merge(reject_nil(creation_opts))
       @accepted_healthy_states = @creation_opts[:accepted_healthy_states]
+      @event_poller = nil
     end
 
     def deploy(version_label, settings={})

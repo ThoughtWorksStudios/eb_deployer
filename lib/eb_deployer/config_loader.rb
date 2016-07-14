@@ -57,7 +57,7 @@ module EbDeployer
 
     def package_digest(package)
       return nil unless package
-      return package unless File.exists?(package)
+      return package unless File.exist?(package)
       Digest::MD5.file(package).hexdigest
     end
   end

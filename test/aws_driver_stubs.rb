@@ -8,6 +8,7 @@ class EBStub
     @versions_deleted = {}
     @event_fetched_times = 0
     @envs_health_states = {}
+    @events = nil
   end
 
   def create_application(app)
@@ -25,7 +26,7 @@ class EBStub
   end
 
   def create_environment(app, env, solution_stack, cname_prefix, version, tier, tags, settings, template_name)
-    raise 'cname prefix is not avaible' if @envs.values.detect { |env| env[:cname_prefix] == cname_prefix }
+    raise 'cname prefix is not avaible' if @envs.values.detect { |value| value[:cname_prefix] == cname_prefix }
     raise "env name #{env} is longer than 23 chars" if env.size > 23
     raise "app not exists" unless application_exists?(app)
     @envs[env_key(app, env)] = {
@@ -176,7 +177,7 @@ class EBStub
   end
 
   def list_solution_stack_names
-    @solution_stacks || ["64bit Amazon Linux 2014.09 v1.1.0 running Tomcat 7 Java 7"]
+    ["64bit Amazon Linux 2014.09 v1.1.0 running Tomcat 7 Java 7"]
   end
 
   #test only
@@ -207,7 +208,7 @@ class EBStub
 
   def environment_names_for_application(app)
     @envs.inject([]) do |memo, pair|
-      key, env = pair
+      _, env = pair
       memo << env[:name] if env[:application] == app
       memo
     end
@@ -340,10 +341,10 @@ class CFStub
 
   def generate_event_from_messages(stack, messages)
     messages.map do |message|
-      event = OpenStruct.new(timestamp: Time.now,
-                             resource_type: 'AWS::CloudFormation::Stack',
-                             logical_resource_id: stack,
-                             resource_status: message)
+      OpenStruct.new(timestamp: Time.now,
+                     resource_type: 'AWS::CloudFormation::Stack',
+                     logical_resource_id: stack,
+                     resource_status: message)
     end.reverse
   end
 end

@@ -242,7 +242,6 @@ module EbDeployer
     app = opts[:application]
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
-    cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
 
     Application.new(app, bs, s3).delete(opts[:environment])
   end

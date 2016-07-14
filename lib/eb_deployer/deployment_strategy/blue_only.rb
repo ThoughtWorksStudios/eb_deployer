@@ -19,7 +19,6 @@ module EbDeployer
           return
         end
 
-        active_ebenv = ebenvs.detect(&method(:active_ebenv?))
         inactive_ebenv = ebenvs.reject(&method(:active_ebenv?)).first
 
         inactive_ebenv.deploy(version_label, env_settings)

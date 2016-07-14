@@ -14,7 +14,7 @@ module EbDeployer
     def create_version(version_label, package)
       create_application_if_not_exists
 
-      source_bundle = if File.exists?(package)
+      source_bundle = if File.exist?(package)
                         if File.extname(package) == '.yml'
                           YAML.load(File.read(package))
                         else
