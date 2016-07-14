@@ -136,6 +136,10 @@ module EbDeployer
           raise "Elasticbeanstalk instance provision failed (maybe a problem with your .ebextension files). The original message: #{event[:message]}"
         end
 
+        if event[:message] =~ /complete, but with errors/
+          raise event[:message]
+        end
+
         if event[:message] =~ /However, there were issues during launch\. See event log for details\./
           raise "Environment launched, but with errors.  The original message: #{event[:message]}"
         end
