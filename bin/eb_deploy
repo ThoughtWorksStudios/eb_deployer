@@ -7,5 +7,7 @@ if File.exists?(git_path)
   $:.unshift(lib_path)
 end
 
+STDOUT.sync = true # Forces output after every line.
+
 require 'eb_deployer'
 EbDeployer.cli
