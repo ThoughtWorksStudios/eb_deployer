@@ -26,7 +26,7 @@ module EbDeployer
                         bucket, obj_key = package.split(':')
                         {'s3_bucket' => bucket, 's3_key' => obj_key}
                       else
-                        raise "Unknown package file/format: #{package.inspect}"
+                        raise "Neither the file exists nor it is a valid s3 url: #{package.inspect}"
                       end
 
       unless @eb_driver.application_version_labels(@name).include?(version_label)
