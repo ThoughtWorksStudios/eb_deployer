@@ -99,7 +99,7 @@ class EBStub
     set_env_ready(app_name, env_name, true) # assume env become ready after it spit out all the events
 
     unless @events # unrestricted mode for testing if no explicit events set
-      return [generate_event_from_messages(['Environment update completed successfully',
+      return [generate_event_from_messages(['Successfully deployed new configuration to environment',
                                            'terminateEnvironment completed successfully',
                                            'Successfully launched environment',
                                            'Completed swapping CNAMEs for environments'
