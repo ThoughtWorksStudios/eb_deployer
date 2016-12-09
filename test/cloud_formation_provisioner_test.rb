@@ -28,4 +28,20 @@ class CloudFormationProvisionerTest < Test::Unit::TestCase
     settings = @provisioner.transform_outputs(resources)
     assert_equal [{'namespace' => 'foo', 'option_name' => 'bar', 'value' => 'value of S'}], settings
   end
+
+  def test_stack_is_tagged
+    resources = { 'template' => @template }
+
+    @provisioner.provision(resources, {'Tag1' => 'Value1'})
+
+    assert_equal({ 'Tag1' => 'Value1' }, @cf.stack_config("myresources")[:tags])
+  end
+
+  def test_stack_is_not_tagged_when_no_tags_specified
+    resources = { 'template' => @template }
+
+    @provisioner.provision(resources)
+
+    assert_equal(nil, @cf.stack_config("myresources")[:tags])
+  end
 end

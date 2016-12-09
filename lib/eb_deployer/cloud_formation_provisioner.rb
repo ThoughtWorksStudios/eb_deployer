@@ -12,7 +12,7 @@ module EbDeployer
       @poller = EventPoller.new(CfEventSource.new(@stack_name, @cf_driver))
     end
 
-    def provision(resources)
+    def provision(resources, tags = nil)
       resources = symbolize_keys(resources)
       template = File.read(resources[:template])
       capabilities = resources[:capabilities] || []
@@ -23,9 +23,9 @@ module EbDeployer
       begin
         if stack_exists?
           anchor = @poller.get_anchor
-          update_stack(template, params, capabilities, policy, override_policy)
+          update_stack(template, params, capabilities, policy, override_policy, tags)
         else
-          create_stack(template, params, capabilities, policy)
+          create_stack(template, params, capabilities, policy, tags)
         end
       rescue Aws::CloudFormation::Errors::ValidationError => e
         if e.message =~ /No updates are to be performed/
@@ -67,7 +67,7 @@ module EbDeployer
       end
     end
 
-    def update_stack(template, params, capabilities, policy, override_policy)
+    def update_stack(template, params, capabilities, policy, override_policy, tags)
       opts = {:capabilities => capabilities, :parameters => params}
       if (policy)
         opts[:stack_policy_during_update_body] = policy if override_policy
@@ -75,6 +75,7 @@ module EbDeployer
         opts[:stack_policy_body] = policy unless override_policy
         log("Applying new stack policy to existing resource stack") unless override_policy
       end
+      add_tags_if_specified(opts, tags)
       @cf_driver.update_stack(@stack_name, template, opts)
     end
 
@@ -82,11 +83,18 @@ module EbDeployer
       @cf_driver.stack_exists?(@stack_name)
     end
 
-    def create_stack(template, params, capabilities, policy)
-      opts = {:disable_rollback => true, :capabilities => capabilities, :parameters => params}
+    def create_stack(template, params, capabilities, policy, tags)
+      opts = {:disable_rollback => true, :capabilities => capabilities, :parameters => params, :tags => tags}
       opts[:stack_policy_body] = policy if policy
+      add_tags_if_specified(opts, tags)
       log("Applying stack policy to new resource stack") if policy
       @cf_driver.create_stack(@stack_name, template, opts)
+    end
+
+    def add_tags_if_specified(opts, tags)
+     if (tags)
+       opts[:tags] = tags 
+     end
     end
 
     def transform_output_to_settings(transforms)
