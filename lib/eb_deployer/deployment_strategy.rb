@@ -1,6 +1,7 @@
 require 'eb_deployer/deployment_strategy/inplace_update'
 require 'eb_deployer/deployment_strategy/blue_green'
 require 'eb_deployer/deployment_strategy/blue_only'
+require 'eb_deployer/deployment_strategy/red_black'
 
 module EbDeployer
   module DeploymentStrategy
@@ -12,6 +13,8 @@ module EbDeployer
         BlueGreen.new(component)
       when 'blue_only', 'blue-only'
         BlueOnly.new(component)
+      when 'red_black', 'red-black'
+        RedBlack.new(component)
       else
         raise 'strategy_name: ' + strategy_name.to_s + ' not supported'
       end
