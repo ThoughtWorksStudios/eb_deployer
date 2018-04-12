@@ -1,6 +1,6 @@
 require 'rails/generators'
 require 'eb_deployer/default_config'
-require 'aws-sdk'
+require 'aws-sdk-elasticbeanstalk'
 require 'securerandom'
 
 module EbDeployer
