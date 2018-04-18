@@ -1,3 +1,12 @@
+0.7.0
+=====
+
+* Add service specific AWS sdk gems
+* [#79](https://github.com/ThoughtWorksStudios/eb_deployer/pull/79): Environment updates can complete with errors
+* [#82](https://github.com/ThoughtWorksStudios/eb_deployer/pull/82): Added a line to force STDOUT output every line
+* [#85](https://github.com/ThoughtWorksStudios/eb_deployer/pull/85): Improve package not found error message
+* [#86](https://github.com/ThoughtWorksStudios/eb_deployer/pull/86): Fix to for inactive stack updates when instances are 0
+ 
 0.6.6
 =====
 
