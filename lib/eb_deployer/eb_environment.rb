@@ -6,7 +6,7 @@ module EbDeployer
     attr_writer :event_poller
 
     def self.unique_ebenv_name(env_name, app_name)
-      raise "Environment name #{env_name} is too long, it must be under 15 chars" if env_name.size > 15
+      raise "Environment name #{env_name} is too long, it must be under 32 chars" if env_name.size > 32
       digest = Digest::SHA1.hexdigest(app_name + '-' + env_name)[0..6]
       "#{env_name}-#{digest}"
     end
