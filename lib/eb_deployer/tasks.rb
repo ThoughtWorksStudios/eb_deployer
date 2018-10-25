@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'open3'
 
 namespace :eb do
   def eb_deployer_env
@@ -10,6 +11,12 @@ namespace :eb do
     "tmp/#{name}.zip"
   end
 
+  def eb_package_files
+    ignore_file = File.join(Dir.pwd, ".ebdeployerignore")
+    ignore_patterns = File.exists?(ignore_file) ? File.readlines(ignore_file).map(&:strip) : []
+    `git ls-files`.lines.reject { |f| ignore_patterns.any? { |p| File.fnmatch(p, f.strip) } }
+  end
+
   desc "Remove the package file we generated."
   task :clean do
     sh "rm -rf #{eb_deployer_package}"
@@ -19,7 +26,11 @@ namespace :eb do
   task :package => [:clean] do
     package = eb_deployer_package
     FileUtils.mkdir_p(File.dirname(package))
-    sh "git ls-files | zip #{package} -@"
+    Open3.popen2("zip #{package} -@") do |i, o, t|
+      i.write(eb_package_files.join)
+      i.close
+      puts o.read
+    end
   end
 
   desc "Deploy package we built in tmp directory. default to dev environment, specify environment variable EB_DEPLOYER_ENV to override, for example: EB_DEPLOYER_ENV=production rake eb:deploy."
