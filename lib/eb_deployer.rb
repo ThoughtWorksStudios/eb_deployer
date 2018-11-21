@@ -205,7 +205,7 @@ module EbDeployer
     application = Application.new(app_name, bs, s3, opts[:package_bucket])
     resource_stacks = ResourceStacks.new(opts[:resources],
                                          cf,
-                                         opts[:skip_resource_stack_update],
+                                         !!opts[:skip_resource_stack_update],
                                          opts[:tags])
 
     stack_name = opts[:stack_name] || "#{app_name}-#{env_name}"
