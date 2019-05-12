@@ -117,7 +117,7 @@ Co-presented session with Amazon ElasticBeanstalk team at AWS re:Invent 2013: [s
 
 [EbDeployer environment](https://github.com/ThoughtWorksStudios/eb_deployer/wiki/EbDeployer-environment)
 
-[Introduction to EbDeployer](http://getmingle.io/scaling/2014/06/13/introduction-to-eb-deployer.html)
+[Introduction to EbDeployer](https://www.thoughtworks.com/mingle/scaling/2014/06/13/introduction-to-eb-deployer.html)
 
 [Papertrail Solution for Rails Applications on ElasticBeanstalk
 ](http://www.thoughtworks.com/mingle/infrastructure/2015/06/10/simple-solution-for-papertrail-on-elasticbeanstalk.html)
