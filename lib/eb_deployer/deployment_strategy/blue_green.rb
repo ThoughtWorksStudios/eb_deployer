@@ -48,6 +48,10 @@ module EbDeployer
             active_ebenv.terminate
           else
             active_ebenv.log("Active environment changed state to unhealthy. Existing (black) environment will not be terminated")
+            unless inactive_settings.empty?
+              active_ebenv.log("applying inactive settings...")
+              active_ebenv.apply_settings(inactive_settings)
+            end
           end
 
         end
