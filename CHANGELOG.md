@@ -1,3 +1,8 @@
+0.7.1
+=====
+
+* apply inactive settings to not terminated black instance
+
 0.7.0
 =====
 
