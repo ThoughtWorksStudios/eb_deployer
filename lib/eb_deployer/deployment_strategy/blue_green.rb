@@ -34,26 +34,11 @@ module EbDeployer
 
         if blue_green_terminate_inactive
           active_ebenv.log("Waiting #{blue_green_terminate_inactive_wait}s before terminating environment...")
+      
+          sleep 120
 
-          # Loop until timeout reached or environment becomes Red
-          count = 0
-          loop do
-            break if count >= blue_green_terminate_inactive_wait or inactive_ebenv.health_state != 'Green'
-            sleep blue_green_terminate_inactive_sleep
-            count += blue_green_terminate_inactive_sleep
-          end
-
-          if inactive_ebenv.health_state == 'Green'
-            active_ebenv.log("Active environment healthy, terminating inactive (black) environment")
-            active_ebenv.terminate
-          else
-            active_ebenv.log("Active environment changed state to unhealthy. Existing (black) environment will not be terminated")
-            unless inactive_settings.empty?
-              active_ebenv.log("applying inactive settings...")
-              active_ebenv.apply_settings(inactive_settings)
-            end
-          end
-
+          active_ebenv.log("terminating inactive (black) environment")
+          active_ebenv.terminate
         end
 
         unless inactive_settings.empty? || blue_green_terminate_inactive
