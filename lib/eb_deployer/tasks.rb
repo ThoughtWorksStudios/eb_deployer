@@ -13,7 +13,7 @@ namespace :eb do
 
   def eb_package_files
     ignore_file = File.join(Dir.pwd, ".ebdeployerignore")
-    ignore_patterns = File.exists?(ignore_file) ? File.readlines(ignore_file).map(&:strip) : []
+    ignore_patterns = File.exist?(ignore_file) ? File.readlines(ignore_file).map(&:strip) : []
     `git ls-files`.lines.reject { |f| ignore_patterns.any? { |p| File.fnmatch(p, f.strip) } }
   end
 

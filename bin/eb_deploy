@@ -2,7 +2,7 @@
 
 git_path = File.join(File.expand_path('../..', __FILE__), '.git')
 
-if File.exists?(git_path)
+if File.exist?(git_path)
   lib_path = File.expand_path('../../lib', __FILE__)
   $:.unshift(lib_path)
 end
