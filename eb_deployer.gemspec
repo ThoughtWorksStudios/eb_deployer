@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split($\).reject {|f| f =~ /^samples\// }
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "eb_deployer_updated"
+  gem.name          = "eb_deployer"
   gem.require_paths = ["lib"]
   gem.version       = EbDeployer::VERSION
 end
