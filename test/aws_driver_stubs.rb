@@ -7,6 +7,8 @@ class EBStub
     @envs_been_deleted = {}
     @versions_deleted = {}
     @event_fetched_times = 0
+    @envs_health_states = {}
+    @events = nil
   end
 
   def create_application(app)
@@ -23,8 +25,8 @@ class EBStub
     @apps.include?(app)
   end
 
-  def create_environment(app, env, solution_stack, cname_prefix, version, tier, tags, settings)
-    raise 'cname prefix is not avaible' if @envs.values.detect { |env| env[:cname_prefix] == cname_prefix }
+  def create_environment(app, env, solution_stack, cname_prefix, version, tier, tags, settings, template_name)
+    raise 'cname prefix is not avaible' if @envs.values.detect { |value| value[:cname_prefix] == cname_prefix }
     raise "env name #{env} is longer than 23 chars" if env.size > 23
     raise "app not exists" unless application_exists?(app)
     @envs[env_key(app, env)] = {
@@ -35,7 +37,8 @@ class EBStub
       :cname_prefix => cname_prefix,
       :tier => tier,
       :tags => tags,
-      :settings => settings }
+      :settings => settings,
+      :template_name => template_name }
     set_env_ready(app, env, false)
   end
 
@@ -51,9 +54,9 @@ class EBStub
   end
 
 
-  def update_environment(app, env, version, tier, settings)
+  def update_environment(app, env, version, tier, settings, template_name)
     raise "not in ready state, consider waiting for previous action finish by pulling envents" unless env_ready?(app, env)
-    @envs[env_key(app, env)].merge!(:version => version, :settings => settings, :tier => tier)
+    @envs[env_key(app, env)].merge!(:version => version, :settings => settings, :tier => tier, :template_name => template_name)
     set_env_ready(app, env, false)
   end
 
@@ -96,7 +99,7 @@ class EBStub
     set_env_ready(app_name, env_name, true) # assume env become ready after it spit out all the events
 
     unless @events # unrestricted mode for testing if no explicit events set
-      return [generate_event_from_messages(['Environment update completed successfully',
+      return [generate_event_from_messages(['Successfully deployed new configuration to environment',
                                            'terminateEnvironment completed successfully',
                                            'Successfully launched environment',
                                            'Completed swapping CNAMEs for environments'
@@ -145,7 +148,7 @@ class EBStub
   def environment_cname(app_name, env_name)
     return unless @envs[env_key(app_name, env_name)]
     if cname_prefix = environment_cname_prefix(app_name, env_name)
-      cname_prefix + ".elasticbeanstalk.com"
+      cname_prefix + ".us-west-1.elasticbeanstalk.com"
     end
   end
 
@@ -166,7 +169,7 @@ class EBStub
   end
 
   def environment_health_state(app_name, env_name)
-    'Green'
+    @envs_health_states.fetch(app_name+env_name, 'Green')
   end
 
   def environment_verion_label(app_name, env_name)
@@ -174,10 +177,15 @@ class EBStub
   end
 
   def list_solution_stack_names
-    @solution_stacks || ["64bit Amazon Linux 2014.09 v1.1.0 running Tomcat 7 Java 7"]
+    ["64bit Amazon Linux 2014.09 v1.1.0 running Tomcat 7 Java 7"]
   end
 
   #test only
+
+  def mark_env_health_state_as(app_name, env_name, state)
+    @envs_health_states[app_name+env_name] = state
+  end
+
   def mark_all_envs_ready
     @envs.values.each { |env| set_env_ready(env[:application], env[:name], true) }
   end
@@ -200,7 +208,7 @@ class EBStub
 
   def environment_names_for_application(app)
     @envs.inject([]) do |memo, pair|
-      key, env = pair
+      _, env = pair
       memo << env[:name] if env[:application] == app
       memo
     end
@@ -212,6 +220,10 @@ class EBStub
 
   def versions_deleted(app_name)
     @versions_deleted[app_name]
+  end
+
+  def template_name(app_name, env_name)
+    @envs[env_key(app_name, env_name)][:template_name]
   end
 
   private
@@ -329,10 +341,10 @@ class CFStub
 
   def generate_event_from_messages(stack, messages)
     messages.map do |message|
-      event = OpenStruct.new(timestamp: Time.now,
-                             resource_type: 'AWS::CloudFormation::Stack',
-                             logical_resource_id: stack,
-                             resource_status: message)
+      OpenStruct.new(timestamp: Time.now,
+                     resource_type: 'AWS::CloudFormation::Stack',
+                     logical_resource_id: stack,
+                     resource_status: message)
     end.reverse
   end
 end

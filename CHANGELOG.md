@@ -1,3 +1,29 @@
+0.7.0
+=====
+
+* Add service specific AWS sdk gems
+* [#79](https://github.com/ThoughtWorksStudios/eb_deployer/pull/79): Environment updates can complete with errors
+* [#82](https://github.com/ThoughtWorksStudios/eb_deployer/pull/82): Added a line to force STDOUT output every line
+* [#85](https://github.com/ThoughtWorksStudios/eb_deployer/pull/85): Improve package not found error message
+* [#86](https://github.com/ThoughtWorksStudios/eb_deployer/pull/86): Fix to for inactive stack updates when instances are 0
+ 
+0.6.6
+=====
+
+* Add support for specifying (and overriding) a [stack policy](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html) for the CloudFormation resource stack. (contributed by @jlabrecque)
+* Fix issue where deployment hangs if resource stack update fails and stack is rolled back, deployment will now fail when the resource stack update fails. (contributed by @jlabrecque)
+* Add support for creating environment base on a elasticbeanstalk template. (contributed by @djpate)
+
+0.6.5
+=====
+
+* #66: Making it possible to specify other accepted health states when deploying (@dziemid)
+
+0.6.4
+=====
+
+* fixes #65 - aws driver should be able to detect CNAME prefixes from both regionalized and legacy EB domains
+
 0.6.3
 =====
 

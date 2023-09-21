@@ -83,7 +83,16 @@ common:
       end
     end
 
-
+  # List of Elastic Beanstalk health states that will be considered healthy when deploying.
+  # You may want to override default 'Green' with that list, if for example you are using
+  # Elastic Beanstalk worker tier and you don't want eb_deployer to fail if you have messages
+  # in your SQS queue.
+  # By default eb_deployer only considers 'Green' as the healthy state.
+  # For a list of all Elastic Beanstalk health states refer to:
+  # http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.healthstatus.html#using-features.healthstatus.colors
+  # accepted_healthy_states:
+  #  - Green
+  #  - Yellow
 
   # Elastic Beanstalk settings that will apply to the environments you are
   # deploying.
@@ -113,6 +122,9 @@ common:
   # options settings.
   # keys:
   #    template => CloudFormation template file with JSON format
+  #    policy => CloudFormation policy file with JSON format
+  #    override_policy => (false) If override_policy is true and a policy file is provided then the policy will temporarily override any existing policy on the resource stack during this update,
+  #                       otherwise the provided policy will replace any existing policy on the resource stack
   #    inputs => A Hash, input values for the CloudFormation template
   #    outputs => A Hash with key map to your CloudFormation template outputs and value as elastic beanstalk settings namespace and option_name.
   #    capabilities => An array. You need set it to ['CAPABILITY_IAM'] if the

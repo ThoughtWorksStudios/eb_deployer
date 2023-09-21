@@ -3,7 +3,9 @@ require 'set'
 require 'time'
 require 'json'
 require 'timeout'
-require 'aws-sdk'
+require 'aws-sdk-s3'
+require 'aws-sdk-elasticbeanstalk'
+require 'aws-sdk-cloudformation'
 require 'optparse'
 require 'erb'
 require 'fileutils'
@@ -56,7 +58,7 @@ module EbDeployer
 
 
   #
-  # Deploy a package to specfied environments on elastic beanstalk
+  # Deploy a package to specified environments on elastic beanstalk
   #
   # @param [Hash] opts
   #
@@ -91,12 +93,17 @@ module EbDeployer
   #   For all available options take a look at
   #   http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
   #
+  # @option opts [Symbol] :accepted_healthy_states (['Green']) If :accepted_healthy_states
+  #   is specified, EBDeployer will accept provided values when checking
+  #   health of an environment instead of default value 'Green'. You can use it
+  #   to specify additional healthy states, for example: ['Green', "Yellow"]
+  #
   # @option opts [Symbol] :phoenix_mode (false) If phoenix mode is turn on, it
   #   will terminate the old elastic beanstalk environment and recreate on
   #   deploy. For blue-green deployment it terminate the inactive environment
   #   first then recreate it. This is useful to avoiding configuration drift and
   #   accumulating state on the EC2 instances. Also it has the benefit of keeping
-  #   your EC2 instance system package upto date, because everytime EC2 instance
+  #   your EC2 instance system package upto date, because every time EC2 instance
   #   boot up from AMI it does a system update.
   #
   #
@@ -111,6 +118,10 @@ module EbDeployer
   #   following keys:
   #
   #     :template => CloudFormation template file with JSON format
+  #     :policy => CloudFormation policy file with JSON format
+  #     :override_policy => (false) If override_policy is true and a policy file is provided then the
+  #   policy will temporarily override any existing policy on the resource stack during this update,
+  #   otherwise the provided policy will replace any existing policy on the resource stack
   #     :parameters (or :inputs) => A Hash, input values for the CloudFormation template
   #     :transforms => A Hash with key map to your CloudFormation
   #   template outputs and value as lambda that return a single or array of
@@ -146,7 +157,7 @@ module EbDeployer
   #
   # @option opts [Symbol] :strategy (:blue-green) There are two options:
   #   blue-green or inplace-update. Blue green keep two elastic beanstalk
-  #   environments and always deploy to inactive one, to achive zero downtime.
+  #   environments and always deploy to inactive one, to achieve zero downtime.
   #   inplace-update strategy will only keep one environment, and update the
   #   version inplace on deploy. this will save resources but will have downtime.
   #
@@ -159,8 +170,8 @@ module EbDeployer
   # @option opts [Symbol] :version_label *required*. Version label give the
   #   package uploaded a unique identifier.  Should use something related to
   #   pipeline counter if you have build pipeline setup to build the installer.
-  #   For the convient of dev we recommend use md5 digest of the installer so
-  #   that everytime you upload new installer it forms a new version. e.g.
+  #   For the convenience of dev we recommend use md5 digest of the installer so
+  #   that every time you upload new installer it forms a new version. e.g.
   #
   #      :version_label => ENV['MY_PIPELINE_COUNTER']
   #                       || "dev-" + Digest::MD5.file(my_package).hexdigest
@@ -173,6 +184,9 @@ module EbDeployer
   #   keep.  Older versions are removed and deleted from the S3 source bucket as well.
   #   If specified as zero or not specified, all versions will be kept.  If a
   #   version_prefix is given, only removes version starting with the prefix.
+  #
+  # @option opts [Symbol] :template_name. Specifies the environement template you wish
+  #   to use to build your environment.
   def self.deploy(opts)
     if region = opts[:region]
       Aws.config.update(:region => region)
@@ -191,7 +205,8 @@ module EbDeployer
     application = Application.new(app_name, bs, s3, opts[:package_bucket])
     resource_stacks = ResourceStacks.new(opts[:resources],
                                          cf,
-                                         opts[:skip_resource_stack_update])
+                                         !!opts[:skip_resource_stack_update],
+                                         opts[:tags])
 
     stack_name = opts[:stack_name] || "#{app_name}-#{env_name}"
 
@@ -200,10 +215,12 @@ module EbDeployer
       env.settings = opts[:option_settings] || opts[:settings] || []
       env.inactive_settings = opts[:inactive_settings] || []
       env.creation_opts = {
+        :template_name => opts[:template_name],
         :solution_stack => opts[:solution_stack_name],
         :cname_prefix =>  opts[:cname_prefix],
         :smoke_test => opts[:smoke_test],
         :phoenix_mode => opts[:phoenix_mode],
+        :accepted_healthy_states => opts[:accepted_healthy_states],
         :blue_green_terminate_inactive => opts[:blue_green_terminate_inactive] || false,
         :blue_green_terminate_inactive_wait => opts[:blue_green_terminate_inactive_wait] || 600,
         :blue_green_terminate_inactive_sleep => opts[:blue_green_terminate_inactive_sleep] || 15,
@@ -228,7 +245,6 @@ module EbDeployer
     app = opts[:application]
     bs = opts[:bs_driver] || AWSDriver::Beanstalk.new
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
-    cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
 
     Application.new(app, bs, s3).delete(opts[:environment])
   end
@@ -302,7 +318,6 @@ module EbDeployer
 
       opts.on("--debug", "Output AWS debug log") do |d|
         require 'logger'
-        require 'aws-sdk'
         logger = Logger.new($stdout)
         logger.level = Logger::DEBUG
         Aws.config.update(:logger => logger)

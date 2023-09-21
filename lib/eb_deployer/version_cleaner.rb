@@ -19,7 +19,7 @@ module EbDeployer
       end
 
       all_versions.sort! { |x, y| y[:date_updated] <=> x[:date_updated] }
-      versions_to_keep = all_versions.slice!(range_to_keep)
+      all_versions.slice!(range_to_keep)
       all_versions.map { |apv| apv[:version] }
     end
 

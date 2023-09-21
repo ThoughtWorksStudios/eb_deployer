@@ -61,6 +61,17 @@ class EbEnvironmentTest < Test::Unit::TestCase
     assert_raises(RuntimeError) { env.deploy("version 1") }
   end
 
+  def test_should_raise_runtime_error_when_issues_during_environment_update
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, :cname_prefix => 'myapp-production')
+    @eb_driver.set_events("myapp", t("production", 'myapp'),
+                          [],
+                          ["start deploying",
+                           "create environment",
+                           "Update environment operation is complete, but with errors. For more information, see troubleshooting documentation."])
+
+    assert_raises(RuntimeError) { env.deploy("version 1") }
+  end
+
   def test_should_raise_runtime_error_when_issues_during_launch
     env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, :cname_prefix => 'myapp-production')
     @eb_driver.set_events("myapp", t("production", 'myapp'),
@@ -99,5 +110,11 @@ class EbEnvironmentTest < Test::Unit::TestCase
     assert_nil @eb_driver.environment_cname_prefix('myapp', t('production', 'myapp'))
   end
 
+  def test_should_be_possible_to_accept_yellow_health_state
+    env = EbDeployer::EbEnvironment.new("myapp", "production", @eb_driver, :accepted_healthy_states => ["Green", "Yellow"])
+    @eb_driver.mark_env_health_state_as("myapp", env.name, "Yellow")
+    env.deploy("version1")
+    assert @eb_driver.environment_exists?('myapp', t('production', 'myapp'))
+  end
 
 end

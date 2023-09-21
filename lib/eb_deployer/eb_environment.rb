@@ -6,7 +6,7 @@ module EbDeployer
     attr_writer :event_poller
 
     def self.unique_ebenv_name(env_name, app_name)
-      raise "Environment name #{env_name} is too long, it must be under 15 chars" if env_name.size > 15
+      raise "Environment name #{env_name} is too long, it must be under 32 chars" if env_name.size > 32
       digest = Digest::SHA1.hexdigest(app_name + '-' + env_name)[0..6]
       "#{env_name}-#{digest}"
     end
@@ -16,6 +16,8 @@ module EbDeployer
       @name = self.class.unique_ebenv_name(name, app)
       @bs = eb_driver
       @creation_opts = default_create_options.merge(reject_nil(creation_opts))
+      @accepted_healthy_states = @creation_opts[:accepted_healthy_states]
+      @event_poller = nil
     end
 
     def deploy(version_label, settings={})
@@ -34,7 +36,7 @@ module EbDeployer
     def apply_settings(settings)
       raise "Env #{self.name} not exists for applying settings" unless @bs.environment_exists?(@app, @name)
       wait_for_env_status_to_be_ready
-      with_polling_events(/Environment update completed successfully/i) do
+      with_polling_events(/Successfully deployed new configuration to environment/i) do
         @bs.update_environment_settings(@app, @name, settings)
       end
     end
@@ -72,6 +74,10 @@ module EbDeployer
       @creation_opts[:tier]
     end
 
+    def template_name
+      @creation_opts[:template_name]
+    end
+
     def has_cname?
       !configured_tier || configured_tier.downcase == 'webserver'
     end
@@ -92,17 +98,19 @@ module EbDeployer
                                version_label,
                                configured_tier,
                                tags,
-                               settings)
+                               settings,
+                               template_name)
       end
     end
 
     def update_eb_env(settings, version_label)
-      with_polling_events(/Environment update completed successfully/i) do
+      with_polling_events(/Successfully deployed new configuration to environment/i) do
         @bs.update_environment(@app,
                                @name,
                                version_label,
                                configured_tier,
-                               settings)
+                               settings,
+                               template_name)
       end
     end
 
@@ -126,6 +134,10 @@ module EbDeployer
 
         if event[:message] =~ /Command failed on instance/
           raise "Elasticbeanstalk instance provision failed (maybe a problem with your .ebextension files). The original message: #{event[:message]}"
+        end
+
+        if event[:message] =~ /complete, but with errors/
+          raise event[:message]
         end
 
         if event[:message] =~ /However, there were issues during launch\. See event log for details\./
@@ -162,8 +174,7 @@ module EbDeployer
     def wait_for_env_become_healthy
       Timeout.timeout(600) do
         current_health_status = @bs.environment_health_state(@app, @name)
-
-        while current_health_status != 'Green'
+        while !@accepted_healthy_states.include?(current_health_status)
           log("health status: #{current_health_status}")
           sleep 15
           current_health_status = @bs.environment_health_state(@app, @name)
@@ -181,7 +192,8 @@ module EbDeployer
       {
         :solution_stack => "64bit Amazon Linux 2014.09 v1.1.0 running Tomcat 7 Java 7",
         :smoke_test =>  Proc.new {},
-        :tier => 'WebServer'
+        :tier => 'WebServer',
+        :accepted_healthy_states => ['Green']
       }
     end
 
