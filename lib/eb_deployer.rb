@@ -260,7 +260,7 @@ module EbDeployer
     parser.parse!
     action = options.delete(:action)
 
-    if File.exists?(options[:config_file])
+    if File.exist?(options[:config_file])
       puts "Found configuration at #{options[:config_file]}."
     else
       puts "Generated default configuration at #{options[:config_file]}."

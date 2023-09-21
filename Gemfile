@@ -6,5 +6,5 @@ gemspec
 gem 'redcarpet', :platform => :mri
 gem 'yard'
 gem 'rake'
-gem 'railties', '~> 4.1'
+gem 'railties', '~> 5.0', '>= 5.0.0.1'
 gem 'test-unit'
