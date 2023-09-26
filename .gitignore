@@ -7,3 +7,5 @@
 /samples/jruby_rails4/public/assets/*
 /TAGS
 /.aws
+/.bundle
+/vendor
