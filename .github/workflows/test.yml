@@ -1,0 +1,15 @@
+name: Tests
+
+on:
+  pull_request: {}
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@52b8784594ec115fd17094752708121dc5dabb47
+    - run: bundle install
+    - run: bundle exec rake test
